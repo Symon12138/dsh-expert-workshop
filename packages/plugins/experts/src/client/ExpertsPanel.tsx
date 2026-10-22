@@ -118,7 +118,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
   }, [buildQuery, management]);
 
   const loadMineCount = useCallback(async () => {
-    try { const [agent, team] = await Promise.all([management.list({ origin: 'personal', expertType: 'agent', limit: 1 }), management.list({ origin: 'personal', expertType: 'team', limit: 1 })]); setTypeCounts({ agent: agent.total, team: team.total }); setMineCount(agent.total + team.total); } catch { /* non-fatal badge */ }
+    try { const [agent, team] = await Promise.all([management.list({ origin: 'personal', expertType: 'agent', availability: 'enabled', limit: 1 }), management.list({ origin: 'personal', expertType: 'team', availability: 'enabled', limit: 1 })]); setTypeCounts({ agent: agent.total, team: team.total }); setMineCount(agent.total + team.total); } catch { /* non-fatal badge */ }
   }, [management]);
 
   useEffect(() => { void load(); }, [load]);
@@ -257,12 +257,13 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
           const readiness = READINESS[summary.readiness] ?? READINESS.unknown;
           const draft = isDraft(summary);
           const usable = summary.canUse && !draft && summary.availability === 'enabled' && summary.readiness === 'ready';
+          const displayTitle = summary.expertType === 'team' ? summary.name : (summary.name.split(' · ')[0]?.trim() || summary.name);
           return <article className={`card ${draft ? 'draft' : ''} ${summary.availability !== 'enabled' ? 'unavailable' : ''} ${actionMenu === summary.id ? 'menu-open' : ''}`} key={summary.id}>
             <div className="card-top">
               <button className="card-open" aria-label={`查看专家 ${summary.name}`} onClick={() => setDetailId(summary.id)}>
                 <Avatar summary={summary} />
-                <span className="card-title"><strong title={summary.name}>{summary.name}</strong>
-                  <span className="card-meta">{summary.profession || (summary.expertType === 'team' ? '专家团' : '专家')}{view === 'mine' && <span> · {stateLabel(summary)}</span>}</span></span>
+                <span className="card-title"><strong title={summary.name}>{displayTitle}</strong>
+                  <span className="card-meta">{summary.expertType === 'team' ? '专家团' : (summary.profession || '专家')}{view === 'mine' && <span> · {stateLabel(summary)}</span>}</span></span>
               </button>
               {summary.canManage && <div className="card-actions">
                 <Button variant="ghost" size="sm" className="more-button" aria-label={`管理专家 ${summary.name}`} aria-haspopup="menu" aria-expanded={actionMenu === summary.id}

@@ -307,7 +307,8 @@ export class ExpertsManager extends Service implements ExpertsService {
     try {
       await registerExpertPreset(this.ctx, revision.presetRevisionRef, revision.compositionDigest, this.agentsHome);
     } catch {
-      this.unavailablePresets.add(revision.presetRevisionRef);
+      // Not proof the preset is broken: it may already be registered, and the
+      // readiness check below re-verifies the persisted preset file.
     }
   }
 
@@ -700,9 +701,8 @@ export class ExpertsManager extends Service implements ExpertsService {
     caps: { canUse: boolean; canEdit: boolean; canManage: boolean },
   ): ExpertSummary {
     const definition = draft.definition;
-    const withoutFrontmatter = definition.role.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '');
-    const firstLine = withoutFrontmatter.split(/\r?\n/).map(line => line.trim()).find(Boolean) ?? '';
-    const profession = (firstLine.replace(/^#+\s*/, '') || definition.description).slice(0, 120);
+    const nameParts = definition.name.split(' · ');
+    const profession = (nameParts.length > 1 ? nameParts.slice(1).join(' · ').trim() : definition.description || definition.name).slice(0, 120);
     return {
       id: expert.id,
       expertType: definition.team ? 'team' : 'agent',
