@@ -246,7 +246,9 @@ export class ExpertsManager extends Service implements ExpertsService {
       this.connectors = service;
       ctx.effect(() => () => { if (this.connectors === service) this.connectors = undefined; }, 'experts.connectors');
     });
+    const initStarted = Date.now();
     const domain = await this.ctx.storageDomain.open(expertsDomainSpec);
+    console.log('[experts] domain opened ms=', Date.now() - initStarted);
     this.ctx.effect(() => () => domain.close(), 'workdshExperts.domainClose');
     this.experts = domain.table('experts');
     this.drafts = domain.table('drafts');
@@ -254,17 +256,22 @@ export class ExpertsManager extends Service implements ExpertsService {
     this.bindings = domain.table('bindings');
     this.preferences = domain.table('preferences');
     this.operations = domain.table('operations');
-    for (const [, revision] of this.revisions.entries()) {
-      if (revision.compilerVersion !== COMPILER_VERSION) continue;
+    const activePresets = new Map<string, string>();
+    for (const [, binding] of this.bindings.entries()) {
+      activePresets.set(binding.presetRevisionRef, binding.compositionDigest);
+    }
+    for (const [presetRevisionRef, compositionDigest] of activePresets) {
       try {
-        await registerExpertPreset(this.ctx, revision.presetRevisionRef, revision.compositionDigest, this.agentsHome);
+        await registerExpertPreset(this.ctx, presetRevisionRef, compositionDigest, this.agentsHome);
       } catch {
         // A missing persisted preset must not take unrelated experts offline.
-        this.unavailablePresets.add(revision.presetRevisionRef);
+        this.unavailablePresets.add(presetRevisionRef);
       }
     }
+    console.log('[experts] presets registered ms=', Date.now() - initStarted, 'count=', activePresets.size);
     // Staged uploads are transient; best-effort cleanup when the plugin unloads.
     this.ctx.effect(() => () => { void rm(this.stagingRoot, { recursive: true, force: true }); }, 'workdshExperts.stagingCleanup');
+    console.log('[experts] init done ms=', Date.now() - initStarted);
   }
 
   // ── table access ──────────────────────────────────────────────────────────
@@ -292,6 +299,16 @@ export class ExpertsManager extends Service implements ExpertsService {
   private operationsTable(): KvTable<string, Operation> {
     if (!this.operations) throw new ExpertsError('experts/unavailable', '专家服务尚未就绪。');
     return this.operations;
+  }
+
+  /** Register one published preset on demand so a large catalog cannot slow boot. */
+  private async ensurePresetRegistered(revision: ExpertRevision): Promise<void> {
+    if (this.unavailablePresets.has(revision.presetRevisionRef)) return;
+    try {
+      await registerExpertPreset(this.ctx, revision.presetRevisionRef, revision.compositionDigest, this.agentsHome);
+    } catch {
+      this.unavailablePresets.add(revision.presetRevisionRef);
+    }
   }
 
   private loadExpert(expertId: string): Expert {
@@ -590,7 +607,21 @@ export class ExpertsManager extends Service implements ExpertsService {
         continue;
       }
       const healthy = health?.get(revision.presetRevisionRef);
-      map.set(revision.revisionId, healthy === false || (health !== undefined && healthy === undefined) ? 'broken' : 'ready');
+      if (healthy === false) {
+        map.set(revision.revisionId, 'broken');
+        continue;
+      }
+      if (healthy === undefined && health !== undefined) {
+        // Not registered yet: a persisted preset file is registered on demand at summon.
+        try {
+          await readExpertPreset(revision.presetRevisionRef, this.agentsHome);
+          map.set(revision.revisionId, 'ready');
+        } catch {
+          map.set(revision.revisionId, 'broken');
+        }
+        continue;
+      }
+      map.set(revision.revisionId, 'ready');
     }
     return map;
   }
@@ -618,21 +649,40 @@ export class ExpertsManager extends Service implements ExpertsService {
   /** Authoritative readiness for one revision: preset health plus every frozen Skill dependency. */
   private async computeReadiness(revision: ExpertRevision | undefined, actor: ActorContext, signal?: AbortSignal): Promise<ExpertReadiness> {
     if (!revision) return 'unknown';
-    if (this.unavailablePresets.has(revision.presetRevisionRef)) return 'broken';
+    const debug = revision.expertId === 'expert-9d39344fabfd';
+    if (this.unavailablePresets.has(revision.presetRevisionRef)) {
+      if (debug) console.log('[experts][debug] unavailable preset', revision.presetRevisionRef);
+      return 'broken';
+    }
     if (revision.definition.packageDocuments) {
       try { await verifyPackageFiles(expertPresetDir(revision.presetRevisionRef, this.agentsHome), revision.definition.packageDocuments, revision.definition.packageAssets); }
-      catch { return 'missing-dependency'; }
+      catch (error) {
+        if (debug) console.log('[experts][debug] package files failed', String(error).slice(0, 100));
+        return 'missing-dependency';
+      }
     }
     for (const ref of Object.values(revision.teamMembers ?? {})) {
       const state = await this.computeReadiness(this.loadRevision(ref.expertId, ref.revisionId), actor, signal);
       if (state !== 'ready') return state;
     }
-    if ((await this.requiredCapabilityIssues(revision, signal)).length) return 'unsupported-capability';
+    if ((await this.requiredCapabilityIssues(revision, signal)).length) {
+      if (debug) console.log('[experts][debug] capability issues');
+      return 'unsupported-capability';
+    }
     try {
       const preset = await this.ctx.agentPresets.resolve(revision.presetRevisionRef);
+      if (debug) console.log('[experts][debug] preset resolved broken=', preset.broken);
       if (preset.broken) return 'broken';
-    } catch {
-      return 'broken';
+    } catch (error) {
+      if (debug) console.log('[experts][debug] preset resolve failed', String(error).slice(0, 120));
+      // Not registered yet: a persisted preset file can be registered on demand at summon.
+      try {
+        await readExpertPreset(revision.presetRevisionRef, this.agentsHome);
+        if (debug) console.log('[experts][debug] preset file ok');
+      } catch (error2) {
+        if (debug) console.log('[experts][debug] preset file failed', expertPresetDir(revision.presetRevisionRef, this.agentsHome), String(error2).slice(0, 120));
+        return 'broken';
+      }
     }
     for (const ref of revision.dependencyLock) {
       signal?.throwIfAborted();
@@ -650,10 +700,13 @@ export class ExpertsManager extends Service implements ExpertsService {
     caps: { canUse: boolean; canEdit: boolean; canManage: boolean },
   ): ExpertSummary {
     const definition = draft.definition;
+    const withoutFrontmatter = definition.role.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '');
+    const firstLine = withoutFrontmatter.split(/\r?\n/).map(line => line.trim()).find(Boolean) ?? '';
+    const profession = (firstLine.replace(/^#+\s*/, '') || definition.description).slice(0, 120);
     return {
       id: expert.id,
       expertType: definition.team ? 'team' : 'agent',
-      profession: definition.role,
+      profession,
       tags: definition.tags,
       name: definition.name,
       description: definition.description,
@@ -1336,6 +1389,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     if (targetRevisionId === undefined) throw new ExpertsError('experts/not-published', '专家尚未发布，无法召唤。');
     let revision = this.loadRevision(expertId, targetRevisionId);
     revision = await this.ensureCurrentExecutionRevision(actor, revision, signal);
+    await this.ensurePresetRegistered(revision);
     const readiness = await this.computeReadiness(revision, actor, signal);
     const missing: DomainIssue[] = [];
     if (readiness === 'missing-dependency') missing.push({ code: 'experts/dependency-missing', message: '存在缺失或漂移的 Skill 依赖，请修复后再召唤。' });

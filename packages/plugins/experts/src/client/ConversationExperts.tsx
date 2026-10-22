@@ -12,6 +12,12 @@ const pickerCss = `
 .wd-expert-trigger .expert-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:13px/20px "PingFang SC","Microsoft YaHei",sans-serif}.wd-expert-trigger svg{flex:none}
 .wd-expert-trigger:disabled{opacity:.5;cursor:default}
 .wd-expert-popover{position:absolute;z-index:90;left:0;bottom:calc(100% + 10px);width:336px;max-height:min(430px,60vh);overflow:auto;padding:8px;border-radius:15px;background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);box-shadow:var(--dsw-elevation-panel);font:14px/20px "PingFang SC","Microsoft YaHei",sans-serif}
+.wd-expert-tabs{display:flex;gap:4px;margin:0 0 8px;padding:2px;border-radius:10px;background:var(--dsw-alias-bg-layer-2)}
+.wd-expert-tabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:32px;border:0;border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer;font:13px/20px "PingFang SC","Microsoft YaHei",sans-serif}
+.wd-expert-tabs button[aria-selected="true"]{background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);font-weight:600}
+.wd-expert-tabs button span{font-size:11px;color:var(--dsw-alias-label-tertiary)}
+.wd-expert-search{width:100%;box-sizing:border-box;margin-bottom:6px;padding:7px 10px;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);font:13px/18px "PingFang SC","Microsoft YaHei",sans-serif;outline:none}
+.wd-expert-search:focus{border-color:var(--dsw-alias-brand-primary)}
 .wd-expert-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 5px;border-radius:10px}.wd-expert-row:hover{background:var(--dsw-alias-interactive-bg-hover)}
 .wd-expert-copy{display:grid;grid-template-columns:38px minmax(0,1fr);gap:10px;align-items:center;min-width:0}
 .wd-expert-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:var(--dsw-alias-interactive-bg-hover)}
@@ -28,12 +34,14 @@ type Props = PropsRuntime<'conversation.input.left'> & {
   summon: (id: string, revision: string | undefined, draft: string | undefined, source?: ComposerHandoffSource) => Promise<void>;
 };
 
-/** Use the governed execution flow, never select an internal preset directly. */
+/** WorkBuddy-style picker: separate 专家 / 专家团 tabs, search, then summon. */
 export function ConversationExperts({ useInput, sessionId, management, summon, openManagement }: Props) {
   const input = useInput(state => state);
   const root = React.useRef<HTMLDivElement>(null);
   const trigger = React.useRef<HTMLButtonElement>(null);
   const [open, setOpen] = React.useState(false);
+  const [tab, setTab] = React.useState<'agent' | 'team'>('agent');
+  const [query, setQuery] = React.useState('');
   const [items, setItems] = React.useState<readonly ExpertSummary[]>([]);
   const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -78,15 +86,25 @@ export function ConversationExperts({ useInput, sessionId, management, summon, o
     finally { setActing(false); }
   };
   const blocked = input.attachmentIds.length > 0 || input.phase !== 'plain';
+  const counts = { agent: 0, team: 0 };
+  for (const row of items) counts[row.expertType === 'team' ? 'team' : 'agent']++;
+  const needle = query.trim().toLocaleLowerCase();
+  const visible = items.filter(row => (row.expertType === 'team' ? 'team' : 'agent') === tab
+    && (needle.length === 0 || `${row.name} ${row.description} ${row.profession ?? ''}`.toLocaleLowerCase().includes(needle)));
   return <>
     <style>{pickerCss}</style>
     <div className="wd-expert-picker" ref={root}>
       <button ref={trigger} className="wd-expert-trigger" type="button" aria-label="召唤专家" aria-haspopup="dialog" aria-expanded={open} disabled={blocked || acting} title={blocked ? '请先处理当前附件或正在执行的任务，再召唤专家。' : active ? `当前专家：${active.name}；点击更换专家` : '召唤专家'} onClick={() => setOpen(value => !value)}><Icon name="experts" />{active && <span className="expert-name">{active.name}</span>}</button>
       {open && <div role="dialog" aria-label="召唤专家" className="wd-expert-popover">
+        <div className="wd-expert-tabs" role="tablist" aria-label="专家类型">
+          <button type="button" role="tab" aria-selected={tab === 'agent'} onClick={() => setTab('agent')}>专家 <span>{counts.agent}</span></button>
+          <button type="button" role="tab" aria-selected={tab === 'team'} onClick={() => setTab('team')}>专家团 <span>{counts.team}</span></button>
+        </div>
+        <input className="wd-expert-search" type="search" placeholder={tab === 'team' ? '搜索专家团' : '搜索专家'} aria-label={tab === 'team' ? '搜索专家团' : '搜索专家'} value={query} onChange={event => setQuery(event.currentTarget.value)} />
         {loading && <div className="wd-expert-status" role="status">正在加载专家…</div>}
         {error && <div className="wd-expert-status" role="alert">{error}</div>}
-        {!loading && !error && !items.length && <div className="wd-expert-status">暂无可用专家，请先导入或发布专家。</div>}
-        {items.map(row => <div className="wd-expert-row" key={row.id}>
+        {!loading && !error && !visible.length && <div className="wd-expert-status">{needle.length > 0 ? '没有匹配的结果，换个关键词试试。' : tab === 'team' ? '暂无可用专家团。' : '暂无可用专家，请先导入或发布专家。'}</div>}
+        {visible.map(row => <div className="wd-expert-row" key={row.id}>
           <div className="wd-expert-copy"><span className="wd-expert-mark"><Icon name="experts" /></span><span><strong>{row.name}</strong><small>{row.description}</small></span></div>
           <button className="wd-expert-action" type="button" aria-label={`召唤 ${row.name}`} aria-pressed={active?.id === row.id} disabled={acting || row.readiness !== 'ready'} title={row.readiness === 'ready' ? '新建专家任务，保留输入文字，由你确认发送' : '专家依赖尚未就绪，请在专家中心查看'} onClick={() => void choose(row)}>{acting ? '处理中' : row.readiness === 'ready' ? '召唤' : '未就绪'}</button>
         </div>)}
