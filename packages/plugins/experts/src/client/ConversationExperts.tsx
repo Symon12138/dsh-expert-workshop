@@ -5,6 +5,16 @@ import type { ExpertSummary } from '../shared.js';
 import type { ExpertManagementClient } from './management.js';
 import { Icon } from 'workdsh-ui';
 
+const AVATAR_COLORS = ['#3b6cf6', '#7a5af8', '#e5484d', '#188a5f', '#d97706', '#0e9384', '#c026d3', '#2563eb', '#db2777', '#ca8a04'];
+function avatarColor(name: string): string {
+  let hash = 0;
+  for (const ch of name) hash = (hash * 31 + (ch.codePointAt(0) ?? 0)) >>> 0;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length]!;
+}
+function displayTitle(row: ExpertSummary): string {
+  return row.expertType === 'team' ? row.name : (row.name.split(' · ').at(-1)?.trim() || row.name);
+}
+
 const pickerCss = `
 .wd-expert-picker{position:relative;display:flex;align-items:center}
 .wd-expert-trigger{display:flex;align-items:center;justify-content:center;min-width:36px;max-width:190px;height:36px;padding:0 9px;gap:7px;border:0;border-radius:10px;background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer}
@@ -20,7 +30,7 @@ const pickerCss = `
 .wd-expert-search:focus{border-color:var(--dsw-alias-brand-primary)}
 .wd-expert-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 5px;border-radius:10px}.wd-expert-row:hover{background:var(--dsw-alias-interactive-bg-hover)}
 .wd-expert-copy{display:grid;grid-template-columns:38px minmax(0,1fr);gap:10px;align-items:center;min-width:0}
-.wd-expert-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:var(--dsw-alias-interactive-bg-hover)}
+.wd-expert-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:var(--dsw-alias-interactive-bg-hover);color:#fff;font-weight:600;font-size:16px}
 .wd-expert-copy strong,.wd-expert-copy small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wd-expert-copy small{margin-top:2px;font-size:11px;color:var(--dsw-alias-label-secondary)}
 .wd-expert-action,.wd-expert-manage{border:0;background:transparent;color:inherit;cursor:pointer;font:inherit;border-radius:8px;padding:6px 8px}.wd-expert-action:disabled{opacity:.5;cursor:default}
 .wd-expert-manage{display:flex;gap:8px;width:100%;margin-top:6px;padding:10px 9px;border-top:1px solid var(--dsw-alias-border-l2);border-radius:0;text-align:left}.wd-expert-manage:hover{background:var(--dsw-alias-interactive-bg-hover)}
@@ -105,7 +115,7 @@ export function ConversationExperts({ useInput, sessionId, management, summon, o
         {error && <div className="wd-expert-status" role="alert">{error}</div>}
         {!loading && !error && !visible.length && <div className="wd-expert-status">{needle.length > 0 ? '没有匹配的结果，换个关键词试试。' : tab === 'team' ? '暂无可用专家团。' : '暂无可用专家，请先导入或发布专家。'}</div>}
         {visible.map(row => <div className="wd-expert-row" key={row.id}>
-          <div className="wd-expert-copy"><span className="wd-expert-mark"><Icon name="experts" /></span><span><strong>{row.name}</strong><small>{row.description}</small></span></div>
+          <div className="wd-expert-copy"><span className="wd-expert-mark" style={{ background: avatarColor(row.name) }}>{displayTitle(row).trim().charAt(0) || '专'}</span><span><strong title={row.name}>{displayTitle(row)}</strong><small>{row.description}</small></span></div>
           <button className="wd-expert-action" type="button" aria-label={`召唤 ${row.name}`} aria-pressed={active?.id === row.id} disabled={acting || row.readiness !== 'ready'} title={row.readiness === 'ready' ? '新建专家任务，保留输入文字，由你确认发送' : '专家依赖尚未就绪，请在专家中心查看'} onClick={() => void choose(row)}>{acting ? '处理中' : row.readiness === 'ready' ? '召唤' : '未就绪'}</button>
         </div>)}
         <button className="wd-expert-manage" type="button" disabled={acting} onClick={() => { setOpen(false); openManagement(); }}><span aria-hidden="true">↗</span>管理专家</button>
