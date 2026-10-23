@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots';
 import type { ExpertSummary } from '../shared.js';
 import type { ExpertManagementClient } from './management.js';
-import { Icon } from 'workdsh-ui';
+import { Button, Icon, Modal } from 'workdsh-ui';
 
 const AVATAR_COLORS = ['#3b6cf6', '#7a5af8', '#e5484d', '#188a5f', '#d97706', '#0e9384', '#c026d3', '#2563eb', '#db2777', '#ca8a04'];
 function avatarColor(name: string): string {
@@ -35,6 +35,11 @@ const pickerCss = `
 .wd-expert-action,.wd-expert-manage{border:0;background:transparent;color:inherit;cursor:pointer;font:inherit;border-radius:8px;padding:6px 8px}.wd-expert-action:disabled{opacity:.5;cursor:default}
 .wd-expert-manage{display:flex;gap:8px;width:100%;margin-top:6px;padding:10px 9px;border-top:1px solid var(--dsw-alias-border-l2);border-radius:0;text-align:left}.wd-expert-manage:hover{background:var(--dsw-alias-interactive-bg-hover)}
 .wd-expert-status{padding:12px;color:var(--dsw-alias-label-secondary)}
+.summon-guard{padding:4px 2px 0}
+.summon-guard h2{margin:0 0 12px;font-size:18px}
+.summon-guard p{margin:0 0 12px;color:var(--dsw-alias-label-secondary);line-height:1.7}
+.summon-guard .summon-dont-ask{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dsw-alias-label-tertiary)}
+.summon-guard .summon-guard-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
 @media(max-width:560px){.wd-expert-popover{position:fixed;left:12px;right:12px;bottom:86px;width:auto}}
 `;
 
@@ -56,6 +61,8 @@ export function ConversationExperts({ useInput, sessionId, management, summon, o
   const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [acting, setActing] = React.useState(false);
+  const [guardRow, setGuardRow] = React.useState<ExpertSummary>();
+  const [dontAsk, setDontAsk] = React.useState(false);
   const [active, setActive] = React.useState<{ id: string; name: string }>();
   React.useEffect(() => {
     const controller = new AbortController();
@@ -89,11 +96,28 @@ export function ConversationExperts({ useInput, sessionId, management, summon, o
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [open, management]);
-  const choose = async (row: ExpertSummary) => {
+  const FINANCE_NOTICE_KEY = 'workdsh.experts.financeNoticeHidden';
+  const performSummon = async (row: ExpertSummary) => {
     setActing(true); setError('');
     try { await summon(row.id, row.publishedRevisionRef?.revisionId, input.draft || undefined, { sessionId: String(sessionId), draft: input.draft, references: input.occurrences }); setOpen(false); }
     catch (cause) { setError(cause instanceof Error ? cause.message : '召唤失败，请重试。'); }
     finally { setActing(false); }
+  };
+  const choose = (row: ExpertSummary) => {
+    const team = row.expertType === 'team';
+    const finance = row.categoryId === '08-FinanceInvestment';
+    let hidden = false;
+    try { hidden = window.localStorage.getItem(FINANCE_NOTICE_KEY) === '1'; } catch { /* private mode */ }
+    if (!team && (!finance || hidden)) { void performSummon(row); return; }
+    setDontAsk(false);
+    setGuardRow(row);
+  };
+  const confirmGuard = () => {
+    if (!guardRow) return;
+    if (guardRow.categoryId === '08-FinanceInvestment' && dontAsk) { try { window.localStorage.setItem(FINANCE_NOTICE_KEY, '1'); } catch { /* private mode */ } }
+    const pending = guardRow;
+    setGuardRow(undefined);
+    void performSummon(pending);
   };
   const blocked = input.attachmentIds.length > 0 || input.phase !== 'plain';
   const counts = { agent: 0, team: 0 };
@@ -121,5 +145,17 @@ export function ConversationExperts({ useInput, sessionId, management, summon, o
         <button className="wd-expert-manage" type="button" disabled={acting} onClick={() => { setOpen(false); openManagement(); }}><span aria-hidden="true">↗</span>管理专家</button>
       </div>}
     </div>
+    <Modal open={Boolean(guardRow)} label="召唤提示" className="summon-dialog" onClose={() => setGuardRow(undefined)}>
+      {guardRow && <div className="summon-guard">
+        <h2>{guardRow.expertType === 'team' ? '“专家团”使用提示' : '“专家”使用提示'}</h2>
+        {guardRow.expertType === 'team' && <p>“专家团”可能会调用多位“专家”协同执行任务，消耗通常为“专家”的数倍。</p>}
+        {guardRow.categoryId === '08-FinanceInvestment' && <p>“{guardRow.expertType === 'team' ? '专家团' : '专家'}”内容由 AI 生成，仅供参考，无法替代专业判断，不构成决策和投资建议。</p>}
+        {guardRow.categoryId === '08-FinanceInvestment' && <label className="summon-dont-ask"><input type="checkbox" checked={dontAsk} onChange={event => setDontAsk(event.currentTarget.checked)} /> 不再提示</label>}
+        <div className="summon-guard-actions">
+          <Button onClick={() => setGuardRow(undefined)}>取消</Button>
+          <Button variant="primary" disabled={acting} onClick={confirmGuard}>悉知并继续使用</Button>
+        </div>
+      </div>}
+    </Modal>
   </>;
 }

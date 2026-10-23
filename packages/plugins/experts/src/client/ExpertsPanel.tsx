@@ -10,6 +10,7 @@ import type { ExpertAvailability, ExpertSort, ExpertSummary } from '../shared.js
 import type { ExpertManagementClient } from './management.js';
 import { ExpertDetailModal } from './ExpertDetailModal.js';
 import { expertDraftId } from '../domain/navigation.js';
+import { CATEGORY_LABEL, CATEGORY_ORDER } from './categories.js';
 import { ExpertDraftEditor } from './ExpertDraftEditor.js';
 import { ImportExpertModal } from './ImportExportModals.js';
 import { expertsCss } from './styles.js';
@@ -29,7 +30,6 @@ type ExpertsPanelInjected = {
 export type ExpertsPanelProps = PropsRuntime<'main'> & InjectFace<ExpertsPanelInjected>;
 
 type View = 'center' | 'mine';
-type StateFilter = 'all' | 'draft' | 'published' | 'disabled' | 'archived';
 type Notice = { kind: 'info' | 'warn' | 'error'; text: string };
 
 function messageOf(cause: unknown): string { return cause instanceof Error ? cause.message : '专家操作失败，请重试。'; }
@@ -38,24 +38,6 @@ function icon(name: string) { return <Icon name={name as IconName} />; }
 
 const ORIGIN_LABEL: Record<string, string> = { default: '默认模板', personal: '我的专家', organization: '组织' };
 const AVAILABILITY_LABEL: Record<ExpertAvailability, string> = { enabled: '已启用', disabled: '已停用', archived: '已归档' };
-const CATEGORY_ORDER: readonly (readonly [string, string])[] = [
-  ['13-TencentZone', '腾讯专区'],
-  ['01-ProductDesign', '产品设计'],
-  ['15-BackToSchool', '开学季'],
-  ['02-Engineering', '技术工程'],
-  ['08-FinanceInvestment', '金融投资'],
-  ['03-GameSpatial', '游戏空间'],
-  ['04-DataAI', '数据智能'],
-  ['05-MarketingGrowth', '营销增长'],
-  ['06-ContentCreative', '内容创作'],
-  ['07-SalesCommerce', '销售商务'],
-  ['09-OperationsHR', '运营人力'],
-  ['10-ProjectQuality', '项目质量'],
-  ['11-SecurityCompliance', '法务安全'],
-  ['12-IndustryConsultant', '行业顾问'],
-  ['14-GlobalDevelopment', '全球发展'],
-];
-const CATEGORY_LABEL = new Map(CATEGORY_ORDER);
 const SORTS: readonly (readonly [ExpertSort, string])[] = [['mix', '综合'], ['hot', '最热'], ['new', '最新']];
 const READINESS: Record<string, { label: string; cls: string }> = {
   ready: { label: '可用', cls: 'ready' },
@@ -85,11 +67,11 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
   const [typeCounts, setTypeCounts] = useState({ agent: 0, team: 0 });
   const [query, setQuery] = useState('');
   const [debounced, setDebounced] = useState('');
-  const [stateFilter, setStateFilter] = useState<StateFilter>('all');
   const [category, setCategory] = useState('all');
   const [sort, setSort] = useState<ExpertSort>('mix');
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
   const [items, setItems] = useState<readonly ExpertSummary[]>([]);
+  const [total, setTotal] = useState(0);
   const [nextCursor, setNextCursor] = useState<string | undefined>();
   const [busy, setBusy] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -101,7 +83,10 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
   const [importOpen, setImportOpen] = useState(false);
   const [actionMenu, setActionMenu] = useState<string>();
   const [acting, setActing] = useState(false);
+  const [guard, setGuard] = useState<{ expertId: string; revisionId?: string; draftText?: string; name: string; team: boolean; finance: boolean }>();
+  const [dontAsk, setDontAsk] = useState(false);
   const search = useRef<HTMLInputElement>(null);
+  const categoryNav = useRef<HTMLElement>(null);
   const loadSequence = useRef(0);
   const kindLabel = kind === 'team' ? '专家团' : '专家';
 
@@ -120,10 +105,8 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     if (view === 'center') {
       return { expertType: kind, ...(search_ ? { search: search_ } : {}), ...(category_ ? { categoryId: category_ } : {}), sort, availability: 'enabled' as const, limit: 100 };
     }
-    const availability = stateFilter === 'disabled' || stateFilter === 'archived' || stateFilter === 'published'
-      ? (stateFilter === 'published' ? 'enabled' : stateFilter) as ExpertAvailability : undefined;
-    return { expertType: kind, ...(search_ ? { search: search_ } : {}), origin: 'personal' as const, ...(category_ ? { categoryId: category_ } : {}), sort, ...(availability ? { availability } : {}), limit: 100 };
-  }, [view, kind, debounced, stateFilter, category, sort]);
+    return { expertType: kind, ...(search_ ? { search: search_ } : {}), origin: 'personal' as const, ...(category_ ? { categoryId: category_ } : {}), sort, limit: 100 };
+  }, [view, kind, debounced, category, sort]);
 
   const load = useCallback(async (cursor?: string) => {
     const sequence = ++loadSequence.current;
@@ -135,6 +118,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
       const result = await management.list(cursor ? { ...base, cursor } : base);
       if (sequence !== loadSequence.current) return;
       setItems(prev => (appending ? [...prev, ...result.items] : result.items));
+      setTotal(result.total);
       setCategoryCounts(result.categoryCounts ?? {});
       setNextCursor(result.nextCursor);
     } catch (cause) {
@@ -142,7 +126,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
       if (codeOf(cause) === 'experts/cursor-stale') {
         setNotice({ kind: 'warn', text: '目录已变化，分页游标失效，已为你重新加载第一页。' });
         setItems([]); setNextCursor(undefined);
-        try { const fresh = await management.list(buildQuery()); setItems(fresh.items); setCategoryCounts(fresh.categoryCounts ?? {}); setNextCursor(fresh.nextCursor); } catch { /* surfaced below */ }
+        try { const fresh = await management.list(buildQuery()); setItems(fresh.items); setTotal(fresh.total); setCategoryCounts(fresh.categoryCounts ?? {}); setNextCursor(fresh.nextCursor); } catch { /* surfaced below */ }
       } else setError(messageOf(cause));
     } finally { if (sequence === loadSequence.current) { setBusy(false); setLoadingMore(false); } }
   }, [buildQuery, management]);
@@ -165,12 +149,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     document.addEventListener('pointerdown', outside); return () => document.removeEventListener('pointerdown', outside);
   }, [actionMenu]);
 
-  const visible = useMemo(() => {
-    if (view === 'center') return items.filter(item => item.publishedRevisionRef !== undefined);
-    if (stateFilter === 'draft') return items.filter(item => item.publishedRevisionRef === undefined);
-    if (stateFilter === 'published') return items.filter(item => item.publishedRevisionRef !== undefined);
-    return items;
-  }, [items, view, stateFilter]);
+  const visible = useMemo(() => view === 'center' ? items.filter(item => item.publishedRevisionRef !== undefined) : items, [items, view]);
   const categoryTabs = useMemo(() => CATEGORY_ORDER.map(([id]) => id).filter(id => (categoryCounts[id] ?? 0) > 0), [categoryCounts]);
 
   const refresh = useCallback(() => { void load(); void loadMineCount(); }, [load, loadMineCount]);
@@ -186,6 +165,23 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     try { await summon(expertId, revisionId, draftText); setDetailId(undefined); }
     catch (cause) { setError(messageOf(cause)); }
     finally { setActing(false); }
+  };
+  const FINANCE_NOTICE_KEY = 'workdsh.experts.financeNoticeHidden';
+  const financeNoticeHidden = () => { try { return window.localStorage.getItem(FINANCE_NOTICE_KEY) === '1'; } catch { return false; } };
+  const requestSummon = (expertId: string, revisionId: string | undefined, draftText: string | undefined) => {
+    const row = items.find(item => item.id === expertId);
+    const team = row?.expertType === 'team';
+    const finance = row?.categoryId === '08-FinanceInvestment';
+    if (!team && (!finance || financeNoticeHidden())) { void runSummon(expertId, revisionId, draftText); return; }
+    setDontAsk(false);
+    setGuard({ expertId, revisionId, draftText, name: row?.name ?? '专家', team, finance });
+  };
+  const confirmSummon = () => {
+    if (!guard) return;
+    if (guard.finance && dontAsk) { try { window.localStorage.setItem(FINANCE_NOTICE_KEY, '1'); } catch { /* private mode */ } }
+    const pending = guard;
+    setGuard(undefined);
+    void runSummon(pending.expertId, pending.revisionId, pending.draftText);
   };
   const createExpert = async (type: 'agent' | 'team' = kind) => {
     setActing(true); setError('');
@@ -248,7 +244,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
       </div></details>
     </header>
 
-    {view === 'mine' && <Button variant="ghost" size="sm" className="back-center" onClick={() => { setView('center'); setQuery(''); setStateFilter('all'); }}>‹ 全部专家</Button>}
+    {view === 'mine' && <Button variant="ghost" size="sm" className="back-center" onClick={() => { setView('center'); setQuery(''); }}>‹ 全部专家</Button>}
     <div className="section-head">
       <nav className="work-types" aria-label={view === 'mine' ? '我的作品类型' : '专家中心类型'}>{([['agent', '专家'], ['team', '专家团']] as const).map(([type, label]) => <button key={type} className={kind === type ? 'active' : ''} aria-pressed={kind === type} onClick={() => { setKind(type); setQuery(''); }}>{label}{view === 'mine' && <span>{typeCounts[type]}</span>}</button>)}</nav>
       <div className="section-actions">
@@ -258,26 +254,29 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
       </div>
     </div>
 
-    {view === 'center' && categoryTabs.length > 0 && <nav className="category-tabs" aria-label="专家分类">
-      <button className={category === 'all' ? 'active' : ''} aria-pressed={category === 'all'} onClick={() => setCategory('all')}>全部</button>
-      {categoryTabs.map(id => <button key={id} className={category === id ? 'active' : ''} aria-pressed={category === id} onClick={() => setCategory(id)}>{CATEGORY_LABEL.get(id) ?? id}</button>)}
-    </nav>}
+    {view === 'center' && categoryTabs.length > 0 && <div className="category-bar">
+      <button className="cat-scroll" aria-label="向左滚动" onClick={() => categoryNav.current?.scrollBy({ left: -320, behavior: 'smooth' })}>‹</button>
+      <nav className="category-tabs" aria-label="专家分类" ref={categoryNav}>
+        <button className={category === 'all' ? 'active' : ''} aria-pressed={category === 'all'} onClick={() => setCategory('all')}>全部</button>
+        {categoryTabs.map(id => <button key={id} className={category === id ? 'active' : ''} aria-pressed={category === id} onClick={() => setCategory(id)}>{CATEGORY_LABEL.get(id) ?? id}</button>)}
+      </nav>
+      <button className="cat-scroll" aria-label="向右滚动" onClick={() => categoryNav.current?.scrollBy({ left: 320, behavior: 'smooth' })}>›</button>
+    </div>}
 
-    {view === 'mine' && <nav className="filter-tabs" aria-label="状态过滤">
-      {([['all', '全部'], ['draft', '草稿'], ['published', '已发布'], ['disabled', '已停用'], ['archived', '已归档']] as const).map(([key, label]) =>
-        <Button key={key} className={stateFilter === key ? 'active' : ''} aria-current={stateFilter === key ? 'page' : undefined}
-          onClick={() => setStateFilter(key)}>{label}</Button>)}
+    {view === 'mine' && <nav className="filter-tabs" aria-label="我的专家分类">
+      <span className="mine-hint">我创建的 · 共 {typeCounts[kind]} 个{kindLabel}</span>
     </nav>}
 
     {notice && <div className={`notice ${notice.kind}`} role="status"><div className="notice-body"><span>{notice.text}</span></div><Button onClick={() => setNotice(undefined)} aria-label="关闭提示">×</Button></div>}
+    {debounced && !busy && <div className="search-summary" role="status">搜索「{debounced}」找到 {total} 位{kindLabel}<button onClick={() => { setQuery(''); search.current?.focus(); }}>清除搜索</button></div>}
     {error && <div role="alert" className="counts error">{error}</div>}
 
     {busy
       ? <div className="grid" aria-hidden>{Array.from({ length: 8 }, (_, index) => <div className="skeleton" key={index} />)}</div>
       : !error && !visible.length
         ? <div className="empty">
-          <strong>{debounced ? `没有匹配的${kindLabel}` : view === 'mine' ? `还没有自己的${kind === 'team' ? '专家团' : '专家'}` : `暂无可用${kindLabel}`}</strong>
-          <span className="muted">{debounced ? '保留搜索词，可清除后重试。' : view === 'mine' ? '从默认模板复制，或直接制作一个属于你的专家。' : '默认模板尚未就绪，请稍后重试或制作专家。'}</span>
+          <strong>{debounced ? `没有找到与「${debounced}」匹配的${kindLabel}` : view === 'mine' ? `还没有创建任何${kindLabel}` : `暂无可用${kindLabel}`}</strong>
+          <span className="muted">{debounced ? '试试其他关键词，或清除搜索。' : view === 'mine' ? `创建属于你的${kind === 'team' ? '专家团' : '专家'}，分享专业知识。` : '默认模板尚未就绪，请稍后重试或制作专家。'}</span>
           <div className="empty-actions">
             {debounced && <Button onClick={() => { setQuery(''); search.current?.focus(); }}>清除搜索</Button>}
             <Button variant="primary" className="create-expert" disabled={acting} onClick={() => void createExpert()}>创建{kindLabel}</Button>
@@ -302,7 +301,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
                 {actionMenu === summary.id && <div className="card-menu" role="menu">
                   {draft
                     ? <button role="menuitem" onClick={() => { void editInConversation(summary.id); }}>继续编辑</button>
-                    : <button role="menuitem" disabled={!usable || acting} onClick={() => void runSummon(summary.id, summary.publishedRevisionRef?.revisionId, undefined)}>召唤专家</button>}
+                    : <button role="menuitem" disabled={!usable || acting} onClick={() => { setActionMenu(undefined); requestSummon(summary.id, summary.publishedRevisionRef?.revisionId, undefined); }}>召唤专家</button>}
                   {summary.canEdit && !draft && <button role="menuitem" onClick={() => { void editInConversation(summary.id); }}>编辑</button>}
                   <button role="menuitem" disabled={acting} onClick={() => void copyToMine(summary)}>复制到我的专家</button>
                   <button role="menuitem" disabled={acting} onClick={() => void exportExpert(summary)}>导出</button>
@@ -333,7 +332,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     <Modal open={Boolean(detailId)} label={detailId ? '专家详情' : '专家详情'} className="expert-dialog" onClose={() => setDetailId(undefined)}>
       {detailId && <ExpertDetailModal expertId={detailId} management={management} acting={acting}
         onClose={() => setDetailId(undefined)}
-        onSummon={(expertId, revisionId, draftText) => void runSummon(expertId, revisionId, draftText)}
+        onSummon={(expertId, revisionId, draftText) => requestSummon(expertId, revisionId, draftText)}
         onEditTask={id => void editInConversation(id)}
         onEditDraft={id => { setDetailId(undefined); setEditorId(id); }}
         onCopy={async (expertId, revisionId) => {
@@ -354,11 +353,24 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
         onChanged={refresh} />}
     </Modal>
 
+    <Modal open={Boolean(guard)} label="召唤提示" className="summon-dialog" onClose={() => setGuard(undefined)}>
+      {guard && <div className="summon-guard">
+        <h2>{guard.team ? '“专家团”使用提示' : '“专家”使用提示'}</h2>
+        {guard.team && <p>“专家团”可能会调用多位“专家”协同执行任务，消耗通常为“专家”的数倍。</p>}
+        {guard.finance && <p>“{guard.team ? '专家团' : '专家'}”内容由 AI 生成，仅供参考，无法替代专业判断，不构成决策和投资建议。</p>}
+        {guard.finance && <label className="summon-dont-ask"><input type="checkbox" checked={dontAsk} onChange={event => setDontAsk(event.currentTarget.checked)} /> 不再提示</label>}
+        <div className="summon-guard-actions">
+          <Button onClick={() => setGuard(undefined)}>取消</Button>
+          <Button variant="primary" disabled={acting} onClick={confirmSummon}>悉知并继续使用</Button>
+        </div>
+      </div>}
+    </Modal>
+
     {editorId && <ExpertDraftEditor expertId={editorId} management={management}
       onClose={closeEditor}
       onSaved={refresh}
       onPublished={() => { closeEditor(); refresh(); }}
-      onSummon={(id, revisionId, text) => { closeEditor(); void runSummon(id, revisionId, text); }} />}
+      onSummon={(id, revisionId, text) => { closeEditor(); requestSummon(id, revisionId, text); }} />}
 
     <Modal open={importOpen} label="导入专家" className="import-dialog" onClose={() => setImportOpen(false)}>
       {importOpen && <ImportExpertModal management={management} onClose={() => setImportOpen(false)}

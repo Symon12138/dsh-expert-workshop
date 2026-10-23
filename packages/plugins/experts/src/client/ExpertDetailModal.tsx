@@ -6,6 +6,7 @@ import { skillStateLabel } from './SkillPicker.js';
 import type { ExpertManagementClient } from './management.js';
 import { ExpertWorkSummary } from './ExpertWorkSummary.js';
 import { TeamOverview } from './TeamOverview.js';
+import { CATEGORY_LABEL } from './categories.js';
 
 export type ExpertDetailModalProps = {
   readonly expertId: string;
@@ -117,29 +118,39 @@ export function ExpertDetailModal({ expertId, management, acting, onClose, onSum
       <Button disabled={acting} onClick={() => { onClose(); onEditDraft(expertId); }}>审阅草稿</Button>
     </div>}
 
-    {definition.description && <p className="detail-desc" style={{ marginTop: 20 }}>{definition.description}</p>}
-    {definition.tags.length > 0 && <div className="tag-row">{definition.tags.map(tag => <span className="tag" key={tag}>{tag}</span>)}</div>}
+    <h2 className="detail-section-title">能力介绍</h2>
+    {definition.description && <p className="detail-desc">{definition.description}</p>}
+    {definition.tags.length > 0 && <>
+      <h2 className="detail-section-title">擅长领域</h2>
+      <div className="tag-row">{definition.tags.map(tag => <span className="tag" key={tag}>{tag}</span>)}</div>
+    </>}
 
     {!isDraft && detail.readiness !== 'ready' && <div className={`notice ${readiness.cls === 'bad' ? 'error' : readiness.cls === 'warn' ? 'warn' : 'info'}`} role="status" style={{ marginTop: 20 }}>
       <div className="notice-body"><strong>{readiness.label}</strong><span>{readiness.hint}</span></div>
     </div>}
 
     {definition.examples.length > 0 && <>
-      <h2 className="detail-section-title">{definition.team ? '团队帮你做' : '试试这样问我'}</h2>
+      <h2 className="detail-section-title">{definition.team ? '团队帮你做' : '专家帮你做'}</h2>
       <div className="example-list">
         {definition.examples.map(example => <button className="example" key={example.id} disabled={!canSummon || acting}
           title={canSummon ? '用此示例召唤专家（仅填入草稿，不会自动发送）' : readiness.hint}
           onClick={() => { setMenuOpen(false); onSummon(expertId, revisionId, example.prompt); }}>
           <span className="example-text">{example.title && <strong>{example.title}</strong>}<span>{example.prompt}</span></span>
-          <span aria-hidden>→</span>
+          <span className="example-try">去试试</span>
         </button>)}
       </div>
     </>}
 
     <TeamOverview definition={definition} />
 
-    <details className="expert-settings"><summary>配备技能与能力 · {definition.skillRequirements.length}</summary>
-    <h2 className="detail-section-title">配备技能 · {definition.skillRequirements.length}</h2>
+    <div className="detail-meta">
+      <span>行业分类：{CATEGORY_LABEL.get(definition.categoryId ?? '') ?? definition.categoryId ?? '未分类'}</span>
+      <span>分享者：{ORIGIN_LABEL[expert.origin] ?? expert.origin}</span>
+      <span>版本：{revisionId?.slice(0, 10) ?? '草稿'}</span>
+    </div>
+
+    <details className="expert-settings"><summary>使用技能 · {definition.skillRequirements.length}</summary>
+    <h2 className="detail-section-title">使用技能 · {definition.skillRequirements.length}</h2>
     <p className="detail-subtitle">{isDraft ? '以下为已保存草稿配备的技能；发布时会固定技能版本。' : '以下为已发布版本配备的技能；简介和状态来自当前已安装目录，召唤时使用发布时固定的技能版本。'}</p>
     {skillsError && <p role="alert">{skillsError} <Button onClick={() => void load()}>重试</Button></p>}
     {!skills && !skillsError && <p role="status">正在读取配备技能…</p>}
