@@ -708,6 +708,7 @@ export class ExpertsManager extends Service implements ExpertsService {
       expertType: definition.team ? 'team' : 'agent',
       profession,
       tags: definition.tags,
+      ...(definition.categoryId === undefined ? {} : { categoryId: definition.categoryId }),
       name: definition.name,
       description: definition.description,
       ...(definition.avatarRef === undefined ? {} : { avatarRef: definition.avatarRef }),
@@ -746,14 +747,14 @@ export class ExpertsManager extends Service implements ExpertsService {
     return record.o;
   }
 
-  private sortRows(rows: { expert: Expert; preference?: ExpertPreference }[]): void {
+  private sortRows(rows: { expert: Expert; preference?: ExpertPreference }[], sort: 'mix' | 'hot' | 'new' = 'mix'): void {
     rows.sort((left, right) => {
       const leftPin = left.preference?.pinned ? 1 : 0;
       const rightPin = right.preference?.pinned ? 1 : 0;
       if (leftPin !== rightPin) return rightPin - leftPin;
       const leftUsed = left.preference?.lastUsedAt ? Date.parse(left.preference.lastUsedAt) : 0;
       const rightUsed = right.preference?.lastUsedAt ? Date.parse(right.preference.lastUsedAt) : 0;
-      if (leftUsed !== rightUsed) return rightUsed - leftUsed;
+      if (sort !== 'new' && leftUsed !== rightUsed) return rightUsed - leftUsed;
       const leftUpdated = Date.parse(left.expert.updatedAt);
       const rightUpdated = Date.parse(right.expert.updatedAt);
       if (leftUpdated !== rightUpdated) return rightUpdated - leftUpdated;
@@ -792,6 +793,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     signal?.throwIfAborted();
 
     const search = query.search?.trim().toLowerCase();
+    const categoryCounts: Record<string, number> = {};
     const rows: { expert: Expert; draft: ExpertDraft; preference?: ExpertPreference }[] = [];
     for (const [, expert] of this.expertsTable().entries()) {
       if (expert.teamParentId) continue;
@@ -801,12 +803,15 @@ export class ExpertsManager extends Service implements ExpertsService {
       const draft = this.draftsTable().get(keys.draft(expert.id));
       if (!draft) continue;
       if (query.expertType !== undefined && (draft.definition.team ? 'team' : 'agent') !== query.expertType) continue;
-      if (query.categoryId !== undefined && (draft.definition.categoryId ?? null) !== query.categoryId) continue;
       if (search !== undefined && search.length > 0 && !matchesSearch(draft.definition, search)) continue;
+      if (draft.definition.categoryId !== undefined) {
+        categoryCounts[draft.definition.categoryId] = (categoryCounts[draft.definition.categoryId] ?? 0) + 1;
+      }
+      if (query.categoryId !== undefined && (draft.definition.categoryId ?? null) !== query.categoryId) continue;
       const preference = this.preferenceFor(actor, expert.id);
       rows.push({ expert, draft, ...(preference === undefined ? {} : { preference }) });
     }
-    this.sortRows(rows);
+    this.sortRows(rows, query.sort ?? 'mix');
 
     const visibleExperts = rows.map((row) => row.expert);
     const catalogRevision = this.catalogRevision(visibleExperts);
@@ -831,6 +836,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     return {
       items,
       total: rows.length,
+      categoryCounts,
       ...(nextOffset < rows.length ? { nextCursor: this.encodeCursor(catalogRevision, nextOffset) } : {}),
       catalogRevision,
     };

@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client';
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots';
 import { Icon, Modal, type IconName } from 'workdsh-ui';
-import type { ExpertAvailability, ExpertSummary } from '../shared.js';
+import type { ExpertAvailability, ExpertSort, ExpertSummary } from '../shared.js';
 import type { ExpertManagementClient } from './management.js';
 import { ExpertDetailModal } from './ExpertDetailModal.js';
 import { expertDraftId } from '../domain/navigation.js';
@@ -29,7 +29,6 @@ type ExpertsPanelInjected = {
 export type ExpertsPanelProps = PropsRuntime<'main'> & InjectFace<ExpertsPanelInjected>;
 
 type View = 'center' | 'mine';
-type OriginFilter = 'all' | 'default' | 'personal';
 type StateFilter = 'all' | 'draft' | 'published' | 'disabled' | 'archived';
 type Notice = { kind: 'info' | 'warn' | 'error'; text: string };
 
@@ -39,6 +38,25 @@ function icon(name: string) { return <Icon name={name as IconName} />; }
 
 const ORIGIN_LABEL: Record<string, string> = { default: '默认模板', personal: '我的专家', organization: '组织' };
 const AVAILABILITY_LABEL: Record<ExpertAvailability, string> = { enabled: '已启用', disabled: '已停用', archived: '已归档' };
+const CATEGORY_ORDER: readonly (readonly [string, string])[] = [
+  ['13-TencentZone', '腾讯专区'],
+  ['01-ProductDesign', '产品设计'],
+  ['15-BackToSchool', '开学季'],
+  ['02-Engineering', '技术工程'],
+  ['08-FinanceInvestment', '金融投资'],
+  ['03-GameSpatial', '游戏空间'],
+  ['04-DataAI', '数据智能'],
+  ['05-MarketingGrowth', '营销增长'],
+  ['06-ContentCreative', '内容创作'],
+  ['07-SalesCommerce', '销售商务'],
+  ['09-OperationsHR', '运营人力'],
+  ['10-ProjectQuality', '项目质量'],
+  ['11-SecurityCompliance', '法务安全'],
+  ['12-IndustryConsultant', '行业顾问'],
+  ['14-GlobalDevelopment', '全球发展'],
+];
+const CATEGORY_LABEL = new Map(CATEGORY_ORDER);
+const SORTS: readonly (readonly [ExpertSort, string])[] = [['mix', '综合'], ['hot', '最热'], ['new', '最新']];
 const READINESS: Record<string, { label: string; cls: string }> = {
   ready: { label: '可用', cls: 'ready' },
   'missing-dependency': { label: '依赖缺失', cls: 'bad' },
@@ -47,8 +65,18 @@ const READINESS: Record<string, { label: string; cls: string }> = {
   unknown: { label: '未发布', cls: '' },
 };
 
+const AVATAR_COLORS = ['#3b6cf6', '#7a5af8', '#e5484d', '#188a5f', '#d97706', '#0e9384', '#c026d3', '#2563eb', '#db2777', '#ca8a04'];
+function avatarColor(name: string): string {
+  let hash = 0;
+  for (const ch of name) hash = (hash * 31 + (ch.codePointAt(0) ?? 0)) >>> 0;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length]!;
+}
 function Avatar({ summary }: { summary: ExpertSummary }) {
-  return <span className="avatar" aria-hidden>{summary.avatarRef?.startsWith('data:image/') ? <img src={summary.avatarRef} alt="" /> : summary.name.trim().charAt(0) || '专'}</span>;
+  const title = summary.expertType === 'team' ? summary.name : (summary.name.split(' · ').at(-1)?.trim() || summary.name);
+  const image = summary.avatarRef?.startsWith('data:image/');
+  return <span className="avatar" style={image ? undefined : { background: avatarColor(summary.name) }} aria-hidden>
+    {image ? <img src={summary.avatarRef} alt="" /> : (title.trim().charAt(0) || '专')}
+  </span>;
 }
 
 export function ExpertsPanel({ toggleNavigation, management, openCapability, hasCapability, summon, createExpertTask, editExpertTask }: ExpertsPanelProps) {
@@ -57,10 +85,11 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
   const [typeCounts, setTypeCounts] = useState({ agent: 0, team: 0 });
   const [query, setQuery] = useState('');
   const [debounced, setDebounced] = useState('');
-  const [originFilter, setOriginFilter] = useState<OriginFilter>('all');
   const [stateFilter, setStateFilter] = useState<StateFilter>('all');
+  const [category, setCategory] = useState('all');
+  const [sort, setSort] = useState<ExpertSort>('mix');
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
   const [items, setItems] = useState<readonly ExpertSummary[]>([]);
-  const [total, setTotal] = useState(0);
   const [nextCursor, setNextCursor] = useState<string | undefined>();
   const [busy, setBusy] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -87,13 +116,14 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
 
   const buildQuery = useCallback(() => {
     const search_ = debounced || undefined;
+    const category_ = category === 'all' ? undefined : category;
     if (view === 'center') {
-      return { expertType: kind, ...(search_ ? { search: search_ } : {}), ...(originFilter === 'all' ? {} : { origin: originFilter as 'default' | 'personal' }), availability: 'enabled' as const, limit: 100 };
+      return { expertType: kind, ...(search_ ? { search: search_ } : {}), ...(category_ ? { categoryId: category_ } : {}), sort, availability: 'enabled' as const, limit: 100 };
     }
     const availability = stateFilter === 'disabled' || stateFilter === 'archived' || stateFilter === 'published'
       ? (stateFilter === 'published' ? 'enabled' : stateFilter) as ExpertAvailability : undefined;
-    return { expertType: kind, ...(search_ ? { search: search_ } : {}), origin: 'personal' as const, ...(availability ? { availability } : {}), limit: 100 };
-  }, [view, kind, debounced, originFilter, stateFilter]);
+    return { expertType: kind, ...(search_ ? { search: search_ } : {}), origin: 'personal' as const, ...(category_ ? { categoryId: category_ } : {}), sort, ...(availability ? { availability } : {}), limit: 100 };
+  }, [view, kind, debounced, stateFilter, category, sort]);
 
   const load = useCallback(async (cursor?: string) => {
     const sequence = ++loadSequence.current;
@@ -105,14 +135,14 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
       const result = await management.list(cursor ? { ...base, cursor } : base);
       if (sequence !== loadSequence.current) return;
       setItems(prev => (appending ? [...prev, ...result.items] : result.items));
-      setTotal(result.total);
+      setCategoryCounts(result.categoryCounts ?? {});
       setNextCursor(result.nextCursor);
     } catch (cause) {
       if (sequence !== loadSequence.current) return;
       if (codeOf(cause) === 'experts/cursor-stale') {
         setNotice({ kind: 'warn', text: '目录已变化，分页游标失效，已为你重新加载第一页。' });
         setItems([]); setNextCursor(undefined);
-        try { const fresh = await management.list(buildQuery()); setItems(fresh.items); setTotal(fresh.total); setNextCursor(fresh.nextCursor); } catch { /* surfaced below */ }
+        try { const fresh = await management.list(buildQuery()); setItems(fresh.items); setCategoryCounts(fresh.categoryCounts ?? {}); setNextCursor(fresh.nextCursor); } catch { /* surfaced below */ }
       } else setError(messageOf(cause));
     } finally { if (sequence === loadSequence.current) { setBusy(false); setLoadingMore(false); } }
   }, [buildQuery, management]);
@@ -122,6 +152,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
   }, [management]);
 
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => { setCategory('all'); }, [kind, view]);
   useEffect(() => { void loadMineCount(); }, [loadMineCount, items]);
   useEffect(() => {
     const revalidate = () => { if (document.visibilityState === 'visible') { void load(); void loadMineCount(); } };
@@ -140,6 +171,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     if (stateFilter === 'published') return items.filter(item => item.publishedRevisionRef !== undefined);
     return items;
   }, [items, view, stateFilter]);
+  const categoryTabs = useMemo(() => CATEGORY_ORDER.map(([id]) => id).filter(id => (categoryCounts[id] ?? 0) > 0), [categoryCounts]);
 
   const refresh = useCallback(() => { void load(); void loadMineCount(); }, [load, loadMineCount]);
   const closeEditor = () => {
@@ -207,11 +239,12 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
       })}
       <Input ref={search} className="search" aria-label="搜索专家" placeholder={view === 'mine' ? `搜索我创建的${kind === 'team' ? '专家团' : '专家'}` : `搜索${kindLabel}`} value={query}
         onChange={event => setQuery(event.currentTarget.value)} />
-      <Button className={`mine-toggle ${view === 'mine' ? 'active' : ''}`} aria-pressed={view === 'mine'}
-        onClick={() => { setView('mine'); setQuery(''); }}>我的专家 {mineCount}</Button>
+      <Button className={`mine-toggle ${view === 'mine' ? 'active' : ''}`} aria-pressed={view === 'mine'} aria-label={`我的专家（${mineCount}）`}
+        onClick={() => { setView('mine'); setQuery(''); }}>我的专家</Button>
       <details className="create-menu"><summary className="create-expert">制作专家</summary><div role="menu">
         <button role="menuitem" disabled={acting} onClick={event => { event.currentTarget.closest('details')?.removeAttribute('open'); void createExpert('agent'); }}>创建专家</button>
         <button role="menuitem" disabled={acting} onClick={event => { event.currentTarget.closest('details')?.removeAttribute('open'); void createExpert('team'); }}>创建专家团</button>
+        <button role="menuitem" onClick={event => { event.currentTarget.closest('details')?.removeAttribute('open'); setImportOpen(true); }}>导入专家包</button>
       </div></details>
     </header>
 
@@ -219,27 +252,25 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     <div className="section-head">
       <nav className="work-types" aria-label={view === 'mine' ? '我的作品类型' : '专家中心类型'}>{([['agent', '专家'], ['team', '专家团']] as const).map(([type, label]) => <button key={type} className={kind === type ? 'active' : ''} aria-pressed={kind === type} onClick={() => { setKind(type); setQuery(''); }}>{label}{view === 'mine' && <span>{typeCounts[type]}</span>}</button>)}</nav>
       <div className="section-actions">
-        <Button onClick={() => setImportOpen(true)}>导入</Button>
-        <Button onClick={refresh} disabled={busy}>刷新</Button>
+        <span className="sort-group" aria-label="排序">{SORTS.map(([key, label]) =>
+          <button key={key} className={sort === key ? 'active' : ''} aria-pressed={sort === key} onClick={() => setSort(key)}>{label}</button>)}</span>
+        <Button variant="ghost" size="sm" onClick={refresh} disabled={busy}>刷新</Button>
       </div>
     </div>
 
-    {view === 'center'
-      ? <nav className="filter-tabs" aria-label="来源过滤">
-        {([['all', '全部'], ['default', '默认'], ['personal', '我的']] as const).map(([key, label]) =>
-          <Button key={key} className={originFilter === key ? 'active' : ''} aria-current={originFilter === key ? 'page' : undefined}
-            onClick={() => setOriginFilter(key)}>{label}</Button>)}
-      </nav>
-      : <nav className="filter-tabs" aria-label="状态过滤">
-        {([['all', '全部'], ['draft', '草稿'], ['published', '已发布'], ['disabled', '已停用'], ['archived', '已归档']] as const).map(([key, label]) =>
-          <Button key={key} className={stateFilter === key ? 'active' : ''} aria-current={stateFilter === key ? 'page' : undefined}
-            onClick={() => setStateFilter(key)}>{label}</Button>)}
-      </nav>}
+    {view === 'center' && categoryTabs.length > 0 && <nav className="category-tabs" aria-label="专家分类">
+      <button className={category === 'all' ? 'active' : ''} aria-pressed={category === 'all'} onClick={() => setCategory('all')}>全部</button>
+      {categoryTabs.map(id => <button key={id} className={category === id ? 'active' : ''} aria-pressed={category === id} onClick={() => setCategory(id)}>{CATEGORY_LABEL.get(id) ?? id}</button>)}
+    </nav>}
+
+    {view === 'mine' && <nav className="filter-tabs" aria-label="状态过滤">
+      {([['all', '全部'], ['draft', '草稿'], ['published', '已发布'], ['disabled', '已停用'], ['archived', '已归档']] as const).map(([key, label]) =>
+        <Button key={key} className={stateFilter === key ? 'active' : ''} aria-current={stateFilter === key ? 'page' : undefined}
+          onClick={() => setStateFilter(key)}>{label}</Button>)}
+    </nav>}
 
     {notice && <div className={`notice ${notice.kind}`} role="status"><div className="notice-body"><span>{notice.text}</span></div><Button onClick={() => setNotice(undefined)} aria-label="关闭提示">×</Button></div>}
-    <div role="status" aria-live="polite" className={error ? 'error counts' : 'counts'}>
-      {busy ? '正在读取专家目录…' : error || `目录共 ${total} 个${kindLabel} · 当前显示 ${visible.length} 个${debounced ? `（搜索“${debounced}”）` : ''}`}
-    </div>
+    {error && <div role="alert" className="counts error">{error}</div>}
 
     {busy
       ? <div className="grid" aria-hidden>{Array.from({ length: 8 }, (_, index) => <div className="skeleton" key={index} />)}</div>
@@ -257,13 +288,13 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
           const readiness = READINESS[summary.readiness] ?? READINESS.unknown;
           const draft = isDraft(summary);
           const usable = summary.canUse && !draft && summary.availability === 'enabled' && summary.readiness === 'ready';
-          const displayTitle = summary.expertType === 'team' ? summary.name : (summary.name.split(' · ')[0]?.trim() || summary.name);
+          const displayTitle = summary.expertType === 'team' ? summary.name : (summary.name.split(' · ').at(-1)?.trim() || summary.name);
           return <article className={`card ${draft ? 'draft' : ''} ${summary.availability !== 'enabled' ? 'unavailable' : ''} ${actionMenu === summary.id ? 'menu-open' : ''}`} key={summary.id}>
             <div className="card-top">
               <button className="card-open" aria-label={`查看专家 ${summary.name}`} onClick={() => setDetailId(summary.id)}>
                 <Avatar summary={summary} />
                 <span className="card-title"><strong title={summary.name}>{displayTitle}</strong>
-                  <span className="card-meta">{summary.expertType === 'team' ? '专家团' : (summary.profession || '专家')}{view === 'mine' && <span> · {stateLabel(summary)}</span>}</span></span>
+                  {view === 'mine' && <span className="card-meta">{stateLabel(summary)}</span>}</span>
               </button>
               {summary.canManage && <div className="card-actions">
                 <Button variant="ghost" size="sm" className="more-button" aria-label={`管理专家 ${summary.name}`} aria-haspopup="menu" aria-expanded={actionMenu === summary.id}

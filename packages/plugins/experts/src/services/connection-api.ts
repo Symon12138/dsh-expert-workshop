@@ -139,6 +139,7 @@ function listQuery(payload: unknown): ExpertListQuery {
   const origin = oneOf(input.origin, ['default', 'personal', 'organization'] as const);
   const availability = oneOf(input.availability, ['enabled', 'disabled', 'archived'] as const);
   const categoryId = str(input.categoryId);
+  const sort = oneOf(input.sort, ['mix', 'hot', 'new'] as const);
   const cursor = str(input.cursor);
   const limit = typeof input.limit === 'number' && Number.isFinite(input.limit) ? input.limit : undefined;
   return {
@@ -147,6 +148,7 @@ function listQuery(payload: unknown): ExpertListQuery {
     ...(origin === undefined ? {} : { origin }),
     ...(availability === undefined ? {} : { availability }),
     ...(categoryId === undefined ? {} : { categoryId }),
+    ...(sort === undefined ? {} : { sort }),
     ...(cursor === undefined ? {} : { cursor }),
     ...(limit === undefined ? {} : { limit }),
   };

@@ -171,6 +171,7 @@ export interface ExpertSummary {
   readonly expertType?: 'agent' | 'team';
   readonly profession?: string;
   readonly tags?: readonly string[];
+  readonly categoryId?: string;
   readonly id: string;
   readonly name: string;
   readonly description: string;
@@ -251,13 +252,19 @@ export interface ExpertListQuery {
   readonly origin?: ExpertOrigin;
   readonly availability?: ExpertAvailability;
   readonly categoryId?: string;
+  /** Catalog ordering: recommended, most-used, or newest. Defaults to recommended. */
+  readonly sort?: ExpertSort;
   readonly cursor?: string;
   readonly limit?: number;
 }
 
+export type ExpertSort = 'mix' | 'hot' | 'new';
+
 export interface ExpertListResult {
   readonly items: readonly ExpertSummary[];
   readonly total: number;
+  /** Per-category counts before the category filter, for building category tabs. */
+  readonly categoryCounts?: Readonly<Record<string, number>>;
   readonly nextCursor?: string;
   readonly catalogRevision: string;
 }
