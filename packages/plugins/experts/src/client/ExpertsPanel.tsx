@@ -11,6 +11,8 @@ import type { ExpertManagementClient } from './management.js';
 import { ExpertDetailModal } from './ExpertDetailModal.js';
 import { expertDraftId } from '../domain/navigation.js';
 import { CATEGORY_LABEL, CATEGORY_ORDER } from './categories.js';
+import { avatarColor, expertTitle } from './avatar.js';
+import { FEATURED_SCENES, SCENE_IMAGE_BASE } from './scenes.js';
 import { ExpertDraftEditor } from './ExpertDraftEditor.js';
 import { ImportExpertModal } from './ImportExportModals.js';
 import { expertsCss } from './styles.js';
@@ -47,14 +49,8 @@ const READINESS: Record<string, { label: string; cls: string }> = {
   unknown: { label: '未发布', cls: '' },
 };
 
-const AVATAR_COLORS = ['#3b6cf6', '#7a5af8', '#e5484d', '#188a5f', '#d97706', '#0e9384', '#c026d3', '#2563eb', '#db2777', '#ca8a04'];
-function avatarColor(name: string): string {
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + (ch.codePointAt(0) ?? 0)) >>> 0;
-  return AVATAR_COLORS[hash % AVATAR_COLORS.length]!;
-}
 function Avatar({ summary }: { summary: ExpertSummary }) {
-  const title = summary.expertType === 'team' ? summary.name : (summary.name.split(' · ').at(-1)?.trim() || summary.name);
+  const title = summary.expertType === 'team' ? summary.name : expertTitle(summary.name);
   const image = summary.avatarRef?.startsWith('data:image/');
   return <span className="avatar" style={image ? undefined : { background: avatarColor(summary.name) }} aria-hidden>
     {image ? <img src={summary.avatarRef} alt="" /> : (title.trim().charAt(0) || '专')}
@@ -244,6 +240,21 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
       </div></details>
     </header>
 
+    {view === 'center' && !debounced && category === 'all' && <section className="featured-scenes" aria-label="精选场景">
+      <div className="scene-head"><h2>精选场景</h2><span>按场景找专家</span></div>
+      <div className="scene-row">
+        {FEATURED_SCENES.map(scene => <article className="scene-card" key={scene.id}>
+          <div className="scene-cover" style={{ backgroundImage: `url(${SCENE_IMAGE_BASE}${scene.image})` }} aria-hidden />
+          <strong>{scene.title}</strong>
+          <div className="scene-links">{scene.names.map(name => <button key={name} onClick={() => {
+            setKind(/(团队|专家团)$/.test(name) ? 'team' : 'agent');
+            setCategory('all');
+            setQuery(name);
+          }}>{name}</button>)}</div>
+        </article>)}
+      </div>
+    </section>}
+
     {view === 'mine' && <Button variant="ghost" size="sm" className="back-center" onClick={() => { setView('center'); setQuery(''); }}>‹ 全部专家</Button>}
     <div className="section-head">
       <nav className="work-types" aria-label={view === 'mine' ? '我的作品类型' : '专家中心类型'}>{([['agent', '专家'], ['team', '专家团']] as const).map(([type, label]) => <button key={type} className={kind === type ? 'active' : ''} aria-pressed={kind === type} onClick={() => { setKind(type); setQuery(''); }}>{label}{view === 'mine' && <span>{typeCounts[type]}</span>}</button>)}</nav>
@@ -287,7 +298,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
           const readiness = READINESS[summary.readiness] ?? READINESS.unknown;
           const draft = isDraft(summary);
           const usable = summary.canUse && !draft && summary.availability === 'enabled' && summary.readiness === 'ready';
-          const displayTitle = summary.expertType === 'team' ? summary.name : (summary.name.split(' · ').at(-1)?.trim() || summary.name);
+          const displayTitle = summary.expertType === 'team' ? summary.name : expertTitle(summary.name);
           return <article className={`card ${draft ? 'draft' : ''} ${summary.availability !== 'enabled' ? 'unavailable' : ''} ${actionMenu === summary.id ? 'menu-open' : ''}`} key={summary.id}>
             <div className="card-top">
               <button className="card-open" aria-label={`查看专家 ${summary.name}`} onClick={() => setDetailId(summary.id)}>

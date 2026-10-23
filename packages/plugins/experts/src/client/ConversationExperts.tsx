@@ -4,15 +4,10 @@ import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots';
 import type { ExpertSummary } from '../shared.js';
 import type { ExpertManagementClient } from './management.js';
 import { Button, Icon, Modal } from 'workdsh-ui';
+import { avatarColor, expertTitle } from './avatar.js';
 
-const AVATAR_COLORS = ['#3b6cf6', '#7a5af8', '#e5484d', '#188a5f', '#d97706', '#0e9384', '#c026d3', '#2563eb', '#db2777', '#ca8a04'];
-function avatarColor(name: string): string {
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + (ch.codePointAt(0) ?? 0)) >>> 0;
-  return AVATAR_COLORS[hash % AVATAR_COLORS.length]!;
-}
 function displayTitle(row: ExpertSummary): string {
-  return row.expertType === 'team' ? row.name : (row.name.split(' · ').at(-1)?.trim() || row.name);
+  return row.expertType === 'team' ? row.name : expertTitle(row.name);
 }
 
 const pickerCss = `

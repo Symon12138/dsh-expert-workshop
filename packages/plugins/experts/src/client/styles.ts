@@ -66,6 +66,18 @@ export const expertsCss = `${modalCss}
 .wd-experts .search-summary{display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:12px;color:var(--dsw-alias-label-tertiary)}
 .wd-experts .search-summary button{border:0;background:transparent;min-height:0;padding:0;color:var(--dsw-alias-brand-text);font-size:12px}
 .wd-experts .mine-hint{font-size:12px;color:var(--dsw-alias-label-tertiary)}
+.wd-experts .featured-scenes{margin:0 0 22px}
+.wd-experts .scene-head{display:flex;align-items:baseline;gap:10px;margin:0 0 10px}
+.wd-experts .scene-head h2{margin:0;font-size:16px;font-weight:600}
+.wd-experts .scene-head span{font-size:12px;color:var(--dsw-alias-label-tertiary)}
+.wd-experts .scene-row{display:flex;gap:12px;overflow-x:auto;padding:0 0 6px;scrollbar-width:none}
+.wd-experts .scene-row::-webkit-scrollbar{display:none}
+.wd-experts .scene-card{flex:0 0 236px;display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--dsw-alias-border-l2);border-radius:14px;background:var(--dsw-alias-bg-layer-1)}
+.wd-experts .scene-cover{height:76px;border-radius:10px;background-color:var(--dsw-alias-bg-layer-2);background-size:cover;background-position:center}
+.wd-experts .scene-card>strong{font-size:14px;font-weight:600}
+.wd-experts .scene-links{display:flex;flex-wrap:wrap;gap:4px 10px}
+.wd-experts .scene-links button{border:0;background:transparent;min-height:0;padding:0;font-size:12px;color:var(--dsw-alias-brand-text);text-align:left}
+.wd-experts .scene-links button:hover:not(:disabled){background:transparent;text-decoration:underline}
 .wd-experts .category-tabs button{flex:0 0 auto;border:0;background:transparent;border-radius:999px;padding:5px 13px;color:var(--dsw-alias-label-secondary);font-size:13px;line-height:20px;white-space:nowrap}
 .wd-experts .category-tabs button:hover{background:var(--dsw-alias-interactive-bg-hover)}
 .wd-experts .category-tabs button.active{color:var(--dsw-alias-brand-text);background:var(--dsw-alias-interactive-bg-hover);font-weight:600}
@@ -148,7 +160,7 @@ export const expertsCss = `${modalCss}
 .expert-dialog .detail-header{display:grid;grid-template-columns:48px minmax(0,1fr);gap:16px;align-items:start}
 .expert-dialog .detail-header{padding-right:52px}
 .wd-dialog.expert-dialog .detail-avatar{width:48px;display:grid;place-items:center;overflow:hidden}
-.wd-dialog.expert-dialog .detail-avatar{height:48px;border-radius:50%;background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary);font-size:22px;font-weight:600}
+.wd-dialog.expert-dialog .detail-avatar{height:48px;border-radius:14px;background:var(--dsw-alias-interactive-bg-hover);color:#fff;font-size:22px;font-weight:600}
 .expert-dialog .detail-avatar img{width:100%;object-fit:cover}
 .expert-dialog .detail-avatar img{height:100%}
 .expert-dialog .detail-title h1{margin:0;overflow-wrap:anywhere}

@@ -7,6 +7,7 @@ import type { ExpertManagementClient } from './management.js';
 import { ExpertWorkSummary } from './ExpertWorkSummary.js';
 import { TeamOverview } from './TeamOverview.js';
 import { CATEGORY_LABEL } from './categories.js';
+import { avatarColor, expertTitle } from './avatar.js';
 
 export type ExpertDetailModalProps = {
   readonly expertId: string;
@@ -85,12 +86,14 @@ export function ExpertDetailModal({ expertId, management, acting, onClose, onSum
   const canSummon = detail.canUse && !isDraft && expert.availability === 'enabled' && detail.readiness === 'ready';
   const kindLabel = definition.team ? '专家团' : '专家';
   const versionLabel = revision ? `版本 ${revision.revisionId.slice(0, 10)}` : '草稿';
+  const headline = definition.team ? definition.name : expertTitle(definition.name);
+  const avatarImage = definition.avatarRef?.startsWith('data:image/');
 
   return <div className="dialog-scroll">
     <header className="detail-header">
-      <span className="detail-avatar" aria-hidden>{definition.avatarRef?.startsWith('data:image/') ? <img src={definition.avatarRef} alt="" /> : definition.name.trim().charAt(0) || '专'}</span>
+      <span className="detail-avatar" style={avatarImage ? undefined : { background: avatarColor(definition.name) }} aria-hidden>{avatarImage ? <img src={definition.avatarRef} alt="" /> : headline.trim().charAt(0) || '专'}</span>
       <div className="detail-title">
-        <h1>{definition.name || '（未命名专家）'}</h1>
+        <h1 title={definition.name}>{headline || '（未命名专家）'}</h1>
         <p className="detail-subtitle">{ORIGIN_LABEL[expert.origin] ?? expert.origin} · {kindLabel} · {isDraft ? '草稿' : AVAILABILITY_LABEL[expert.availability]}</p>
       <div className="detail-head-actions">
         {!isDraft && <Button variant="primary" className="summon" disabled={!canSummon || acting} title={canSummon ? `召唤${kindLabel}` : readiness.hint}
