@@ -33,7 +33,7 @@ export function applySkillsHost(ctx: Context, options: SkillManagerOptions = {})
     ...skillCreatorMeta,
     source: 'bundled',
     content: skillCreatorContent,
-    resourceBase: { kind: 'directory', path: fileURLToPath(new URL('../resources/skills/workdsh-skill-creator', import.meta.url)) },
+    resourceBase: { kind: 'directory', path: fileURLToPath(new URL('../resources/skills/expertworkshop-skill-creator', import.meta.url)) },
   }));
 }
 

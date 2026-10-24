@@ -14,7 +14,7 @@ const rootManifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8
 const dshVersion = rootManifest.pnpm.overrides['@deepseek-ai/dsh-base'];
 const realModel = process.argv.includes('--real-model');
 const artifacts = join(root, '.artifacts/dsh-0.1.6-upgrade/native-team-web');
-const home = await realpath(await mkdtemp(join(tmpdir(), 'workdsh-native-team-web-')));
+const home = await realpath(await mkdtemp(join(tmpdir(), 'expertworkshop-native-team-web-')));
 const cwd = join(home, 'workspace'), workspaceId = randomUUID();
 await mkdir(artifacts, { recursive: true }); await mkdir(cwd); await mkdir(join(home, 'storages'));
 for (const name of ['analyst', 'reviewer']) {
@@ -85,11 +85,11 @@ try {
     tarballs.push(join(artifacts, `${manifest.name}-${manifest.version}.tgz`));
   }
   const fixture = join(home, 'fixture'); await mkdir(fixture);
-  await writeFile(join(fixture, 'package.json'), JSON.stringify({ name: 'workdsh-native-team-probe', version: '0.0.0', type: 'module', exports: { '.': './index.mjs', './client': './client.js' }, peerDependencies: { '@deepseek-ai/dsh-llm': dshVersion }, dsh: { bundle: { patch: './patch.yml' }, client: { platform: 'web', inject: ['@deepseek-ai/dsh-api-session-controller', '@deepseek-ai/dsh-client-ui-workspace'] } } }));
+  await writeFile(join(fixture, 'package.json'), JSON.stringify({ name: 'expertworkshop-native-team-probe', version: '0.0.0', type: 'module', exports: { '.': './index.mjs', './client': './client.js' }, peerDependencies: { '@deepseek-ai/dsh-llm': dshVersion }, dsh: { bundle: { patch: './patch.yml' }, client: { platform: 'web', inject: ['@deepseek-ai/dsh-api-session-controller', '@deepseek-ai/dsh-client-ui-workspace'] } } }));
   await copyFile(join(root, 'tests/fixtures/native-team-web/index.mjs'), join(fixture, 'index.mjs'));
-  await writeFile(join(fixture, 'patch.yml'), '- insert:\n    - id: native-team-probe\n      name: workdsh-native-team-probe\n');
-  await writeFile(join(fixture, 'client.js'), `window.__ModuleLoader__.load({id:'workdsh-native-team-probe',factory:function(){return {inject:['sessions','uiWorkspace'],apply:function(ctx){ctx.effect(function(){window.nativeTeamProbe={open:async function(id){await ctx.sessions.refresh();ctx.uiWorkspace.openSession(id)}};return function(){delete window.nativeTeamProbe}})}}}});`);
-  await command(pnpm, ['pack', '--pack-destination', artifacts], fixture); tarballs.push(join(artifacts, 'workdsh-native-team-probe-0.0.0.tgz'));
+  await writeFile(join(fixture, 'patch.yml'), '- insert:\n    - id: native-team-probe\n      name: expertworkshop-native-team-probe\n');
+  await writeFile(join(fixture, 'client.js'), `window.__ModuleLoader__.load({id:'expertworkshop-native-team-probe',factory:function(){return {inject:['sessions','uiWorkspace'],apply:function(ctx){ctx.effect(function(){window.nativeTeamProbe={open:async function(id){await ctx.sessions.refresh();ctx.uiWorkspace.openSession(id)}};return function(){delete window.nativeTeamProbe}})}}}});`);
+  await command(pnpm, ['pack', '--pack-destination', artifacts], fixture); tarballs.push(join(artifacts, 'expertworkshop-native-team-probe-0.0.0.tgz'));
   await command(dsh, ['--profile', 'native-team', '--from-default-profile', 'web', '--dump-config']);
   await command(dsh, ['plugin', '--profile', 'native-team', 'add', `@deepseek-ai/dsh-base@${dshVersion}`, `@deepseek-ai/dsh-web-app@${dshVersion}`, ...tarballs, '--prefer-offline']);
   const profilePatch = join(home, 'profiles/native-team/cordis.patch.yml');

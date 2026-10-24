@@ -14,14 +14,14 @@ export function localActor(evidence?: { sessionId?: string; runId?: string }): A
     principalId: 'local-user',
     organizationId: 'local-personal',
     requestId: `local-${Date.now().toString(36)}`,
-    resolvedBy: 'workdsh-local',
+    resolvedBy: 'expertworkshop-local',
     ...(evidence?.sessionId === undefined ? {} : { sessionId: evidence.sessionId }),
     ...(evidence?.runId === undefined ? {} : { runId: evidence.runId }),
   };
 }
 
 export async function resolveActor(ctx: Context, evidence?: { sessionId?: string; runId?: string }, signal?: AbortSignal): Promise<ActorContext> {
-  const identity = ctx.reflect.get('workdshIdentity') as IdentityService | undefined;
+  const identity = ctx.reflect.get('expertworkshopIdentity') as IdentityService | undefined;
   if (!identity) return localActor(evidence);
   return identity.resolve(evidence, signal);
 }
@@ -40,11 +40,11 @@ export interface ExpertFoundation {
 
 /** Resolve governance services when present; otherwise run in local personal mode. */
 export function resolveExpertFoundation(ctx: Context): ExpertFoundation {
-  const access = ctx.reflect.get('workdshAccess') as AccessService | undefined;
-  const audit = ctx.reflect.get('workdshAudit') as AuditService | undefined;
-  const sessionAccess = ctx.reflect.get('workdshSessionAccess') as LocalSessionAccess | undefined;
+  const access = ctx.reflect.get('expertworkshopAccess') as AccessService | undefined;
+  const audit = ctx.reflect.get('expertworkshopAudit') as AuditService | undefined;
+  const sessionAccess = ctx.reflect.get('expertworkshopSessionAccess') as LocalSessionAccess | undefined;
   return {
-    identity: ctx.reflect.get('workdshIdentity') as IdentityService | undefined,
+    identity: ctx.reflect.get('expertworkshopIdentity') as IdentityService | undefined,
     access: access ?? {
       authorize: async () => ({ effect: 'allow' as const, code: 'local-allow', authorizationRevision: 'local', grantIds: [] }),
     },
@@ -52,6 +52,6 @@ export function resolveExpertFoundation(ctx: Context): ExpertFoundation {
     sessionAccess: sessionAccess ?? {
       create: (request) => ctx.sessionController.create(request),
     },
-    skills: ctx.reflect.get('workdshSkills') as SkillManagementService | undefined,
+    skills: ctx.reflect.get('expertworkshopSkills') as SkillManagementService | undefined,
   };
 }

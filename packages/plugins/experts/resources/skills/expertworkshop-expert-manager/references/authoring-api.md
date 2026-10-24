@@ -5,7 +5,7 @@
 ## 制作文件包
 
 先在工作区制作一个完整专家目录：
-- .workdsh-expert/plugin.json：采用 plugin-json-spec 的身份、双语展示和角色资源声明。也接受 .codebuddy-plugin/plugin.json 输入。
+- .expertworkshop-expert/plugin.json：采用 plugin-json-spec 的身份、双语展示和角色资源声明。也接受 .codebuddy-plugin/plugin.json 输入。
 - agents/<business-id>.md：采用原版 Agent frontmatter 和自由 Markdown 正文，无需四段标记。
 - 团队包含 agents/<team>-team-lead.md 与各成员 MD，settings.json 的 agent 与入口一致。
 - 按需包含 skills/<name>/SKILL.md、references、scripts、templates 和 bin。不要丢弃用户提供的领域材料。
@@ -16,7 +16,7 @@ name 是稳定标识；displayName 是名称，profession 是职业。完整 Age
 
 ## 保存、注册与发布
 
-调用 workdsh_expert_save_documents，documents=[{path,content}] 为包内相对路径和真实文件内容。更新时先 get，传 expert_id、expected_revision。Host 校验角色文件、稳定标识、默认入口和成员关联，再保存一个整团草稿；不生成每成员独立 npm 插件。
+调用 expertworkshop_expert_save_documents，documents=[{path,content}] 为包内相对路径和真实文件内容。更新时先 get，传 expert_id、expected_revision。Host 校验角色文件、稳定标识、默认入口和成员关联，再保存一个整团草稿；不生成每成员独立 npm 插件。
 
 保存返回草稿链接，validate 检查定义和可冻结的已安装技能；request_publish 引导用户在界面统一预览确认。发布固定成员和技能快照，旧任务保持原修订。注册、公开上架、运行授权不是同一件事，不能虚构成功。
 

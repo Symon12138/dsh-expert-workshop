@@ -9,11 +9,11 @@ root = pathlib.Path(__file__).resolve().parents[1]
 evidence = root / '.artifacts/plugin-delivery'
 runtime = json.loads((evidence / 'personal-default-runtime.json').read_text())
 home = pathlib.Path(runtime['home']).resolve()
-assert home.name.startswith('workdsh-personal-default-')
+assert home.name.startswith('expertworkshop-personal-default-')
 manifest = json.loads((home / 'artifacts/release-manifest.json').read_text())
 assert manifest['installation']['defaultPackages'] == [item['name'] for item in runtime['../../packages']]
-allowed = set(manifest['installation']['defaultPackages']) | {'workdsh-contracts', 'workdsh-ui', 'workdsh-plugin-workbench'}
-external = ['workdsh-provider-identity-enterprise', 'workdsh-plugin-enterprise-collaboration', 'workdsh-plugin-enterprise-orders', 'workdsh-plugin-office', 'workdsh-plugin-projects', 'workdsh-plugin-activity']
+allowed = set(manifest['installation']['defaultPackages']) | {'expertworkshop-contracts', 'expertworkshop-ui', 'expertworkshop-plugin-workbench'}
+external = ['expertworkshop-provider-identity-enterprise', 'expertworkshop-plugin-enterprise-collaboration', 'expertworkshop-plugin-enterprise-orders', 'expertworkshop-plugin-office', 'expertworkshop-plugin-projects', 'expertworkshop-plugin-activity']
 rows = []
 for item in runtime['../../packages']:
     path = home / 'artifacts' / item['filename']
@@ -26,7 +26,7 @@ for item in runtime['../../packages']:
         assert package['name'] == item['name']
         for field in ['dependencies', 'optionalDependencies', 'peerDependencies', 'devDependencies']:
             for name in package.get(field, {}):
-                if name.startswith('workdsh-'):
+                if name.startswith('expertworkshop-'):
                     assert name in allowed, (item['name'], field, name)
         scanned = []
         for member in members:

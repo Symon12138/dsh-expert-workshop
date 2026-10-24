@@ -1,21 +1,21 @@
-<p align="center"><img src="apps/web/assets/brand/workdsh-logo.svg" width="88" alt="Expert Workshop logo"></p>
+<p align="center"><img src="apps/web/assets/brand/expertworkshop-logo.svg" width="88" alt="Expert Workshop logo"></p>
 <h1 align="center">Expert Workshop</h1>
 <p align="center"><strong>A WorkBuddy-style workspace where skills, experts, and plugins shape new workflows.</strong></p>
 <p align="center">Inspired by WorkBuddy’s workflow and built on DeepSeek Harness plugins: start with personal use, then install Enterprise Connection for company models, collaboration, and colleague mentions.</p>
 <p align="center"><a href="#download-desktop">Download Desktop</a> · <a href="#from-material-to-deliverable">Explore the workflow</a> · <a href="#personal-and-enterprise-use">Personal and enterprise</a> · <a href="docs/user-guide.en.md">User guide</a> · <a href="README.zh-CN.md">简体中文</a></p>
 <p align="center"><a href="STANDALONE.md"><strong>Install the plugins individually / 插件独立安装说明</strong></a></p>
 
-[![Desktop release](https://img.shields.io/badge/Desktop-3.0.0--alpha.3-176BFF)](https://github.com/techflag/workdsh/releases/tag/desktop-v3.0.0-alpha.3) [![GitHub stars](https://img.shields.io/github/stars/techflag/workdsh?label=stars)](https://github.com/techflag/workdsh) [![MIT License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Desktop release](https://img.shields.io/badge/Desktop-3.0.0--alpha.3-176BFF)](https://github.com/techflag/expertworkshop/releases/tag/desktop-v3.0.0-alpha.3) [![GitHub stars](https://img.shields.io/github/stars/techflag/expertworkshop?label=stars)](https://github.com/techflag/expertworkshop) [![MIT License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-[![GitHub Actions](https://github.com/techflag/workdsh/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/techflag/workdsh/actions/workflows/ci.yml) [![Gitee stars](https://gitee.com/techflag/workdsh/badge/star.svg?theme=dark)](https://gitee.com/techflag/workdsh/stargazers) [![Gitee forks](https://gitee.com/techflag/workdsh/badge/fork.svg?theme=dark)](https://gitee.com/techflag/workdsh/members)
+[![GitHub Actions](https://github.com/techflag/expertworkshop/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/techflag/expertworkshop/actions/workflows/ci.yml) [![Gitee stars](https://gitee.com/techflag/expertworkshop/badge/star.svg?theme=dark)](https://gitee.com/techflag/expertworkshop/stargazers) [![Gitee forks](https://gitee.com/techflag/expertworkshop/badge/fork.svg?theme=dark)](https://gitee.com/techflag/expertworkshop/members)
 
 ## Everyone can tailor their own AI service
 
 Describe what you need, confirm the scope, and let the native AI build a workbench you can keep using. This travel example manages multiple trips, each with its own itinerary, budget and checklist.
 
-[![Watch the Expert Workshop personal AI service demo](assets/promotion/workdsh-personal-ai-service-cover.png)](assets/promotion/workdsh-personal-ai-service-landscape.mp4)
+[![Watch the Expert Workshop personal AI service demo](assets/promotion/expertworkshop-personal-ai-service-cover.png)](assets/promotion/expertworkshop-personal-ai-service-landscape.mp4)
 
-**[▶ Watch the full-system demo · 102 seconds · Chinese narration and subtitles](assets/promotion/workdsh-personal-ai-service-landscape.mp4)**
+**[▶ Watch the full-system demo · 102 seconds · Chinese narration and subtitles](assets/promotion/expertworkshop-personal-ai-service-landscape.mp4)**
 
 <sub>Full application screen recording, including the native sidebar, workbench and AI conversation, with a cover and open-source project link at the end; edited and accelerated. The video duration is not the application creation time.</sub>
 
@@ -25,17 +25,17 @@ Describe what you need, confirm the scope, and let the native AI build a workben
 
 | Feedback | Where to submit | What helps |
 | --- | --- | --- |
-| 🐛 Broken features, installation or UI problems | [Report a bug](https://github.com/techflag/workdsh/issues/new?template=bug_report.yml) | App version, personal/enterprise mode, reproduction steps and error screenshots. |
-| 💡 New features or usability improvements | [Request a feature](https://github.com/techflag/workdsh/issues/new?template=feature_request.yml) | Your use case, current difficulty and desired outcome. |
-| 🔎 Existing reports and progress | [Browse Issues](https://github.com/techflag/workdsh/issues) | Search first; add details or a reaction to an existing report. |
+| 🐛 Broken features, installation or UI problems | [Report a bug](https://github.com/techflag/expertworkshop/issues/new?template=bug_report.yml) | App version, personal/enterprise mode, reproduction steps and error screenshots. |
+| 💡 New features or usability improvements | [Request a feature](https://github.com/techflag/expertworkshop/issues/new?template=feature_request.yml) | Your use case, current difficulty and desired outcome. |
+| 🔎 Existing reports and progress | [Browse Issues](https://github.com/techflag/expertworkshop/issues) | Search first; add details or a reaction to an existing report. |
 
-A GitHub account is required to submit. Unsure which category fits? [Start here](https://github.com/techflag/workdsh/issues/new/choose). For backend account, permission or model-forwarding issues, report to [Expert Workshop Admin](https://github.com/techflag/workdsh-admin/issues). **Issues are public: do not upload passwords, tokens, API keys or confidential company material.**
+A GitHub account is required to submit. Unsure which category fits? [Start here](https://github.com/techflag/expertworkshop/issues/new/choose). For backend account, permission or model-forwarding issues, report to [Expert Workshop Admin](https://github.com/techflag/expertworkshop-admin/issues). **Issues are public: do not upload passwords, tokens, API keys or confidential company material.**
 
-**A personal workspace with installable enterprise capabilities is a defining Expert Workshop feature.** Projects, the library, experts, skills, and connectors share the same implementation. Install Enterprise Connection and sign in to share text and files with `@` colleagues and use Collaboration; add company models through model settings. Independent business plugins can also reuse member authentication through `workdshEnterprise` to call company business APIs.
+**A personal workspace with installable enterprise capabilities is a defining Expert Workshop feature.** Projects, the library, experts, skills, and connectors share the same implementation. Install Enterprise Connection and sign in to share text and files with `@` colleagues and use Collaboration; add company models through model settings. Independent business plugins can also reuse member authentication through `expertworkshopEnterprise` to call company business APIs.
 
-The enterprise plugin is **not listed in a plugin marketplace**. [Download Enterprise Connection](https://github.com/techflag/workdsh/releases/download/desktop-v3.0.0-alpha.3/workdsh-enterprise-connection-0.1.0-alpha.2.tgz), enter the downloaded file’s full path in “Plugins → Add plugin”, install and activate it, then connect through “Settings → Enterprise account”. [Installation and login](#enterprise-connection-download-install-and-sign-in) · [Business plugin authentication](#enterprise-authentication-that-independent-plugins-can-reuse) · [Separate admin backend](https://github.com/techflag/workdsh-admin)
+The enterprise plugin is **not listed in a plugin marketplace**. [Download Enterprise Connection](https://github.com/techflag/expertworkshop/releases/download/desktop-v3.0.0-alpha.3/expertworkshop-enterprise-connection-0.1.0-alpha.2.tgz), enter the downloaded file’s full path in “Plugins → Add plugin”, install and activate it, then connect through “Settings → Enterprise account”. [Installation and login](#enterprise-connection-download-install-and-sign-in) · [Business plugin authentication](#enterprise-authentication-that-independent-plugins-can-reuse) · [Separate admin backend](https://github.com/techflag/expertworkshop-admin)
 
-![Expert Workshop projects home with project templates and the complete desktop sidebar](apps/web/assets/screenshots/workdsh-projects-alpha8-dark.png)
+![Expert Workshop projects home with project templates and the complete desktop sidebar](apps/web/assets/screenshots/expertworkshop-projects-alpha8-dark.png)
 
 <sub>Captured from a local Expert Workshop session. Project names and account figures are demonstration data, not bundled with the installer.</sub>
 
@@ -55,13 +55,13 @@ Expert Workshop draws on WorkBuddy's way of organizing projects, material, exper
 - **Desktop execution, central administration**: the Agent and tools run on the employee’s computer; the server handles accounts, authorization, collaboration data and model forwarding.
 - **The full official UI with shared feature plugins**: personal and enterprise modes reuse the same library, experts, skills, and connectors.
 - **Bundled runtime**: Desktop includes Node.js, pnpm, Python, and built-in plugins without downloading them on first login. Community skills and plugins are installed on demand.
-- **Reusable enterprise authentication for business plugins**: independent plugins inject `workdshEnterprise` to call the company backend using the current member login, without reading or storing tokens.
+- **Reusable enterprise authentication for business plugins**: independent plugins inject `expertworkshopEnterprise` to call the company backend using the current member login, without reading or storing tokens.
 - **Mention colleagues and share AI results**: select organization colleagues with `@`, share analysis text and files, and review received or sent shares in Collaboration. Requires the Enterprise Connection plugin and company login.
 - **Personal and company models together**: connect the company model API and select company models in the conversation model picker while retaining personal providers. Supplier keys remain in the admin backend.
 
 ### Enterprise authentication that independent plugins can reuse
 
-Enterprise Desktop exposes **`workdshEnterprise`** to Host plugins. It reuses the current member login without returning backend tokens, local bridge credentials or passwords. Desktop Main authenticates requests; the backend enforces member and business permissions.
+Enterprise Desktop exposes **`expertworkshopEnterprise`** to Host plugins. It reuses the current member login without returning backend tokens, local bridge credentials or passwords. Desktop Main authenticates requests; the backend enforces member and business permissions.
 
 Run this example in your plugin's **Host entry**, not in its browser page. The Enterprise Connection plugin provides the service after installation, activation and company login; personal mode does not provide it.
 
@@ -70,15 +70,15 @@ import type { Context } from '@deepseek-ai/cordis'
 import type { EnterpriseService } from 'expert-workshop-contracts/enterprise'
 
 declare module '@deepseek-ai/cordis' {
-  interface Context { workdshEnterprise: EnterpriseService }
+  interface Context { expertworkshopEnterprise: EnterpriseService }
 }
 
 export default {
   name: 'company-reports',
-  inject: ['workdshEnterprise'],
+  inject: ['expertworkshopEnterprise'],
   async apply(ctx: Context) {
-    const member = await ctx.workdshEnterprise.identity()
-    const reports = await ctx.workdshEnterprise.request<{ items: unknown[] }>({
+    const member = await ctx.expertworkshopEnterprise.identity()
+    const reports = await ctx.expertworkshopEnterprise.request<{ items: unknown[] }>({
       plugin: 'reports',
       operation: 'list',
       method: 'POST',
@@ -103,7 +103,7 @@ This path is Expert Workshop's product direction. End-to-end validation of proje
 <details>
 <summary>See an HTML deliverable from a real local conversation</summary>
 
-![Expert Workshop conversation, deliverable cards, and right-side HTML preview](apps/web/assets/screenshots/workdsh-html-dashboard-preview.png)
+![Expert Workshop conversation, deliverable cards, and right-side HTML preview](apps/web/assets/screenshots/expertworkshop-html-dashboard-preview.png)
 
 <sub>A local task example showing deliverable cards and right-side preview; it does not imply lossless editing for every file.</sub>
 
@@ -117,17 +117,17 @@ DSH plugins can be individual tools or combine UI, services, and other resources
 
 Expert Workshop connects two independently maintained catalogs: [SkillHub](https://skillhub.cn/) for Skills and [dsh-market](https://dshmarket.com/zh/) for DSH plugins. SkillHub entries show their source and version, and open the source page for license information before installation. The DSH catalog is provided by the third-party dsh-market plugin inside the existing plugin page. Catalog entries are **not all preinstalled, reviewed, or endorsed by Expert Workshop**; check each item's license, dependencies, and DSH compatibility. [Skill management](packages/plugins/skills/README.md) · [Plugin development](docs/plugin-development.en.md) · [Ecosystem manifesto](docs/plugin-ecosystem.en.md)
 
-![SkillHub catalog inside Expert Workshop, showing skill icons, versions, sources, and install actions](apps/web/assets/screenshots/workdsh-skillhub-2026-09.png)
+![SkillHub catalog inside Expert Workshop, showing skill icons, versions, sources, and install actions](apps/web/assets/screenshots/expertworkshop-skillhub-2026-09.png)
 
 <sub>Live SkillHub results; catalog size and entries change over time. The local session shown is a demonstration environment.</sub>
 
-![DSH community plugin catalog opened from Expert Workshop's existing plugin page](apps/web/assets/screenshots/workdsh-dshmarket-2026-09.png)
+![DSH community plugin catalog opened from Expert Workshop's existing plugin page](apps/web/assets/screenshots/expertworkshop-dshmarket-2026-09.png)
 
 <sub>The third-party dsh-market plugin supplies discovery and installation. The screenshot does not imply that catalog plugins are bundled with Expert Workshop.</sub>
 
 ## Personal and enterprise use
 
-Expert Workshop supports personal use and Enterprise Desktop. Personal and enterprise modes use the complete official DSH interface and the same Expert Workshop feature packages. [Expert Workshop Admin](https://github.com/techflag/workdsh-admin) manages company accounts, organizations, permissions and internal model APIs.
+Expert Workshop supports personal use and Enterprise Desktop. Personal and enterprise modes use the complete official DSH interface and the same Expert Workshop feature packages. [Expert Workshop Admin](https://github.com/techflag/expertworkshop-admin) manages company accounts, organizations, permissions and internal model APIs.
 
 | Mode | Where the Agent and tools run | How to enter |
 | --- | --- | --- |
@@ -138,33 +138,33 @@ Desktop keeps personal and enterprise data and credentials in separate spaces. I
 
 ### Enterprise management backend (separate repository)
 
-The enterprise backend is developed and deployed independently in **[techflag/workdsh-admin](https://github.com/techflag/workdsh-admin)**. This repository provides the Expert Workshop client and plugins. The backend provides company accounts, organization permissions, collaboration data, member-authorized conversation auditing and internal model API forwarding.
+The enterprise backend is developed and deployed independently in **[techflag/expertworkshop-admin](https://github.com/techflag/expertworkshop-admin)**. This repository provides the Expert Workshop client and plugins. The backend provides company accounts, organization permissions, collaboration data, member-authorized conversation auditing and internal model API forwarding.
 
-Administrators should follow the [workdsh-admin deployment and usage guide](https://github.com/techflag/workdsh-admin#readme), then provide members with the backend address and company accounts. Members install this repository's desktop app and Enterprise Connection plugin and connect to that address; the Agent and tools continue to run on their computer.
+Administrators should follow the [expertworkshop-admin deployment and usage guide](https://github.com/techflag/expertworkshop-admin#readme), then provide members with the backend address and company accounts. Members install this repository's desktop app and Enterprise Connection plugin and connect to that address; the Agent and tools continue to run on their computer.
 
 ### Enterprise Connection: download, install and sign in
 
 **Enterprise features are enabled by an explicitly installed Enterprise Connection plugin, not bundled in the base Desktop.** One package provides company accounts, colleague collaboration and authenticated requests for independent business plugins.
 
-1. Download `workdsh-enterprise-connection-0.1.0-alpha.2.tgz` from this release and retain the file.
+1. Download `expertworkshop-enterprise-connection-0.1.0-alpha.2.tgz` from this release and retain the file.
 2. In personal mode, open Plugins → Add plugin, enter the full tgz path, install and click Enable now.
 3. Open Settings → Enterprise account → Connect enterprise and sign in using the company backend address and member account.
-4. Open Collaboration to review shares and configure the company API manually in model settings. Developers can inject `workdshEnterprise`; see the [integration guide](docs/ENTERPRISE-PLUGIN-AUTH.md).
+4. Open Collaboration to review shares and configure the company API manually in model settings. Developers can inject `expertworkshopEnterprise`; see the [integration guide](docs/ENTERPRISE-PLUGIN-AUTH.md).
 
 **Enterprise Connection is not listed in a plugin marketplace. Install the downloaded local `.tgz` file by its full path; searching the package name will not install it.**
 
 Example paths in the Add plugin input:
 
 ```text
-macOS: /Users/your-name/Downloads/workdsh-enterprise-connection-0.1.0-alpha.2.tgz
-Windows: C:\Users\your-name\Downloads\workdsh-enterprise-connection-0.1.0-alpha.2.tgz
+macOS: /Users/your-name/Downloads/expertworkshop-enterprise-connection-0.1.0-alpha.2.tgz
+Windows: C:\Users\your-name\Downloads\expertworkshop-enterprise-connection-0.1.0-alpha.2.tgz
 ```
 
 Use your actual username and location. On macOS, select the file in Finder and press `Option + Command + C`; on Windows, right-click and choose Copy as path, removing surrounding quotes before pasting. Paste the full path into Plugins → Add plugin, install, then click Enable now. Do not enter only the package name or upload the archive to the admin backend.
 
-[Download this release's Enterprise Connection tgz](https://github.com/techflag/workdsh/releases/download/desktop-v3.0.0-alpha.3/workdsh-enterprise-connection-0.1.0-alpha.2.tgz). Retain the original `.tgz` if your browser extracts downloads; an extracted folder path is not the archive path.
+[Download this release's Enterprise Connection tgz](https://github.com/techflag/expertworkshop/releases/download/desktop-v3.0.0-alpha.3/expertworkshop-enterprise-connection-0.1.0-alpha.2.tgz). Retain the original `.tgz` if your browser extracts downloads; an extracted folder path is not the archive path.
 
-The Enterprise Connection package is delivered independently through our [GitHub Releases](https://github.com/techflag/workdsh/releases), without a third-party marketplace. Download `workdsh-enterprise-connection-<version>.tgz` and enter its full path in Add plugin. Starting with Desktop 2.0.6-alpha.5, local plugin archives are copied into the application’s account-specific cache; moving or deleting the original download after successful installation does not block later plugin installations. Release assets include the compatible DSH version manifest and `SHA256SUMS`.
+The Enterprise Connection package is delivered independently through our [GitHub Releases](https://github.com/techflag/expertworkshop/releases), without a third-party marketplace. Download `expertworkshop-enterprise-connection-<version>.tgz` and enter its full path in Add plugin. Starting with Desktop 2.0.6-alpha.5, local plugin archives are copied into the application’s account-specific cache; moving or deleting the original download after successful installation does not block later plugin installations. Release assets include the compatible DSH version manifest and `SHA256SUMS`.
 
 In personal mode, open **Plugins → Add plugin**, enter the administrator-provided Enterprise Connection package path or installation address, verify the source and install, then click **Enable now** when installation finishes. One package provides account and collaboration plugins. Then open **Settings → Enterprise account → Connect enterprise**, enter the backend address and sign in. Installation uses the official progress and error feedback; no terminal command is required. Enterprise plugins are not yet published to a searchable catalog.
 
@@ -240,27 +240,27 @@ Expert Workshop Admin — organization overview:
 
 ## Download Desktop
 
-Desktop **3.0.0-alpha.3** is published as the Latest release (Alpha version). The [GitHub Release](https://github.com/techflag/workdsh/releases/tag/desktop-v3.0.0-alpha.3) provides these complete installers:
+Desktop **3.0.0-alpha.3** is published as the Latest release (Alpha version). The [GitHub Release](https://github.com/techflag/expertworkshop/releases/tag/desktop-v3.0.0-alpha.3) provides these complete installers:
 
 | Platform | Download |
 | --- | --- |
-| Windows x64 | [Expert Workshop Setup.exe](https://github.com/techflag/workdsh/releases/download/desktop-v3.0.0-alpha.3/dsh-plugin-desktop-windows-x64--Expert Workshop-3.0.0-alpha.3-x64-Setup.exe) |
-| macOS Apple Silicon | [Expert Workshop arm64.dmg](https://github.com/techflag/workdsh/releases/download/desktop-v3.0.0-alpha.3/dsh-plugin-desktop-macos-arm64--Expert Workshop-3.0.0-alpha.3-arm64.dmg) |
-| macOS Intel | [Expert Workshop x64.dmg](https://github.com/techflag/workdsh/releases/download/desktop-v3.0.0-alpha.3/dsh-plugin-desktop-macos-x64--Expert Workshop-3.0.0-alpha.3-x64.dmg) |
+| Windows x64 | [Expert Workshop Setup.exe](https://github.com/techflag/expertworkshop/releases/download/desktop-v3.0.0-alpha.3/dsh-plugin-desktop-windows-x64--Expert Workshop-3.0.0-alpha.3-x64-Setup.exe) |
+| macOS Apple Silicon | [Expert Workshop arm64.dmg](https://github.com/techflag/expertworkshop/releases/download/desktop-v3.0.0-alpha.3/dsh-plugin-desktop-macos-arm64--Expert Workshop-3.0.0-alpha.3-arm64.dmg) |
+| macOS Intel | [Expert Workshop x64.dmg](https://github.com/techflag/expertworkshop/releases/download/desktop-v3.0.0-alpha.3/dsh-plugin-desktop-macos-x64--Expert Workshop-3.0.0-alpha.3-x64.dmg) |
 
-**Downloads in China (older mirror)**: the [Gitee 2.0.6-alpha.3 release](https://gitee.com/techflag/workdsh/releases/tag/desktop-v2.0.6-alpha.3) provides split archives for Windows x64 and macOS Apple Silicon. The current repository allows 100 MB per attachment and 1 GB total; download every part for your platform and its merge script, then follow the release instructions. The script verifies SHA256 before producing the installer. For Intel Mac or a complete single-file installer, use the GitHub links above. Enterprise plugin TGZ/ZIP files are also available directly on the Gitee release page.
+**Downloads in China (older mirror)**: the [Gitee 2.0.6-alpha.3 release](https://gitee.com/techflag/expertworkshop/releases/tag/desktop-v2.0.6-alpha.3) provides split archives for Windows x64 and macOS Apple Silicon. The current repository allows 100 MB per attachment and 1 GB total; download every part for your platform and its merge script, then follow the release instructions. The script verifies SHA256 before producing the installer. For Intel Mac or a complete single-file installer, use the GitHub links above. Enterprise plugin TGZ/ZIP files are also available directly on the Gitee release page.
 
-**Development and feedback**: GitHub is the sole development source; Gitee mirrors source and release assets. Report problems through [Gitee Issues](https://gitee.com/techflag/workdsh/issues) or [GitHub Issues](https://github.com/techflag/workdsh/issues). See the [China distribution roadmap](https://gitee.com/techflag/workdsh/issues/IKJN8I), [cross-platform testing request](https://gitee.com/techflag/workdsh/issues/IKJN8J), and [business-plugin authentication example task](https://gitee.com/techflag/workdsh/issues/IKJN8K). Accepted Gitee code contributions enter GitHub through review before synchronization; there is no second product codebase.
+**Development and feedback**: GitHub is the sole development source; Gitee mirrors source and release assets. Report problems through [Gitee Issues](https://gitee.com/techflag/expertworkshop/issues) or [GitHub Issues](https://github.com/techflag/expertworkshop/issues). See the [China distribution roadmap](https://gitee.com/techflag/expertworkshop/issues/IKJN8I), [cross-platform testing request](https://gitee.com/techflag/expertworkshop/issues/IKJN8J), and [business-plugin authentication example task](https://gitee.com/techflag/expertworkshop/issues/IKJN8K). Accepted Gitee code contributions enter GitHub through review before synchronization; there is no second product codebase.
 
-Desktop installers include Node.js, pnpm and Python runtimes by default, so users do not need to install them separately. This is an **Alpha release**: end-to-end project document references, expert execution, and different Office formats are still being validated. The macOS DMGs are unsigned; download updates from [Releases](https://github.com/techflag/workdsh/releases). Start with the [user guide](docs/user-guide.en.md) and [FAQ](docs/faq.en.md).
+Desktop installers include Node.js, pnpm and Python runtimes by default, so users do not need to install them separately. This is an **Alpha release**: end-to-end project document references, expert execution, and different Office formats are still being validated. The macOS DMGs are unsigned; download updates from [Releases](https://github.com/techflag/expertworkshop/releases). Start with the [user guide](docs/user-guide.en.md) and [FAQ](docs/faq.en.md).
 
 The base Desktop package does not preinstall enterprise plugins. Install them separately to enable enterprise login. For existing downloads, available features are described in their corresponding release notes.
 
-The **Tools → Terminal command dsh (optional)** menu lets you inspect, install, repair or remove the terminal command. Desktop chat does not require it; its dialog appears only when you select the menu. Installation creates a command entry using the packaged Node, pnpm and official CLI. Removing it does not delete the app or workspace. Commands display the active Desktop space; use `--workdsh-space=personal` or `--workdsh-space=enterprise` to select it explicitly. Initialize the space in Desktop first and keep Desktop signed in for enterprise operations. Plugin changes apply to that space’s Profile.
+The **Tools → Terminal command dsh (optional)** menu lets you inspect, install, repair or remove the terminal command. Desktop chat does not require it; its dialog appears only when you select the menu. Installation creates a command entry using the packaged Node, pnpm and official CLI. Removing it does not delete the app or workspace. Commands display the active Desktop space; use `--expertworkshop-space=personal` or `--expertworkshop-space=enterprise` to select it explicitly. Initialize the space in Desktop first and keep Desktop signed in for enterprise operations. Plugin changes apply to that space’s Profile.
 
 ### Build plugins with enterprise authentication
 
-Host plugins inject `workdshEnterprise` and call `request({ plugin: "reports", operation: "list", method: "POST", body: { page: 1 } })`. Desktop attaches the current member authentication without exposing tokens. The backend must authorize every business operation. See the [integration guide](docs/ENTERPRISE-PLUGIN-AUTH.md) for code, type-package setup and the required new Desktop/plugin versions.
+Host plugins inject `expertworkshopEnterprise` and call `request({ plugin: "reports", operation: "list", method: "POST", body: { page: 1 } })`. Desktop attaches the current member authentication without exposing tokens. The backend must authorize every business operation. See the [integration guide](docs/ENTERPRISE-PLUGIN-AUTH.md) for code, type-package setup and the required new Desktop/plugin versions.
 
 ## Development and documentation
 
@@ -287,7 +287,7 @@ scripts/        Product build and release checks
 
 ### Enterprise Desktop packaging configuration
 
-After deploying [Expert Workshop Admin](https://github.com/techflag/workdsh-admin), the company administrator provides the public backend address when packaging Desktop. The configuration file contains only the address, for example:
+After deploying [Expert Workshop Admin](https://github.com/techflag/expertworkshop-admin), the company administrator provides the public backend address when packaging Desktop. The configuration file contains only the address, for example:
 
 ```json
 {
@@ -297,14 +297,14 @@ After deploying [Expert Workshop Admin](https://github.com/techflag/workdsh-admi
 }
 ```
 
-Set `WORKDSH_DEPLOYMENT_CONFIG` to this file. Packaging writes it to `workdsh-config.json` in application resources, and the employee entry uses the fixed address. Model API addresses and internal access keys are configured in the official model settings, outside the packaging configuration. See the [Desktop packaging instructions](apps/desktop/README.md).
+Set `EXPERTWORKSHOP_DEPLOYMENT_CONFIG` to this file. Packaging writes it to `expertworkshop-config.json` in application resources, and the employee entry uses the fixed address. Model API addresses and internal access keys are configured in the official model settings, outside the packaging configuration. See the [Desktop packaging instructions](apps/desktop/README.md).
 
 ## Community and acknowledgements
 
-Thanks to the maintainers and contributors of [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), the foundation of our runtime and plugin system; [Tencent SkillHub](https://github.com/Tencent/skillhub), whose public catalog API powers skill discovery; [@cocofhu/skillhub](https://github.com/cocofhu/skillhub), the bundled DSH SkillHub plugin; and [dsh-market](https://github.com/dsh-market/dsh-market) with the [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) catalog, which power community plugin discovery. WorkBuddy inspired the workspace design. The bundled skill-creator adaptation retains its [Apache-2.0 notice](packages/plugins/skills/resources/skills/workdsh-skill-creator/NOTICE.md). Feedback and contributions: [GitHub Issues](https://github.com/techflag/workdsh/issues) · [Contributing](CONTRIBUTING.en.md)
+Thanks to the maintainers and contributors of [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), the foundation of our runtime and plugin system; [Tencent SkillHub](https://github.com/Tencent/skillhub), whose public catalog API powers skill discovery; [@cocofhu/skillhub](https://github.com/cocofhu/skillhub), the bundled DSH SkillHub plugin; and [dsh-market](https://github.com/dsh-market/dsh-market) with the [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) catalog, which power community plugin discovery. WorkBuddy inspired the workspace design. The bundled skill-creator adaptation retains its [Apache-2.0 notice](packages/plugins/skills/resources/skills/expertworkshop-skill-creator/NOTICE.md). Feedback and contributions: [GitHub Issues](https://github.com/techflag/expertworkshop/issues) · [Contributing](CONTRIBUTING.en.md)
 
 Expert Workshop uses the [MIT License](LICENSE). It is an independent community project and is not affiliated with, partnered with, authorized by, or endorsed by DeepSeek or WorkBuddy. Those names appear only to describe technical origins, compatibility, and design references. Upstream contributors shown on GitHub are inherited from synchronized commit history; this does not imply that they maintain this repository.
 
 ## Star history
 
-[![Expert Workshop star history](https://api.star-history.com/chart?repos=techflag/workdsh&type=date)](https://www.star-history.com/?repos=techflag%2Fworkdsh&type=date)
+[![Expert Workshop star history](https://api.star-history.com/chart?repos=techflag/expertworkshop&type=date)](https://www.star-history.com/?repos=techflag%2Fexpertworkshop&type=date)

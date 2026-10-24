@@ -31,10 +31,10 @@ export function createElectronBuilderConfig(
   const resolvedArch = env.DSH_DESKTOP_TARGET_ARCH ?? hostArch
   const packagesMacOS = targetPlatform === 'darwin' || (targetPlatform === undefined && hostPlatform === 'darwin')
   const packagesWindows = targetPlatform === 'win32'
-  // WORKDSH TEST PATCH: unsigned local test builds skip Developer ID signing and notarization.
-  const workdshUnsigned = env.WORKDSH_DESKTOP_UNSIGNED === '1'
-  const macOSSigning = packagesMacOS && !workdshUnsigned ? resolveMacOSSigningEnvironment(env) : undefined
-  if (packagesMacOS && !workdshUnsigned) resolveMacOSNotarizationEnvironment(env)
+  // EXPERTWORKSHOP TEST PATCH: unsigned local test builds skip Developer ID signing and notarization.
+  const expertworkshopUnsigned = env.EXPERTWORKSHOP_DESKTOP_UNSIGNED === '1'
+  const macOSSigning = packagesMacOS && !expertworkshopUnsigned ? resolveMacOSSigningEnvironment(env) : undefined
+  if (packagesMacOS && !expertworkshopUnsigned) resolveMacOSNotarizationEnvironment(env)
   const windowsSigner = packagesWindows
     ? createWindowsTokenSigner({
         certificateFile: env.DSH_DESKTOP_WINDOWS_CER_FILE,
@@ -50,9 +50,9 @@ export function createElectronBuilderConfig(
   const buildPaths = desktopTargetBuildPaths(update.target)
   return {
     appId,
-    // WORKDSH TEST PATCH: Expert Workshop product branding.
+    // EXPERTWORKSHOP TEST PATCH: Expert Workshop product branding.
     productName: 'Expert Workshop',
-    artifactName: 'workdsh-${version}-${os}-${arch}.${ext}',
+    artifactName: 'expertworkshop-${version}-${os}-${arch}.${ext}',
     directories: { output: buildPaths.artifacts },
     asar: true,
     files: [
@@ -67,25 +67,25 @@ export function createElectronBuilderConfig(
     ],
     mac: {
       category: 'public.app-category.developer-tools',
-      // WORKDSH TEST PATCH: Expert Workshop branded application icon.
-      icon: fileURLToPath(new URL('./workdsh-icon.icns', import.meta.url)),
-      identity: workdshUnsigned ? null : macOSSigning?.signingIdentity,
-      forceCodeSigning: !workdshUnsigned,
+      // EXPERTWORKSHOP TEST PATCH: Expert Workshop branded application icon.
+      icon: fileURLToPath(new URL('./expertworkshop-icon.icns', import.meta.url)),
+      identity: expertworkshopUnsigned ? null : macOSSigning?.signingIdentity,
+      forceCodeSigning: !expertworkshopUnsigned,
       hardenedRuntime: true,
-      notarize: !workdshUnsigned,
+      notarize: !expertworkshopUnsigned,
       target: ['dmg', 'zip'],
     },
     dmg: {
-      sign: !workdshUnsigned,
+      sign: !expertworkshopUnsigned,
       writeUpdateInfo: false,
     },
     afterSign: context => {
       if (context.electronPlatformName !== 'darwin') return
-      if (workdshUnsigned) return
+      if (expertworkshopUnsigned) return
       verifyMacOSSignatureAfterSign(context, macOSSigning ?? resolveMacOSSigningEnvironment(env))
     },
     artifactBuildCompleted: artifact => {
-      if (workdshUnsigned) return
+      if (expertworkshopUnsigned) return
       if (!artifact.file.endsWith('.dmg')) return
       return notarizeMacOSDiskImageArtifact(
         artifact,

@@ -1,5 +1,5 @@
 ---
-name: workdsh-skill-creator
+name: expertworkshop-skill-creator
 description: 创建或更新技能，将专业知识、工作流程、工具操作和可复用脚本、参考文档、模板组织成可校验、可分发的技能包。
 when-to-use: 用户希望创建、修改、完善或打包技能时使用。
 license: Apache-2.0; see LICENSE.workbuddy.txt and NOTICE.md

@@ -14,11 +14,11 @@ import { ExpertsError } from '../domain/values.js';
 /**
  * Model-facing expert authoring tools (D04 / P1-02).
  *
- * These tools call the SAME `ctx.workdshExperts` Host authority as the UI; they
+ * These tools call the SAME `ctx.expertworkshopExperts` Host authority as the UI; they
  * never hold a second state truth. The actor is resolved on the Host from the
  * trusted identity provider using the calling Session — the model never supplies
  * an actor, an owner or a confirmation boolean. Publishing is deliberately split:
- * `workdsh_expert_request_publish` only reports `needs-confirmation` and the exact
+ * `expertworkshop_expert_request_publish` only reports `needs-confirmation` and the exact
  * digests to be frozen; exchanging a challenge for a proof (`confirmPublish`) and
  * `publish` are trusted-UI Connection routes and are NOT exposed as tools, so a
  * model restatement or `confirmed:true` can never authorise a publish.
@@ -286,10 +286,10 @@ async function workspaceTarget(ctx: Context, exec: ToolRunContext, path: string)
 
 /** Register the model-facing expert management tools against the same Host authority as the UI. */
 export function registerExpertManagementTools(ctx: Context): void {
-  const manager: ExpertsManager = ctx.workdshExperts;
+  const manager: ExpertsManager = ctx.expertworkshopExperts;
 
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_save_resources',
+    name: 'expertworkshop_expert_save_resources',
     description: '从当前工作区的真实文件保存完整专家资源。支持头像、程序、二进制参考文件；与Markdown制作稿统一保存及校验。修改已有作品时保留未改文件、带expected_revision；保存不等于执行授权。',
     parameters: { expert_id: { type: 'string' }, expected_revision: { type: 'string' }, documents: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, content: { type: 'string', required: true } } } }, resources: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, source_path: { type: 'string', required: true }, executable: { type: 'boolean' } } } }, remove_paths: { type: 'array', items: { type: 'string' } } },
     output: { schema: detailOutput, render: (_args, value) => renderResult('完整作品与真实资源已保存。', value, value.draft_url) },
@@ -317,7 +317,7 @@ export function registerExpertManagementTools(ctx: Context): void {
     },
   }));
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_export_file',
+    name: 'expertworkshop_expert_export_file',
     description: '实际生成并呈现完整.expert.zip文件，包含角色MD、原资源和二进制文件。所有文件写入与展示经过原生bash/present及沙箱；不是仅返回下载说明。已有不同内容的文件不会覆盖。',
     parameters: { expert_id: { type: 'string', required: true }, revision_id: { type: 'string' }, file_path: { type: 'string', required: true, description: '当前工作区内的目标ZIP文件路径。' } },
     output: { schema: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, bytes: { type: 'integer', required: true }, digest: { type: 'string', required: true }, presented: { type: 'boolean', required: true } } }, render: (_args, value) => renderResult('完整专家文件包已生成并展示。', value) },
@@ -341,7 +341,7 @@ export function registerExpertManagementTools(ctx: Context): void {
     },
   }));
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_save_documents', description: '将单专家或整个专家团的 Markdown 制作稿保存为一个作品草稿。读取并提交 agents/*.md 与 team.md 的内容；不会发布、授权或执行脚本。',
+    name: 'expertworkshop_expert_save_documents', description: '将单专家或整个专家团的 Markdown 制作稿保存为一个作品草稿。读取并提交 agents/*.md 与 team.md 的内容；不会发布、授权或执行脚本。',
     parameters: { expert_id: { type: 'string' }, expected_revision: { type: 'string' }, documents: { type: 'array', required: true, items: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, content: { type: 'string', required: true } } } } },
     output: { schema: detailOutput, render: (_args, value) => renderResult('整套制作稿已保存，可打开预览。', value, value.draft_url) },
     async execute(args, exec) {
@@ -356,7 +356,7 @@ export function registerExpertManagementTools(ctx: Context): void {
     },
   }));
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_get_documents', description: '读取已保存作品的 Markdown 制作稿，用于修改或通过原生 write/present 交付文件。返回内容不代表已经写入工作区。',
+    name: 'expertworkshop_expert_get_documents', description: '读取已保存作品的 Markdown 制作稿，用于修改或通过原生 write/present 交付文件。返回内容不代表已经写入工作区。',
     parameters: { expert_id: { type: 'string', required: true } },
     output: { schema: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, content: { type: 'string', required: true } } } }, render: (_args, value) => renderResult('制作稿内容：', value) },
     async execute(args, exec) {
@@ -366,7 +366,7 @@ export function registerExpertManagementTools(ctx: Context): void {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_list_skills',
+    name: 'expertworkshop_expert_list_skills',
     description: '查询可编辑专家的真实本地已安装技能目录，返回稳定标识、简介与可配备状态。只读；创建或获取草稿后选择 selectable=true 的项，不能猜测技能名称。',
     parameters: { expert_id: { type: 'string', required: true, description: '当前主体可编辑的目标专家 id。' } },
     output: {
@@ -387,7 +387,7 @@ export function registerExpertManagementTools(ctx: Context): void {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_list',
+    name: 'expertworkshop_expert_list',
     description: '列出当前主体可见的 Expert Workshop 专家（我的专家、内置专家），可按名称/描述/标签搜索与筛选。只读，不修改任何数据。',
     parameters: {
       search: { type: 'string', description: '可选搜索词，最多 200 字。' },
@@ -430,7 +430,7 @@ export function registerExpertManagementTools(ctx: Context): void {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_get',
+    name: 'expertworkshop_expert_get',
     description: '读取一个 Expert Workshop 专家的完整详情：草稿定义、并发令牌 revision、草稿修订 draft_revision、就绪状态与校验问题。只读。',
     parameters: {
       expert_id: { type: 'string', required: true, description: '专家 id。' },
@@ -450,7 +450,7 @@ export function registerExpertManagementTools(ctx: Context): void {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_create_draft',
+    name: 'expertworkshop_expert_create_draft',
     description: '创建一个新的「我的专家」草稿。这只写入私有草稿，绝不发布、不安装、不召唤任务。返回并发令牌 revision 与草稿修订 draft_revision。',
     parameters: { definition: definitionParameters },
     output: {
@@ -468,7 +468,7 @@ export function registerExpertManagementTools(ctx: Context): void {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_update_draft',
+    name: 'expertworkshop_expert_update_draft',
     description: '修改一个已存在的专家草稿。必须传入上次看到的并发令牌 expected_revision，冲突时会失败并要求刷新。绝不改动已发布修订或运行中的任务。',
     parameters: {
       expert_id: { type: 'string', required: true, description: '专家 id。' },
@@ -496,7 +496,7 @@ export function registerExpertManagementTools(ctx: Context): void {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_validate',
+    name: 'expertworkshop_expert_validate',
     description: '校验一个专家草稿是否可发布，并解析其 Skill 依赖，返回定义摘要与依赖锁摘要。无副作用。发布前应先调用它。',
     parameters: {
       expert_id: { type: 'string', required: true, description: '专家 id。' },
@@ -522,7 +522,7 @@ export function registerExpertManagementTools(ctx: Context): void {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_request_publish',
+    name: 'expertworkshop_expert_request_publish',
     description: '对已通过校验的草稿发起发布前检查，返回 needs-confirmation 与将被冻结的精确摘要。此工具不会发布：用户必须在专家界面亲自确认，确认与发布只能由受信 UI 完成。',
     parameters: {
       expert_id: { type: 'string', required: true, description: '专家 id。' },

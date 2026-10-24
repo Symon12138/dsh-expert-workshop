@@ -11,10 +11,10 @@ const ownedBy = (owner: SessionOwnerBinding, actor: ActorContext): boolean =>
 export async function assertSessionAssociationAccess(ctx: Context, actor: ActorContext, sessionId: string, signal?: AbortSignal): Promise<void> {
   signal?.throwIfAborted();
   assertActorContext(actor);
-  const access = ctx.get('workdshAccess') as RuntimeBindingService | undefined;
-  const identity = ctx.get('workdshIdentity') as IdentityService | undefined;
+  const access = ctx.get('expertworkshopAccess') as RuntimeBindingService | undefined;
+  const identity = ctx.get('expertworkshopIdentity') as IdentityService | undefined;
   const controller = ctx.get('sessionController') as Context['sessionController'] | undefined;
-  const protectedSessions = ctx.get('workdshSessionAccess') as Pick<Context['sessionController'], 'inspect'> | undefined;
+  const protectedSessions = ctx.get('expertworkshopSessionAccess') as Pick<Context['sessionController'], 'inspect'> | undefined;
   if (!controller) throw new Error('projects/session-authority-unavailable');
   const resolved = identity ? await identity.resolve({ sessionId }, signal) : actor;
   if (identity && (resolved.principalId !== actor.principalId || resolved.organizationId !== actor.organizationId

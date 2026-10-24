@@ -71,7 +71,7 @@ export function SkillHubPanel({ query, management, onInstalled, onOpenInstalled 
     const controller = new AbortController();
     setBusy(true); setError('');
     void (async () => {
-      const results = await Promise.all(SECTIONS.map(async ({ key }) => ({ key, data: await fetchJson<{ skills?: Record<string, unknown>[] }>(`/api/workdsh-skills/skillhub?kind=showcase&section=${key}`, controller.signal) })));
+      const results = await Promise.all(SECTIONS.map(async ({ key }) => ({ key, data: await fetchJson<{ skills?: Record<string, unknown>[] }>(`/api/expertworkshop-skills/skillhub?kind=showcase&section=${key}`, controller.signal) })));
       if (controller.signal.aborted) return;
       const bySlug = new Map<string, MarketItem>();
       for (const { key, data } of results) {
@@ -92,7 +92,7 @@ export function SkillHubPanel({ query, management, onInstalled, onOpenInstalled 
     if (!normalized) { setSearchItems([]); setSearchBusy(false); return () => controller.abort(); }
     setSearchBusy(true);
     const timer = window.setTimeout(() => {
-      void fetchJson<{ results?: Record<string, unknown>[] }>(`/api/workdsh-skills/skillhub?kind=search&q=${encodeURIComponent(normalized)}&limit=60`, controller.signal)
+      void fetchJson<{ results?: Record<string, unknown>[] }>(`/api/expertworkshop-skills/skillhub?kind=search&q=${encodeURIComponent(normalized)}&limit=60`, controller.signal)
         .then(data => { if (!controller.signal.aborted) setSearchItems((data.results ?? []).map(normalize).filter(item => item.slug)); })
         .catch(cause => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : 'SkillHub 搜索失败。'); })
         .finally(() => { if (!controller.signal.aborted) setSearchBusy(false); });
@@ -116,7 +116,7 @@ export function SkillHubPanel({ query, management, onInstalled, onOpenInstalled 
       const params = new URLSearchParams({ kind: 'download', slug: item.slug });
       if (item.version) params.set('version', item.version);
       if (item.namespace?.handle) params.set('namespace', item.namespace.handle);
-      const response = await fetch(`/api/workdsh-skills/skillhub?${params}`, { credentials: 'same-origin' });
+      const response = await fetch(`/api/expertworkshop-skills/skillhub?${params}`, { credentials: 'same-origin' });
       if (!response.ok) throw new Error(response.status === 404 ? '该技能暂不提供下载（可能是企业专有技能）。' : `下载失败（${response.status}）。`);
       const blob = await response.blob();
       const file = new File([blob], `${item.slug}.zip`, { type: 'application/zip' });

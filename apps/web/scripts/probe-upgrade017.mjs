@@ -10,7 +10,7 @@ import { chromium, expect } from '@playwright/test';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const artifacts = join(root, '.artifacts/upgrade017-acceptance');
-const home = await realpath(await mkdtemp(join(tmpdir(), 'workdsh-office-native-')));
+const home = await realpath(await mkdtemp(join(tmpdir(), 'expertworkshop-office-native-')));
 await mkdir(artifacts, { recursive: true });
 const workspace = join(home, 'workspace');
 await mkdir(workspace);
@@ -67,7 +67,7 @@ async function stop() {
   await stopped; clearTimeout(timer);
 }
 async function api(host, endpoint, payload = {}) {
-  const response = await fetch(`${host.address}/api/workdsh-experts`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(15_000) });
+  const response = await fetch(`${host.address}/api/expertworkshop-experts`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(15_000) });
   assert.equal(response.status, 200);
   const result = await response.json();
   assert.equal(result.ok, true, JSON.stringify(result));
@@ -82,8 +82,8 @@ try {
     tarballs.push(join(artifacts, `${manifest.name}-${manifest.version}.tgz`));
   }
   const fixture = join(home, 'probe-client'); await mkdir(fixture);
-  await writeFile(join(fixture, 'package.json'), JSON.stringify({ name: 'workdsh-office-native-probe', version: '0.0.0', type: 'module', exports: { '.': './index.js', './client': './client.js' }, dsh: { bundle: { patch: './patch.yml' }, client: { platform: 'web', inject: ['@deepseek-ai/dsh-client-ui-sidebar-right', '@deepseek-ai/dsh-client-ui-sidebar-documentpreview'] } } }));
-  await writeFile(join(fixture, 'patch.yml'), '- insert:\n    - id: office-native-probe\n      name: workdsh-office-native-probe\n');
+  await writeFile(join(fixture, 'package.json'), JSON.stringify({ name: 'expertworkshop-office-native-probe', version: '0.0.0', type: 'module', exports: { '.': './index.js', './client': './client.js' }, dsh: { bundle: { patch: './patch.yml' }, client: { platform: 'web', inject: ['@deepseek-ai/dsh-client-ui-sidebar-right', '@deepseek-ai/dsh-client-ui-sidebar-documentpreview'] } } }));
+  await writeFile(join(fixture, 'patch.yml'), '- insert:\n    - id: office-native-probe\n      name: expertworkshop-office-native-probe\n');
   await writeFile(join(fixture, 'index.js'), `import {appendFile} from 'node:fs/promises';
 export const inject=['llm'];
 export function apply(ctx){ctx.on('llm/stream',async function*(options){
@@ -91,8 +91,8 @@ const messages=JSON.stringify(options.messages);const result={library:messages.i
 await appendFile(${JSON.stringify(join(home,'model-checks.jsonl'))},JSON.stringify(result)+'\\n');
 yield {type:'block-start',index:0,blockType:'text'};yield {type:'block-end',index:0,block:{type:'text',text:result.library&&result.project?'PROJECT_CHAIN_ACCEPTED':'升级验收任务'}};yield {type:'finish',reason:{kind:'stop'}};
 });}`);
-  await writeFile(join(fixture, 'client.js'), `window.__ModuleLoader__.load({id:'workdsh-office-native-probe',factory:function(){return {inject:['sidebarRight','documentPreviews'],apply:function(ctx){ctx.effect(function(){window.officeNativeProbe={files:function(sid){ctx.sidebarRight.openTabIn(sid,'files')},registered:function(){return ctx.documentPreviews.getSnapshot().map(d=>d.id)},candidates:function(path){return ctx.documentPreviews.candidates(path).map(d=>({id:d.id,title:d.title()}))}};return function(){delete window.officeNativeProbe}})}}}});`);
-  await command(pnpm, ['pack', '--pack-destination', artifacts], fixture); tarballs.push(join(artifacts, 'workdsh-office-native-probe-0.0.0.tgz'));
+  await writeFile(join(fixture, 'client.js'), `window.__ModuleLoader__.load({id:'expertworkshop-office-native-probe',factory:function(){return {inject:['sidebarRight','documentPreviews'],apply:function(ctx){ctx.effect(function(){window.officeNativeProbe={files:function(sid){ctx.sidebarRight.openTabIn(sid,'files')},registered:function(){return ctx.documentPreviews.getSnapshot().map(d=>d.id)},candidates:function(path){return ctx.documentPreviews.candidates(path).map(d=>({id:d.id,title:d.title()}))}};return function(){delete window.officeNativeProbe}})}}}});`);
+  await command(pnpm, ['pack', '--pack-destination', artifacts], fixture); tarballs.push(join(artifacts, 'expertworkshop-office-native-probe-0.0.0.tgz'));
   for (const kind of ['docx','pptx','xlsx']) await writeFile(join(workspace, 'input.'+kind), await readFile(join(root, 'tests/fixtures/upgrade017/input.'+kind)));
   await writeFile(join(workspace, 'input.csv'), [
     '单号,供应商,物料编码,物料名称,数量,单价,金额,交货日期,备注',
@@ -127,7 +127,7 @@ yield {type:'block-start',index:0,blockType:'text'};yield {type:'block-end',inde
   page.on('pageerror', error => browserErrors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') browserErrors.push(message.text()); });
   page.on('response', async response => {
-    if (!response.url().endsWith('/api/workdsh-experts')) return;
+    if (!response.url().endsWith('/api/expertworkshop-experts')) return;
     try { const body = await response.json(); if (!body?.ok) browserErrors.push('expert API failure: ' + JSON.stringify(body?.error ?? body).slice(0, 400)); } catch {}
   });
   await page.context().addCookies(host.cookie.split('; ').map(pair => { const at = pair.indexOf('='); return { name: pair.slice(0, at), value: pair.slice(at + 1), url: host.address }; }));
@@ -137,7 +137,7 @@ yield {type:'block-start',index:0,blockType:'text'};yield {type:'block-end',inde
   await page.locator('[contenteditable="true"]').first().waitFor({ timeout: 20_000 }).catch(() => {});
   await page.waitForTimeout(800);
   await page.waitForFunction(() => window.officeNativeProbe);
-  assert.ok((await page.evaluate(() => window.officeNativeProbe.registered())).includes('workdsh-office'));
+  assert.ok((await page.evaluate(() => window.officeNativeProbe.registered())).includes('expertworkshop-office'));
   // Record any pointer fallback separately from ordinary UI interactions.
   const clickWithFallback = async (locator, timeout) => {
     const failure = await locator.click({ timeout }).then(() => null).catch(error => String(error.message).split('\n')[0]);
@@ -183,7 +183,7 @@ yield {type:'block-start',index:0,blockType:'text'};yield {type:'block-end',inde
     }
     await clickWithFallback(entry, 30000);
     const candidates = await page.evaluate(kind => window.officeNativeProbe.candidates('input.'+kind), kind);
-    assert.ok(candidates.length && candidates[0].id !== 'workdsh-office', JSON.stringify(candidates));
+    assert.ok(candidates.length && candidates[0].id !== 'expertworkshop-office', JSON.stringify(candidates));
     await page.waitForTimeout(2500);
     const body = await page.locator('body').innerText();
     assert.doesNotMatch(body, /File not found|文件不存在|Unable to preview|Failed to load/i);
@@ -208,7 +208,7 @@ yield {type:'block-start',index:0,blockType:'text'};yield {type:'block-end',inde
 
   await writeFile(join(artifacts,'buttons.json'),JSON.stringify(await page.getByRole('button').evaluateAll(nodes=>nodes.map(n=>({text:n.textContent,title:n.title,aria:n.getAttribute('aria-label')}))),null,2));
   const call = async (domain, endpoint, payload={}) => {
-    const response=await fetch(host.address+'/api/workdsh-'+domain,{method:'POST',headers:{cookie:host.cookie,'content-type':'application/json'},body:JSON.stringify({endpoint,payload})});
+    const response=await fetch(host.address+'/api/expertworkshop-'+domain,{method:'POST',headers:{cookie:host.cookie,'content-type':'application/json'},body:JSON.stringify({endpoint,payload})});
     const result=await response.json();assert.equal(result.ok,true,JSON.stringify(result));return result.value;
   };
   const project = await call('projects','create',{name:'升级验收项目'});
@@ -217,7 +217,7 @@ yield {type:'block-start',index:0,blockType:'text'};yield {type:'block-end',inde
   await call('projects','update-config',{projectId,expectedRevisionId:snapshot.config.id,config:{instruction:'PROJECT_ACCEPT_017: 检查所引用的验收资料。',capabilities:[]}});
   const asset = await call('library','import',{name:'验收资料.md',mediaType:'text/markdown',base64:Buffer.from('# 验收资料\nLIBRARY_ACCEPT_017').toString('base64'),operationId:'accept017-import'});
   await call('projects','add-asset',{projectId,asset:{nodeId:asset.id,assetId:asset.asset.id,revisionId:asset.revision.id,name:asset.name,kind:asset.asset.kind}});
-  await page.goto(host.address+'/?workdsh-view=projects&project='+projectId);
+  await page.goto(host.address+'/?expertworkshop-view=projects&project='+projectId);
   for (const name of ['Continue','Configure later']) await page.getByRole('button',{name,exact:true}).click({timeout:4000}).catch(()=>{});
   const composer=page.locator('.wd-p-composer textarea');await composer.waitFor();
   await composer.press('@');
@@ -227,7 +227,7 @@ yield {type:'block-start',index:0,blockType:'text'};yield {type:'block-end',inde
   await composer.fill('分析引用的资料，检查项目指令。');
   await page.locator('.wd-p-composer footer .wd-p-primary').click();
   await page.getByText('PROJECT_CHAIN_ACCEPTED',{exact:true}).waitFor({timeout:30000});
-  assert.equal(new URL(page.url()).searchParams.get('workdsh-view'),'conversation');
+  assert.equal(new URL(page.url()).searchParams.get('expertworkshop-view'),'conversation');
   await expect(page.locator('body')).toContainText('验收资料.md');
   await expect(page.locator('body')).toContainText('升级验收项目');
   snapshot=await call('projects','get',{projectId});assert.equal(snapshot.tasks.length,1);assert.equal(snapshot.tasks[0].references.length,1);
@@ -264,7 +264,7 @@ yield {type:'block-start',index:0,blockType:'text'};yield {type:'block-end',inde
   const reopened=await browser.newPage({viewport:{width:1440,height:1000}});
   reopened.on('pageerror',error=>browserErrors.push(error.message));
   await reopened.context().addCookies(host.cookie.split('; ').map(pair=>{const at=pair.indexOf('=');return {name:pair.slice(0,at),value:pair.slice(at+1),url:host.address};}));
-  await reopened.goto(host.address+'/?workdsh-view=projects&project='+projectId);
+  await reopened.goto(host.address+'/?expertworkshop-view=projects&project='+projectId);
   for(const name of ['Continue','Configure later']) await reopened.getByRole('button',{name,exact:true}).click({timeout:4000}).catch(()=>{});
   await reopened.getByRole('button',{name:'任务',exact:true}).click();
   await reopened.locator('.wd-p-task-row').first().click();

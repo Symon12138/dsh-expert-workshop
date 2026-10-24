@@ -71,8 +71,8 @@ import { assertUploadWithinLimit, buildExport, preflightPackage } from './portab
  * resolves the actor first, so no method takes an actor/owner/confirmation
  * boolean from the client or model. Every write is serialized on one mutation
  * tail, guarded by optimistic concurrency (`expectedRevision`), made idempotent
- * through the durable `operations` table, authorized through `workdshAccess` and
- * audited through `workdshAudit`. Publishing freezes an immutable revision and
+ * through the durable `operations` table, authorized through `expertworkshopAccess` and
+ * audited through `expertworkshopAudit`. Publishing freezes an immutable revision and
  * compiles a read-only preset; execution reserves a native Session bound to that
  * exact revision and never re-binds it.
  */
@@ -88,16 +88,16 @@ interface SessionAccess {
 
 declare module '@deepseek-ai/cordis' {
   interface Context {
-    workdshIdentity: IdentityService;
-    workdshAccess: AccessService;
-    workdshAudit: AuditService;
-    workdshSessionAccess: SessionAccess;
-    workdshSkills: SkillManagementService;
-    workdshExperts: ExpertsManager;
+    expertworkshopIdentity: IdentityService;
+    expertworkshopAccess: AccessService;
+    expertworkshopAudit: AuditService;
+    expertworkshopSessionAccess: SessionAccess;
+    expertworkshopSkills: SkillManagementService;
+    expertworkshopExperts: ExpertsManager;
   }
 }
 
-const EXPERT_DOMAIN = 'workdsh-experts';
+const EXPERT_DOMAIN = 'expertworkshop-experts';
 const PLAN_TTL_MS = 10 * 60 * 1000;
 const HANDOFF_TTL_MS = 10 * 60 * 1000;
 const STAGED_IMPORT_PATTERN = /^[a-z0-9-]{1,64}$/;
@@ -199,7 +199,7 @@ function sanitizeFileName(fileName: string): string {
   return base || 'expert.zip';
 }
 
-declare module '@deepseek-ai/cordis' { interface Context { workdshConnectors: ConnectorManagementService; } }
+declare module '@deepseek-ai/cordis' { interface Context { expertworkshopConnectors: ConnectorManagementService; } }
 
 export interface ExpertsManagerOptions { agentsHome?: string; includeDefaultSkillRoots?: boolean; }
 
@@ -232,11 +232,11 @@ export class ExpertsManager extends Service implements ExpertsService {
   private readonly includeDefaultSkillRoots?: boolean;
 
   constructor(ctx: Context, options: ExpertsManagerOptions = {}) {
-    super(ctx, 'workdshExperts');
+    super(ctx, 'expertworkshopExperts');
     const agentsHome = resolveAgentsHome(options.agentsHome);
     this.agentsHome = agentsHome;
     this.includeDefaultSkillRoots = options.includeDefaultSkillRoots;
-    this.stagingRoot = join(agentsHome, '.workdsh-state', 'experts', 'staging');
+    this.stagingRoot = join(agentsHome, '.expertworkshop-state', 'experts', 'staging');
   }
 
   private compilePreset(input: Parameters<typeof compileExpertPreset>[1]) {
@@ -246,7 +246,7 @@ export class ExpertsManager extends Service implements ExpertsService {
   private async retainSkill(...args: Parameters<SkillManagementService['retainRevision']>): Promise<{ snapshotDir: string }> {
     const skills = this.foundation.skills;
     if (skills) return await skills.retainRevision(...args);
-    const dir = join(this.agentsHome, '.workdsh-state', 'experts', 'standalone-skill');
+    const dir = join(this.agentsHome, '.expertworkshop-state', 'experts', 'standalone-skill');
     await mkdir(dir, { recursive: true });
     await writeFile(join(dir, 'SKILL.md'), '---\nname: standalone-skill\ndescription: Standalone install placeholder\n---\n', 'utf8');
     return { snapshotDir: dir };
@@ -282,7 +282,7 @@ export class ExpertsManager extends Service implements ExpertsService {
       for (const record of seed.revisions ?? []) await this.revisionsTable().put(keys.revision(record.expertId, record.revisionId), record as never);
       for (const record of seed.bindings ?? []) await this.bindingsTable().put(keys.binding(record.sessionId), record as never);
       for (const record of seed.preferences ?? []) await this.preferencesTable().put(keys.preference(record.principalId, record.expertId), record as never);
-      await cp(join(root, 'presets'), join(this.agentsHome, '.workdsh-state', 'experts', 'presets'), { recursive: true, force: false, errorOnExist: false });
+      await cp(join(root, 'presets'), join(this.agentsHome, '.expertworkshop-state', 'experts', 'presets'), { recursive: true, force: false, errorOnExist: false });
       console.log('[experts] bundled catalog seeded', seed.experts?.length ?? 0);
     } catch (error) {
       console.warn('[experts] bundled catalog not seeded', error);
@@ -290,15 +290,15 @@ export class ExpertsManager extends Service implements ExpertsService {
   }
 
   async [Service.init](): Promise<void> {
-    this.ctx.inject(['workdshConnectors'], (ctx) => {
-      const service = ctx.workdshConnectors;
+    this.ctx.inject(['expertworkshopConnectors'], (ctx) => {
+      const service = ctx.expertworkshopConnectors;
       this.connectors = service;
       ctx.effect(() => () => { if (this.connectors === service) this.connectors = undefined; }, 'experts.connectors');
     });
     const initStarted = Date.now();
     const domain = await this.ctx.storageDomain.open(expertsDomainSpec);
     console.log('[experts] domain opened ms=', Date.now() - initStarted);
-    this.ctx.effect(() => () => domain.close(), 'workdshExperts.domainClose');
+    this.ctx.effect(() => () => domain.close(), 'expertworkshopExperts.domainClose');
     this.experts = domain.table('experts');
     this.drafts = domain.table('drafts');
     this.revisions = domain.table('revisions');
@@ -320,7 +320,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     }
     console.log('[experts] presets registered ms=', Date.now() - initStarted, 'count=', activePresets.size);
     // Staged uploads are transient; best-effort cleanup when the plugin unloads.
-    this.ctx.effect(() => () => { void rm(this.stagingRoot, { recursive: true, force: true }); }, 'workdshExperts.stagingCleanup');
+    this.ctx.effect(() => () => { void rm(this.stagingRoot, { recursive: true, force: true }); }, 'expertworkshopExperts.stagingCleanup');
     console.log('[experts] init done ms=', Date.now() - initStarted);
   }
 
@@ -1095,7 +1095,7 @@ export class ExpertsManager extends Service implements ExpertsService {
               ? (() => { throw new ExpertsError('experts/invalid-definition', '请修改完整制作文件，不能仅修改摘要字段。'); })()
               : normalizeDefinition(mergeDefinition(base.definition, patch));
           if (base.definition.packageDocuments && candidate.packageDocuments) {
-            const identity = (files: Record<string, string>) => JSON.parse(files['.workdsh-expert/plugin.json'] ?? files['.codebuddy-plugin/plugin.json']);
+            const identity = (files: Record<string, string>) => JSON.parse(files['.expertworkshop-expert/plugin.json'] ?? files['.codebuddy-plugin/plugin.json']);
             const before = identity(base.definition.packageDocuments), after = identity(candidate.packageDocuments);
             if (before.name !== after.name || before.agentName !== after.agentName) throw new ExpertsError('experts/invalid-definition', '修改必须保留包 name 与默认 agentName；更换身份请创建新作品。');
           }

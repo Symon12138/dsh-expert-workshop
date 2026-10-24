@@ -36,7 +36,7 @@ ctx.provide('connection', { fetch: { register() { return async () => {}; } } });
 const tools = await ctx.plugin(Tools).then(() => ctx.tools);
 try {
   await ctx.plugin(Storage);
-  const testRoot = await mkdtemp(join(tmpdir(), 'workdsh-connectors-'));
+  const testRoot = await mkdtemp(join(tmpdir(), 'expertworkshop-connectors-'));
   await ctx.plugin({ ...StorageJson }, { root: testRoot });
   await ctx.plugin({ ...StorageDomain }, { backend: 'json' });
   class MemoryCredentials extends CredentialProvider {
@@ -55,7 +55,7 @@ try {
   await ctx.plugin(McpResources);
   await ctx.plugin(Agents);
   await ctx.plugin(Connectors);
-  const manager = ctx.workdshConnectors;
+  const manager = ctx.expertworkshopConnectors;
   const ready = await waitFor(async () => {
     const row = (await manager.list())[0];
     return row?.state === 'ready' ? row : undefined;
@@ -71,29 +71,29 @@ try {
   const unregisterAgent = ctx.agents.register(agent);
   await unregisterAgent;
   if ((await manager.selection('probe-session')).length !== 0) throw new Error('A new conversation must not select a connector by default.');
-  if (tools.schemas(agent).some(tool => tool.name.startsWith('mcp__workdsh-example__'))) throw new Error('Unselected MCP tools leaked into a new conversation.');
+  if (tools.schemas(agent).some(tool => tool.name.startsWith('mcp__expertworkshop-example__'))) throw new Error('Unselected MCP tools leaked into a new conversation.');
   const selected = await manager.setSelection('probe-session', [ready.id]);
   if (selected.length !== 1 || selected[0] !== ready.id) throw new Error('Conversation connector selection did not persist.');
-  if (!tools.schemas(agent).some(tool => tool.name === 'mcp__workdsh-example__search_catalog')) throw new Error('Selected MCP tools were not exposed to the conversation.');
+  if (!tools.schemas(agent).some(tool => tool.name === 'mcp__expertworkshop-example__search_catalog')) throw new Error('Selected MCP tools were not exposed to the conversation.');
   if ((await manager.setSelection('probe-session', [])).length !== 0) throw new Error('Conversation connector selection did not clear.');
-  if (tools.schemas(agent).some(tool => tool.name.startsWith('mcp__workdsh-example__'))) throw new Error('Cleared MCP tools remained exposed to the conversation.');
+  if (tools.schemas(agent).some(tool => tool.name.startsWith('mcp__expertworkshop-example__'))) throw new Error('Cleared MCP tools remained exposed to the conversation.');
   await unregisterAgent();
   await agentScope.dispose();
   await scopeFactory.dispose();
-  const searched = await execute('mcp__workdsh-example__search_catalog', { query: '验收' });
+  const searched = await execute('mcp__expertworkshop-example__search_catalog', { query: '验收' });
   const searchResult = searched.structuredContent;
   if (searchResult?.count !== 1 || searchResult.rows?.[0]?.id !== 'DSH-102') throw new Error(`MCP business tool result mismatch: ${JSON.stringify(searched)}`);
-  const guide = await execute('read_mcp_resource', { server: 'workdsh-example', uri: 'workdsh://connector/guide' });
+  const guide = await execute('read_mcp_resource', { server: 'expertworkshop-example', uri: 'expertworkshop://connector/guide' });
   if (!guide.contents?.[0]?.text?.includes('随包 stdio MCP Server')) throw new Error('MCP resource content mismatch.');
 
-  const disabled = await manager.setEnabled('workdsh-example', false);
-  if (disabled.state !== 'disabled' || tools.get('mcp__workdsh-example__search_catalog')) throw new Error('Disabling did not unregister MCP tools.');
-  const unknown = await tools.execute({ name: 'mcp__workdsh-example__search_catalog', arguments: {}, callId: 'connector-disabled', agent: { id: 'connector-probe' }, signal });
+  const disabled = await manager.setEnabled('expertworkshop-example', false);
+  if (disabled.state !== 'disabled' || tools.get('mcp__expertworkshop-example__search_catalog')) throw new Error('Disabling did not unregister MCP tools.');
+  const unknown = await tools.execute({ name: 'mcp__expertworkshop-example__search_catalog', arguments: {}, callId: 'connector-disabled', agent: { id: 'connector-probe' }, signal });
   if (!unknown.isError) throw new Error('Disabled MCP tool remained callable.');
 
-  const restored = await manager.setEnabled('workdsh-example', true);
-  if (restored.state !== 'ready' || !tools.get('mcp__workdsh-example__search_catalog')) throw new Error('Re-enabling did not restore MCP tools.');
-  const duplicate = await manager.create({ title: '第二个 MCP', description: '验证多实例配置', serverName: 'workdsh-second', transport: 'stdio', command: process.execPath, args: [new URL('../../../packages/plugins/connectors/dist/example-server.mjs', import.meta.url).pathname] });
+  const restored = await manager.setEnabled('expertworkshop-example', true);
+  if (restored.state !== 'ready' || !tools.get('mcp__expertworkshop-example__search_catalog')) throw new Error('Re-enabling did not restore MCP tools.');
+  const duplicate = await manager.create({ title: '第二个 MCP', description: '验证多实例配置', serverName: 'expertworkshop-second', transport: 'stdio', command: process.execPath, args: [new URL('../../../packages/plugins/connectors/dist/example-server.mjs', import.meta.url).pathname] });
   if (duplicate.state !== 'ready' || (await manager.list()).length !== 2) throw new Error('Multiple MCP instances were not registered.');
   await manager.remove(duplicate.id);
   if ((await manager.list()).length !== 1) throw new Error('Removing a connector instance failed.');
@@ -114,4 +114,4 @@ try {
 } finally {
   await ctx.fiber.dispose();
 }
-if (tools.get('mcp__workdsh-example__search_catalog')) throw new Error('Plugin disposal left an MCP tool registered.');
+if (tools.get('mcp__expertworkshop-example__search_catalog')) throw new Error('Plugin disposal left an MCP tool registered.');

@@ -30,7 +30,7 @@ test('installation and live registration must agree before reporting enabled or 
 
 test('local workbenches require neither a repository nor a project', () => {
   assert.doesNotThrow(() => assertWorkbenchDescriptor(descriptor()));
-  assert.doesNotThrow(() => assertWorkbenchDescriptor({ ...descriptor(), repository: 'https://github.com/techflag/workdsh' }));
+  assert.doesNotThrow(() => assertWorkbenchDescriptor({ ...descriptor(), repository: 'https://github.com/techflag/expertworkshop' }));
 });
 test('registration snapshot cannot be changed by the caller or retain unrelated fields', () => {
   const input = { ...descriptor(), token: 'must-not-be-retained', packageName: 'spoofed-owner' };

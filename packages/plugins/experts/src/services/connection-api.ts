@@ -19,7 +19,7 @@ import { EXPERT_IMPORT_LIMITS, buildExport } from './portability.js';
 /**
  * Exact Fetch transport for the expert Host service (D04 / P1-02).
  *
- * The management page and the Agent tools call the SAME `ctx.workdshExperts`
+ * The management page and the Agent tools call the SAME `ctx.expertworkshopExperts`
  * authority; this module only carries requests over Connection's authenticated
  * `/api` channel. The actor is resolved on the Host from the trusted identity
  * provider for every request, so a client never supplies an actor, an owner or a
@@ -27,9 +27,9 @@ import { EXPERT_IMPORT_LIMITS, buildExport } from './portability.js';
  * trusted UI user action and is deliberately NOT offered as an Agent tool.
  */
 
-export const expertsManagementPath = '/api/workdsh-experts';
-export const expertsImportPath = '/api/workdsh-experts/import';
-export const expertsExportPath = '/api/workdsh-experts/export';
+export const expertsManagementPath = '/api/expertworkshop-experts';
+export const expertsImportPath = '/api/expertworkshop-experts/import';
+export const expertsExportPath = '/api/expertworkshop-experts/export';
 
 const maximumBodyBytes = 32 * 1024 * 1024;
 
@@ -304,7 +304,7 @@ function json(result: ConnectionRpcResult<unknown>, status = 200): Response {
 /** Register the expert management API inside Connection's authenticated `/api` carrier. */
 export function registerExpertsConnection(ctx: Context): void {
   const connection = (ctx as Context & { connection: HostConnectionHandle }).connection;
-  const manager: ExpertsManager = ctx.workdshExperts;
+  const manager: ExpertsManager = ctx.expertworkshopExperts;
   const lifetime = new AbortController();
   const pending = new Set<Promise<Response>>();
   const handle = (fetcher: (request: Request) => Promise<Response>) => (request: Request) => {
@@ -322,7 +322,7 @@ export function registerExpertsConnection(ctx: Context): void {
     lifetime.abort();
     await Promise.all(unregister.map((dispose) => dispose()));
     await Promise.allSettled([...pending]);
-  }, 'workdsh.experts.fetch');
+  }, 'expertworkshop.experts.fetch');
 
   unregister.push(connection.fetch.register({
     path: expertsManagementPath,
@@ -355,7 +355,7 @@ export function registerExpertsConnection(ctx: Context): void {
       if (Number.isFinite(declaredLength) && declaredLength > EXPERT_IMPORT_LIMITS.maxZipBytes) {
         return json(fail('experts/invalid-request', `专家包不得超过 ${EXPERT_IMPORT_LIMITS.maxZipBytes / (1024 * 1024)} MiB。`), 413);
       }
-      const encodedName = request.headers.get('x-workdsh-file-name');
+      const encodedName = request.headers.get('x-expertworkshop-file-name');
       if (!encodedName) return json(fail('experts/invalid-request', '请求缺少文件名。'), 400);
       try {
         const fileName = decodeURIComponent(encodedName);
@@ -390,7 +390,7 @@ export function registerExpertsConnection(ctx: Context): void {
             'content-length': String(zipBytes.byteLength),
             'content-disposition': `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(descriptor.fileName)}`,
             'cache-control': 'no-store',
-            'x-workdsh-digest': descriptor.digest,
+            'x-expertworkshop-digest': descriptor.digest,
           },
         });
       } catch (error) {

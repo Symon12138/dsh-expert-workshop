@@ -33,10 +33,10 @@ try{
  dispose.push(registry.register({name:'root',children:{main:{kind:'keyed',scope:'root'}}},()=>null));
  dispose.push(registry.register({name:'main',key:'conversation',children:{'main.conversation':{kind:'single',scope:'session-maybe'}}},()=>null));
  dispose.push(registry.register({name:'main.conversation',children:{'conversation.header':{kind:'single',scope:'session-maybe'}}},()=>null));
- dispose.push(registry.register({name:'main',key:'workdsh-layout-probe'},()=>null));
+ dispose.push(registry.register({name:'main',key:'expertworkshop-layout-probe'},()=>null));
  assert.equal(registry.entriesOfSlot('main').length,2,'Owned business main panel may coexist.');
  let duplicateError;
- try{registry.register({name:'main',key:'workdsh-wrap-probe',children:{'main.conversation':{kind:'single',scope:'session-maybe'}}},()=>null);}
+ try{registry.register({name:'main',key:'expertworkshop-wrap-probe',children:{'main.conversation':{kind:'single',scope:'session-maybe'}}},()=>null);}
  catch(error){duplicateError=error.message;}
  assert.match(duplicateError??'',/already declared/,'Business wrapper cannot redeclare the native child Slot.');
  assert.equal(registry.entriesOfSlot('main').length,2,'Rejected duplicate must not leave a partial entry.');

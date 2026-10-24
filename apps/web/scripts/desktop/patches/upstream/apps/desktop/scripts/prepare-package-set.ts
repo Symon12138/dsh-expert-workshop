@@ -27,9 +27,9 @@ import { resolveDesktopTargetBuildPaths } from './desktop-build-paths.mjs'
 
 const DSH_PACKAGE = '@deepseek-ai/dsh'
 const ROOT_PACKAGES = [DSH_PACKAGE, DESKTOP_HOST_PACKAGE] as const
-// WORKDSH TEST PATCH: preseed the Expert Workshop profile layers beside the official roots.
-const WORKDSH_ROOT_PACKAGES = [
-  'workdsh-bundle',
+// EXPERTWORKSHOP TEST PATCH: preseed the Expert Workshop profile layers beside the official roots.
+const EXPERTWORKSHOP_ROOT_PACKAGES = [
+  'expertworkshop-bundle',
   'expert-workshop-plugin-skills',
   'expert-workshop-plugin-access',
   'expert-workshop-plugin-audit',
@@ -60,7 +60,7 @@ function dependencyNames(manifest: Readonly<Record<string, unknown>>, section: s
 
 /**
  * Select the complete available first-party dependency closures rooted at dsh, its private Host,
- * and the WORKDSH TEST PATCH Expert Workshop layers.
+ * and the EXPERTWORKSHOP TEST PATCH Expert Workshop layers.
  * @param available - Packed packages indexed by package name.
  * @returns Selected packages sorted by name.
  */
@@ -85,7 +85,7 @@ export function selectDesktopPackageClosure(
       if (available.has(dependency)) visit(dependency)
     }
   }
-  for (const name of [...ROOT_PACKAGES, ...WORKDSH_ROOT_PACKAGES]) {
+  for (const name of [...ROOT_PACKAGES, ...EXPERTWORKSHOP_ROOT_PACKAGES]) {
     if (!available.has(name)) throw new Error(`desktop package set: packed inputs omit ${name}`)
     visit(name)
   }

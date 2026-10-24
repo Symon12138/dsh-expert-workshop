@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const artifacts = join(root, '.artifacts/dsh-0.1.6-alpha.2-upgrade/p5-activation-limit');
-const home = await realpath(await mkdtemp(join(tmpdir(), 'workdsh-activation-limit-')));
+const home = await realpath(await mkdtemp(join(tmpdir(), 'expertworkshop-activation-limit-')));
 const cwd = join(home, 'workspace'), workspaceId = randomUUID();
 await mkdir(artifacts, { recursive: true }); await mkdir(cwd); await mkdir(join(home, 'storages'));
 const now = new Date().toISOString();
@@ -53,12 +53,12 @@ const start = async () => {
 
 try {
   const fixture = join(home, 'fixture'); await mkdir(fixture);
-  await writeFile(join(fixture, 'package.json'), JSON.stringify({ name: 'workdsh-activation-limit-probe', version: '0.0.0', type: 'module', exports: { '.': './index.mjs' }, peerDependencies: { '@deepseek-ai/dsh-llm': '0.1.6-alpha.2' }, dsh: { bundle: { patch: './patch.yml' } } }));
+  await writeFile(join(fixture, 'package.json'), JSON.stringify({ name: 'expertworkshop-activation-limit-probe', version: '0.0.0', type: 'module', exports: { '.': './index.mjs' }, peerDependencies: { '@deepseek-ai/dsh-llm': '0.1.6-alpha.2' }, dsh: { bundle: { patch: './patch.yml' } } }));
   await copyFile(join(root, 'tests/fixtures/subagent-activation-limit/index.mjs'), join(fixture, 'index.mjs'));
-  await writeFile(join(fixture, 'patch.yml'), '- insert:\n    - id: activation-limit-probe\n      name: workdsh-activation-limit-probe\n');
+  await writeFile(join(fixture, 'patch.yml'), '- insert:\n    - id: activation-limit-probe\n      name: expertworkshop-activation-limit-probe\n');
   await command(pnpm, ['pack', '--pack-destination', artifacts], fixture);
   await command(dsh, ['--profile', 'activation-limit', '--from-default-profile', 'web', '--dump-config']);
-  await command(dsh, ['plugin', '--profile', 'activation-limit', 'add', join(artifacts, 'workdsh-activation-limit-probe-0.0.0.tgz'), '--offline']);
+  await command(dsh, ['plugin', '--profile', 'activation-limit', 'add', join(artifacts, 'expertworkshop-activation-limit-probe-0.0.0.tgz'), '--offline']);
   pass('fixture-installed-via-official-cli-offline');
 
   const host = await start();

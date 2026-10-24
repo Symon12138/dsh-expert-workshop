@@ -12,13 +12,13 @@ export interface ProjectOptions { readonly workspaceRoot?: string; }
 export async function apply(ctx:Context,options:ProjectOptions={}){
   await ctx.plugin(ProjectManager);
   await ctx.plugin({
-    name:'workdsh-projects-integration',
-    inject:[...inject,'systemPrompt','workdshProjects','workspaceController'],
+    name:'expertworkshop-projects-integration',
+    inject:[...inject,'systemPrompt','expertworkshopProjects','workspaceController'],
     apply(integration:Context){registerProjectConnection(integration,options.workspaceRoot);registerProjectContextInjection(integration);},
   });
   await ctx.plugin({
-    name:'workdsh-projects-attribution',
-    inject:['fs','workdshLibrary','workdshProjects','workdshIdentity'],
+    name:'expertworkshop-projects-attribution',
+    inject:['fs','expertworkshopLibrary','expertworkshopProjects','expertworkshopIdentity'],
     apply(attribution:Context){registerDeliverableAttribution(attribution);},
   });
 }

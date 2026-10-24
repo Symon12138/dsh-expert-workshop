@@ -8,7 +8,7 @@ import { promisify } from 'node:util';
 import { chromium, expect } from '@playwright/test';
 
 const root=new URL('../',import.meta.url).pathname;
-const home=await realpath(await mkdtemp(join(tmpdir(),'workdsh-personal-default-')));
+const home=await realpath(await mkdtemp(join(tmpdir(),'expertworkshop-personal-default-')));
 const assets=join(home,'artifacts');await mkdir(assets);
 const evidence=join(root,'.artifacts/plugin-delivery');await mkdir(evidence,{recursive:true});
 const directories=['providers/identity-local','providers/browser-session','plugins/audit','plugins/access','plugins/skills','plugins/experts','plugins/connectors','plugins/library','bundle'];

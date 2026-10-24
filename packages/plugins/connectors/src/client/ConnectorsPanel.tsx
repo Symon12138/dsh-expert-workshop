@@ -46,8 +46,8 @@ export function ConnectorsPanel({ toggleNavigation, management, openCapability, 
   const addRecommended = (entry: RecommendedConnector) => setDraft({ id: undefined, title: entry.name, description: entry.description, serverName: entry.name, transport: entry.transport, command: entry.command, argsText: entry.args.join('\n'), url: '', authorizationToken: '', authorizationConfigured: false });
   const detail = rows.find(row => row.id === expanded);
   const capabilityTabs = [['experts', '专家'], ['skills', '技能'], ['connectors', '连接器']] as const;
-  const capabilityKey: Record<string, string> = { experts: 'workdsh-experts', skills: 'workdsh-skills', connectors: 'workdsh-connectors' };
-  return <section className="wd-connectors" data-testid="workdsh-connectors"><style>{connectorCss}</style>
+  const capabilityKey: Record<string, string> = { experts: 'expertworkshop-experts', skills: 'expertworkshop-skills', connectors: 'expertworkshop-connectors' };
+  return <section className="wd-connectors" data-testid="expertworkshop-connectors"><style>{connectorCss}</style>
     <header className="cap-header"><button className="nav-toggle" onClick={toggleNavigation} aria-label="切换导航">导航</button>
       {capabilityTabs.map(([key, label]) => { const active = key === 'connectors'; const target = capabilityKey[key]; const enabled = active || Boolean(target && hasCapability(target)); return <button key={key} className={`cap-tab ${active ? 'active' : ''}`} disabled={!enabled} aria-current={active ? 'page' : undefined} onClick={() => { if (!active && target) openCapability(target); }}><Icon name={key} />{label}</button>; })}
       <Input className="search" aria-label="搜索连接器" placeholder="搜索连接器" value={query} onChange={event => setQuery(event.currentTarget.value)} />

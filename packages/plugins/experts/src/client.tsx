@@ -1,5 +1,5 @@
 import type { ComposerHandoff, ComposerHandoffSource } from 'expert-workshop-contracts/composer';
-declare module '@deepseek-ai/cordis' { interface Events { 'workdsh/composer-handoff'(handoff: ComposerHandoff): Promise<void>; } }
+declare module '@deepseek-ai/cordis' { interface Events { 'expertworkshop/composer-handoff'(handoff: ComposerHandoff): Promise<void>; } }
 import type { ActivityPresentation } from 'expert-workshop-contracts/activity';
 declare module '@deepseek-ai/cordis' { interface Context { activityPresentation: ActivityPresentation; } }
 import { installExpertPresetMenu } from './client/PresetMenu.js';
@@ -20,7 +20,7 @@ import { ExpertsPanel } from './client/ExpertsPanel.js';
 import { PendingExpertDraft, pendingExpertDraftKey, pendingExpertDraftEvent, expertManagerGuide, expertTeamManagerGuide } from './client/drafts.js';
 import { createExpertManagementClient } from './client/management.js';
 
-export const name = 'workdsh-experts-client';
+export const name = 'expertworkshop-experts-client';
 export const inject = ['slots', 'layout', 'sessions', 'workspaces', 'remote', 'remote.session', 'connection', 'uiWorkspace', 'conversation'];
 
 type SessionId = Awaited<ReturnType<ISessions['create']>>;
@@ -28,7 +28,7 @@ type SessionId = Awaited<ReturnType<ISessions['create']>>;
 /**
  * Expert Client assembly (D04 / P1-02).
  *
- * Contributes exactly one `main` panel (`workdsh-experts`) and one native-input draft
+ * Contributes exactly one `main` panel (`expertworkshop-experts`) and one native-input draft
  * overlay. It deliberately does NOT register a `sidebar.panellist` entry: the shared
  * capability center ("专家 · 技能 · 连接器") stays a single navigation item owned by the
  * Skill plugin, and the two panels switch through the in-panel capability tabs via
@@ -38,11 +38,11 @@ type SessionId = Awaited<ReturnType<ISessions['create']>>;
  * Summon creates the bound native Session on the Host (so the expert's compiled preset
  * is attached at creation), then opens it here and seeds a one-shot draft hand-off; the
  * draft is never auto-sent. "制作专家" opens an ordinary Session seeded with the
- * `/workdsh-expert-manager` guide.
+ * `/expertworkshop-expert-manager` guide.
  */
 export function apply(ctx: Context): void {
   const lifetime = new AbortController();
-  ctx.effect(() => () => lifetime.abort(), 'workdsh.experts.client');
+  ctx.effect(() => () => lifetime.abort(), 'expertworkshop.experts.client');
   const waitForInput = (milliseconds: number) => new Promise<void>((resolve, reject) => {
     lifetime.signal.throwIfAborted();
     const abort = () => { window.clearTimeout(timer); reject(lifetime.signal.reason); };
@@ -121,7 +121,7 @@ export function apply(ctx: Context): void {
     const creation = await management.createExecution(plan.executionPlanId, management.newOperationId('create-execution'));
     const sessionId = creation.sessionId as SessionId;
     const references = source?.references.map(reference => ({ ...reference })) ?? [];
-    if (source) await ctx.parallel('workdsh/composer-handoff', { sourceSessionId: source.sessionId, targetSessionId: String(sessionId), references });
+    if (source) await ctx.parallel('expertworkshop/composer-handoff', { sourceSessionId: source.sessionId, targetSessionId: String(sessionId), references });
     await openSession(sessionId);
     ctx.layout.selectPanel(null);
     if (creation.handoffId) {
@@ -166,7 +166,7 @@ export function apply(ctx: Context): void {
     // Use authored names only. Never translate a Chinese name or expose storage IDs.
     let englishName = '';
     const authoredName = (value: unknown): string => typeof value === 'string' && value.trim() && /^[\x20-\x7e]+$/.test(value.trim()) && /[a-z]/i.test(value) ? value.trim() : '';
-    const manifestText = definition.packageDocuments?.['.workdsh-expert/plugin.json'] ?? definition.packageDocuments?.['.codebuddy-plugin/plugin.json'];
+    const manifestText = definition.packageDocuments?.['.expertworkshop-expert/plugin.json'] ?? definition.packageDocuments?.['.codebuddy-plugin/plugin.json'];
     try {
       if (manifestText) {
         const manifest = JSON.parse(manifestText);
@@ -179,16 +179,16 @@ export function apply(ctx: Context): void {
       }
     } catch { /* Missing or invalid name metadata is omitted from the input. */ }
     const name = `${definition.name}${englishName && englishName !== definition.name ? `（${englishName}）` : ''}`;
-    await seedDraft(sessionId, `/workdsh-expert-manager 帮我修改专家：[${name}]，增加/优化[请补充你希望新增/优化的技能或知识领域等]方面的能力`);
+    await seedDraft(sessionId, `/expertworkshop-expert-manager 帮我修改专家：[${name}]，增加/优化[请补充你希望新增/优化的技能或知识领域等]方面的能力`);
   };
 
   const openCapability = (key: string): void => { ctx.layout.selectPanel(key as Parameters<typeof ctx.layout.selectPanel>[0]); };
   const hasCapability = (key: string): boolean => ctx.slots.entriesOfSlot('main').some(entry => entry.options.key === key);
 
   ctx.slots.inject('main', () => ctx.slots.register({
-    name: 'main', key: 'workdsh-experts',
+    name: 'main', key: 'expertworkshop-experts',
     inject: () => ({ toggleNavigation: () => ctx.layout.toggleSidebar(), management, openCapability, hasCapability, summon, createExpertTask, editExpertTask }),
   }, ExpertsPanel));
-  ctx.slots.inject('conversation.input.overlay', () => ctx.slots.register({ name: 'conversation.input.overlay', id: 'workdsh-expert-draft' }, PendingExpertDraft));
-  ctx.slots.inject('conversation.input.left', () => ctx.slots.register({ name: 'conversation.input.left', id: 'workdsh-summon-expert', order: 25, inject: () => ({ management, summon, openManagement: () => openCapability('workdsh-experts') }) }, ConversationExperts));
+  ctx.slots.inject('conversation.input.overlay', () => ctx.slots.register({ name: 'conversation.input.overlay', id: 'expertworkshop-expert-draft' }, PendingExpertDraft));
+  ctx.slots.inject('conversation.input.left', () => ctx.slots.register({ name: 'conversation.input.left', id: 'expertworkshop-summon-expert', order: 25, inject: () => ({ management, summon, openManagement: () => openCapability('expertworkshop-experts') }) }, ConversationExperts));
 }

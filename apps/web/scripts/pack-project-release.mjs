@@ -59,7 +59,7 @@ for (const directory of packageDirectories) {
     filename,
     bytes: bytes.length,
     sha256: createHash('sha256').update(bytes).digest('hex'),
-    ...(manifest.workdsh?.workbench ? { workbenchId: manifest.workdsh.workbench.id } : {}),
+    ...(manifest.expertworkshop?.workbench ? { workbenchId: manifest.expertworkshop.workbench.id } : {}),
   });
 }
 
@@ -78,7 +78,7 @@ await writeFile(join(destination, 'release-manifest.json'), JSON.stringify({
   runtimeOverrides: Object.fromEntries(Object.entries(project.pnpm.overrides).filter(([name]) => name.startsWith('@deepseek-ai/'))),
   packages,
   installation: {
-    defaultPackages: ['expert-workshop-provider-identity-local','expert-workshop-provider-browser-session','expert-workshop-plugin-audit','expert-workshop-plugin-access','expert-workshop-plugin-skills','expert-workshop-plugin-experts','expert-workshop-plugin-connectors','expert-workshop-plugin-library','expert-workshop-plugin-workbenches','workdsh-bundle'],
+    defaultPackages: ['expert-workshop-provider-identity-local','expert-workshop-provider-browser-session','expert-workshop-plugin-audit','expert-workshop-plugin-access','expert-workshop-plugin-skills','expert-workshop-plugin-experts','expert-workshop-plugin-connectors','expert-workshop-plugin-library','expert-workshop-plugin-workbenches','expertworkshop-bundle'],
     optionalPackages: ['expert-workshop-plugin-office','expert-workshop-plugin-projects','expert-workshop-plugin-activity','expert-workshop-plugin-quality-analysis'],
     enterprisePackages: 'Separate artifacts; not included in this personal collection',
     preservesPreviouslyInstalledOptionalPackages: true,
@@ -92,7 +92,7 @@ await writeFile(join(destination, 'release-manifest.json'), JSON.stringify({
     'packages are GitHub assets and are not published to the npm registry',
   ],
 }, null, 2) + '\n');
-await copyFile(join(root, 'scripts/install-project-release.mjs'), join(destination, 'install-workdsh.mjs'));
+await copyFile(join(root, 'scripts/install-project-release.mjs'), join(destination, 'install-expertworkshop.mjs'));
 await copyFile(join(root, 'scripts/retain-workbench-archives.mjs'), join(destination, 'retain-workbench-archives.mjs'));
 await copyFile(releaseNotes, join(destination, 'RELEASE-NOTES.md'));
 

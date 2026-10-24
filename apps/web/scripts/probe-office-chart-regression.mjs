@@ -22,7 +22,7 @@ try {
  await page.evaluate(({ html, bytes }) => {
   const frame = document.querySelector('iframe');
   window.addEventListener('message', e => {
-   if (e.source === frame.contentWindow && e.data?.type === 'workdsh-office-ready') frame.contentWindow.postMessage({ type: 'workdsh-office-open', bytes: new Uint8Array(bytes), extension: 'xlsx' }, '*');
+   if (e.source === frame.contentWindow && e.data?.type === 'expertworkshop-office-ready') frame.contentWindow.postMessage({ type: 'expertworkshop-office-open', bytes: new Uint8Array(bytes), extension: 'xlsx' }, '*');
   }); frame.srcdoc = html;
  }, { html, bytes: Array.from(bytes) });
  const frame = page.frameLocator('iframe');

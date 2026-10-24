@@ -29,11 +29,11 @@ Expert Workshop 的必需组合仍包含 identity-local、audit、access、skill
 
 ## 旧版迁移边界
 
-已删除自建 `TeamRunsManager`、SOP 运行状态机、`workdsh_expert_team_*` 工具及 `workdsh-expert` 委派 provider。构建前清理 `dist`，防止旧执行器残留在新安装包里。
+已删除自建 `TeamRunsManager`、SOP 运行状态机、`expertworkshop_expert_team_*` 工具及 `expertworkshop-expert` 委派 provider。构建前清理 `dist`，防止旧执行器残留在新安装包里。
 
 用户的专家、技能、发布修订、文件和旧任务历史保留。旧版委派子任务不再续跑旧调度器，应从专家团重新召唤官方 Team 任务。旧团队运行表不会转写成伪造的官方执行记录。团队配置仍可复用，不要求重建用户作品。
 
-原 WorkBuddy 规范与许可证归属保留在资源目录；平台适配说明维护在 `resources/skills/workdsh-expert-manager/references/authoring-api.md`，团队运行指引维护在 `runtime/team-lead.md`。
+原 WorkBuddy 规范与许可证归属保留在资源目录；平台适配说明维护在 `resources/skills/expertworkshop-expert-manager/references/authoring-api.md`，团队运行指引维护在 `runtime/team-lead.md`。
 
 ## 构建与验证
 
@@ -66,13 +66,13 @@ corepack pnpm probe:experts:team:real
 当前源码依赖 DSH 0.2.0-rc.2 / Cordis 4.0.4，应使用同一次构建产出的配套 tgz；不要把旧 Release 的安装包当作已含本次升级。先在独立 Profile 验证，再部署实际使用的 Profile：
 
 ```sh
-dsh --profile workdsh --from-default-profile web --dump-config
-dsh plugin --profile workdsh add /absolute/path/release/expert-workshop-provider-identity-local-0.1.0-alpha.6.tgz \
+dsh --profile expertworkshop --from-default-profile web --dump-config
+dsh plugin --profile expertworkshop add /absolute/path/release/expert-workshop-provider-identity-local-0.1.0-alpha.6.tgz \
   /absolute/path/release/expert-workshop-plugin-audit-0.1.0-alpha.5.tgz \
   /absolute/path/release/expert-workshop-plugin-access-0.1.0-alpha.6.tgz \
   /absolute/path/release/expert-workshop-plugin-skills-0.1.0-alpha.32.tgz \
   /absolute/path/release/expert-workshop-plugin-experts-0.1.0-alpha.8.tgz
-dsh --profile workdsh
+dsh --profile expertworkshop
 ```
 
 在专家入口保存、校验、预览并确认发布，然后召唤。示例只填入原生草稿，发送后才执行；模型与账号在 Harness 中配置。

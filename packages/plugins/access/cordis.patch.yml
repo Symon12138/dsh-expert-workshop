@@ -1,9 +1,9 @@
 - insert:
-    - id: workdsh-access
+    - id: expertworkshop-access
       name: expert-workshop-plugin-access
-    - id: workdsh-session-access
+    - id: expertworkshop-session-access
       name: expert-workshop-plugin-access/session
-    - id: workdsh-tool-access
+    - id: expertworkshop-tool-access
       name: expert-workshop-plugin-access/tool
       config:
         autoBindPersonalSessions: true

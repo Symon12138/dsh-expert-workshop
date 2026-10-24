@@ -4,7 +4,7 @@ import {join,basename} from 'node:path';
 import {randomUUID} from 'node:crypto';
 /** Retain immutable verified installation assets; do not remove prior optional plugins. */
 export async function retainWorkbenchArchives(profile,directory,items){
- const target=join(profile,'workdsh-bootstrap-archives');
+ const target=join(profile,'expertworkshop-bootstrap-archives');
  const verified=[];
  for(const item of items){
   if(!item.workbenchId)continue;

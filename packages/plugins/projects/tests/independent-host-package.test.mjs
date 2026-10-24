@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 test('independent Projects Host entry imports without an unpublished contracts package', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-project-package-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-project-package-'));
   const packageRoot = fileURLToPath(new URL('../', import.meta.url));
   try {
     await mkdir(join(root, 'dist'));

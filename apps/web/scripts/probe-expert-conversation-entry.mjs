@@ -20,7 +20,7 @@ assert.ok(!process.argv[4]||confirmed,'Only --confirmed is supported');
 assert.ok(!confirmed||scenario==='dirty','Confirmed scope applies only to dirty fixture');
 assert.ok(!runLabel || /^[a-z0-9-]{1,40}$/.test(runLabel), 'Run label must contain lowercase letters, digits or hyphens');
 const artifacts = join(root, '.artifacts/expert-conversation-entry');
-const home = await realpath(await mkdtemp(join(tmpdir(), 'workdsh-experts-professional-')));
+const home = await realpath(await mkdtemp(join(tmpdir(), 'expertworkshop-experts-professional-')));
 await mkdir(artifacts, { recursive: true });
 await unlink(join(artifacts, 'report.json')).catch(() => {});
 const workspace = join(home, 'workspace');
@@ -80,7 +80,7 @@ async function stop() {
   await stopped; clearTimeout(timer);
 }
 async function api(host, endpoint, payload = {}) {
-  const response = await fetch(`${host.address}/api/workdsh-experts`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(15_000) });
+  const response = await fetch(`${host.address}/api/expertworkshop-experts`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(15_000) });
   assert.equal(response.status, 200);
   const result = await response.json();
   assert.equal(result.ok, true, JSON.stringify(result));
@@ -134,7 +134,7 @@ try {
   await expect(editor).toHaveText('EXPERT-COMPOSER-DRAFT-验收：请分析本地数据');
   pass('Cancel preserves the current conversation draft');
   await page.getByRole('button', { name: '召唤专家', exact: true }).click();
-  const createdResponse = page.waitForResponse(response => response.url().endsWith('/api/workdsh-experts') && response.request().postDataJSON()?.endpoint === 'create-execution');
+  const createdResponse = page.waitForResponse(response => response.url().endsWith('/api/expertworkshop-experts') && response.request().postDataJSON()?.endpoint === 'create-execution');
   await choice.click();
   const creation = (await (await createdResponse).json()).value;
   const binding = await api(host, 'verify-binding', { sessionId: creation.sessionId });
@@ -156,7 +156,7 @@ try {
   await expect(page.getByRole('button', { name: '召唤专家', exact: true })).toBeVisible();
   pass('Expert conversation entry survives page reload');
   const featureApi = async (feature, endpoint, payload = {}) => {
-    const response = await fetch(`${host.address}/api/workdsh-${feature}`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }) });
+    const response = await fetch(`${host.address}/api/expertworkshop-${feature}`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }) });
     const result = await response.json(); assert.equal(result.ok, true, JSON.stringify(result)); return result.value;
   };
   const folder = await featureApi('library', 'create-folder', { name: '浮层验收资料' });
@@ -201,14 +201,14 @@ try {
   await libraryButton.click();
   await libraryPicker.getByRole('button', { name: '打开 浮层验收资料', exact: true }).click();
   await libraryPicker.getByRole('button', { name: '添加 浮层体验验收.md', exact: true }).click();
-  await expect(editor.locator('[data-composer-chip="workdsh-library"]')).toHaveCount(1);
+  await expect(editor.locator('[data-composer-chip="expertworkshop-library"]')).toHaveCount(1);
   await page.getByRole('button', { name: '召唤专家', exact: true }).click();
-  const comboResponse = page.waitForResponse(response => response.url().endsWith('/api/workdsh-experts') && response.request().postDataJSON()?.endpoint === 'create-execution');
+  const comboResponse = page.waitForResponse(response => response.url().endsWith('/api/expertworkshop-experts') && response.request().postDataJSON()?.endpoint === 'create-execution');
   await choice.click();
   const comboCreation = (await (await comboResponse).json()).value;
   await expect(picker).toHaveCount(0);
   await expect(editor).toContainText('组合任务草稿');
-  await expect(editor.locator('[data-composer-chip="workdsh-library"]')).toHaveCount(1);
+  await expect(editor.locator('[data-composer-chip="expertworkshop-library"]')).toHaveCount(1);
   await expect(page.getByRole('button', { name: '连接器：浮层 MCP 验收', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '召唤专家', exact: true })).toContainText('门店经营分析验收专家');
   const selectedLibrary = await featureApi('library', 'task-selection', { sessionId: comboCreation.sessionId });
@@ -216,7 +216,7 @@ try {
   assert.equal(selectedLibrary[0].name, '浮层体验验收.md');
   const selectedMcp = await featureApi('connectors', 'selection', { sessionId: comboCreation.sessionId });
   assert.equal(selectedMcp.length, 1);
-  await editor.locator('[data-composer-chip="workdsh-library"]').click();
+  await editor.locator('[data-composer-chip="expertworkshop-library"]').click();
   await expect(page.getByText('内容用于对话引用', { exact: false }).first()).toBeVisible();
   await page.screenshot({ path: join(artifacts, 'expert-library-mcp-handoff.png'), animations: 'disabled' });
   pass('Expert handoff preserves clickable Library chips, target task selection and MCP selection');
@@ -232,7 +232,7 @@ try {
   await expect(page.getByRole('button', { name: '召唤专家', exact: true })).toHaveText('');
   await expect(page.getByRole('button', { name: '连接器', exact: true })).toBeVisible();
   await expect(editor).toHaveText('');
-  await expect(editor.locator('[data-composer-chip="workdsh-library"]')).toHaveCount(0);
+  await expect(editor.locator('[data-composer-chip="expertworkshop-library"]')).toHaveCount(0);
   assert.equal((await featureApi('library', 'task-selection', { sessionId: comboCreation.sessionId })).length, 1);
   assert.deepEqual(await featureApi('connectors', 'selection', { sessionId: comboCreation.sessionId }), selectedMcp);
   pass('New Session starts without expert, MCP or Library draft while retaining the previous task references');

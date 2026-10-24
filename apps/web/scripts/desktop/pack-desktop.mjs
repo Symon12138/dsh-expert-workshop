@@ -3,7 +3,7 @@
  * Expert Workshop 桌面打包入口（macOS arm64，未签名本地测试版）。
  *
  * 基于官方 apps/desktop 流水线（deepseek-ai/deepseek-harness，tag dsh-v0.1.5-rc.1）的
- * 隔离快照 + WORKDSH TEST PATCH 补丁（存档见 scripts/desktop/patches/，完整指南见 docs/DESKTOP-PACKAGING.md）。
+ * 隔离快照 + EXPERTWORKSHOP TEST PATCH 补丁（存档见 scripts/desktop/patches/，完整指南见 docs/DESKTOP-PACKAGING.md）。
  *
  * 用法:
  *   node scripts/desktop/pack-desktop.mjs                # 校验快照补丁 → build:desktop → electron-builder → 产物校验
@@ -107,8 +107,8 @@ function snapshotEnv() {
     PATH: `${dirname(process.execPath)}:${process.env.PATH ?? ''}`,
     DSH_DESKTOP_TARGET_PLATFORM: 'darwin',
     DSH_DESKTOP_TARGET_ARCH: 'arm64',
-    WORKDSH_DESKTOP_UNSIGNED: '1',
-    DSH_DESKTOP_APP_ID: 'com.workdsh.app',
+    EXPERTWORKSHOP_DESKTOP_UNSIGNED: '1',
+    DSH_DESKTOP_APP_ID: 'com.expertworkshop.app',
     DSH_DESKTOP_AUTO_UPDATE_ENV: 'production',
     ELECTRON_MIRROR,
   };
@@ -175,10 +175,10 @@ function verifyArtifact() {
   const expect = (label, actual, wanted) => {
     if (actual !== wanted) problems.push(`${label}: 期望 ${wanted}，实际 ${actual}`);
   };
-  expect('CFBundleIdentifier', plistValue('CFBundleIdentifier'), 'com.workdsh.app');
+  expect('CFBundleIdentifier', plistValue('CFBundleIdentifier'), 'com.expertworkshop.app');
   expect('CFBundleDisplayName', plistValue('CFBundleDisplayName'), 'Expert Workshop');
   expect('CFBundleIconFile', plistValue('CFBundleIconFile'), 'icon.icns');
-  const iconSource = join(DESKTOP_APP, 'workdsh-icon.icns');
+  const iconSource = join(DESKTOP_APP, 'expertworkshop-icon.icns');
   const iconPacked = join(APP_BUNDLE, 'Contents', 'Resources', 'icon.icns');
   if (!existsSync(iconPacked) || sha256(iconSource) !== sha256(iconPacked)) problems.push('icon.icns 与品牌源不一致');
 
@@ -192,7 +192,7 @@ function verifyArtifact() {
     const main = asar.extractFile(asarPath, 'lib/main.js').toString();
     const preload = asar.extractFile(asarPath, 'lib/preload-app.cjs').toString();
     if (!main.includes('hiddenInset') || !main.includes('shellFrame')) problems.push('app.asar lib/main.js 缺少窗口壳补丁（hiddenInset/shellFrame）');
-    if (!preload.includes('workdshShell') || !preload.includes('_logoRow')) problems.push('app.asar lib/preload-app.cjs 缺少外壳适配样式补丁');
+    if (!preload.includes('expertworkshopShell') || !preload.includes('_logoRow')) problems.push('app.asar lib/preload-app.cjs 缺少外壳适配样式补丁');
   }
   if (problems.length > 0) fail(`产物校验失败:\n  ${problems.join('\n  ')}`);
   console.log('[pack-desktop] 产物校验通过（Info.plist / 图标 / app.asar 补丁断言）');

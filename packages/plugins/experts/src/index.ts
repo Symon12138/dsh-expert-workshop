@@ -40,7 +40,7 @@ export const inject = [
  * confirmation; the trusted confirm + publish and every task summon/handoff stay
  * user-driven, so the skill never claims a publish or an auto-sent task.
  *
- * The wording is owned by `resources/skills/workdsh-expert-manager/SKILL.md`; this module shape
+ * The wording is owned by `resources/skills/expertworkshop-expert-manager/SKILL.md`; this module shape
  * only re-exports the parsed body for consumers that referenced it before the
  * move, and registers it below.
  */
@@ -58,14 +58,14 @@ export function registerExpertManagerSkill(ctx: Context): () => void {
     ...expertManagerSkillMeta,
     source: 'bundled',
     content: expertManagerSkillContent,
-    resourceBase: { kind: 'directory', path: fileURLToPath(new URL('../resources/skills/workdsh-expert-manager', import.meta.url)) },
+    resourceBase: { kind: 'directory', path: fileURLToPath(new URL('../resources/skills/expertworkshop-expert-manager', import.meta.url)) },
   });
 }
 
 /** Independent Host apply: own service, transport, tools and bundled skill. */
 export async function applyExpertsHost(ctx: Context, options: ExpertsManagerOptions = {}): Promise<void> {
   await ctx.plugin(ExpertsManager, options);
-  await ctx.plugin({ name: 'workdsh-experts-integration', inject: [...inject, 'workdshExperts'], apply: (host: Context) => applyIntegration(host, options) });
+  await ctx.plugin({ name: 'expertworkshop-experts-integration', inject: [...inject, 'expertworkshopExperts'], apply: (host: Context) => applyIntegration(host, options) });
 }
 
 /** The consumer declares the services provided by the manager child Fibers. */

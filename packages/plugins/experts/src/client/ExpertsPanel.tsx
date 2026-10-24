@@ -26,7 +26,7 @@ type ExpertsPanelInjected = {
   hasCapability: (key: string) => boolean;
   /** Summon a published expert into a fresh bound native Session; never auto-sends. */
   summon: (expertId: string, revisionId: string | undefined, draftText: string | undefined) => Promise<void>;
-  /** Open a new native task seeded with the `/workdsh-expert-manager` guide draft. */
+  /** Open a new native task seeded with the `/expertworkshop-expert-manager` guide draft. */
   createExpertTask: (kind?: 'agent' | 'team') => Promise<void>;
   editExpertTask: (expertId: string) => Promise<void>;
 };
@@ -164,7 +164,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     catch (cause) { setError(messageOf(cause)); }
     finally { setActing(false); }
   };
-  const FINANCE_NOTICE_KEY = 'workdsh.experts.financeNoticeHidden';
+  const FINANCE_NOTICE_KEY = 'expertworkshop.experts.financeNoticeHidden';
   const financeNoticeHidden = () => { try { return window.localStorage.getItem(FINANCE_NOTICE_KEY) === '1'; } catch { return false; } };
   const requestSummon = (expertId: string, revisionId: string | undefined, draftText: string | undefined) => {
     const row = items.find(item => item.id === expertId);
@@ -208,7 +208,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
   };
 
   const capabilityTabs = [['experts', '专家'], ['skills', '技能'], ['connectors', '连接器']] as const;
-  const capabilityKey: Record<string, string> = { experts: 'workdsh-experts', skills: 'workdsh-skills', connectors: 'workdsh-connectors' };
+  const capabilityKey: Record<string, string> = { experts: 'expertworkshop-experts', skills: 'expertworkshop-skills', connectors: 'expertworkshop-connectors' };
   const isDraft = (summary: ExpertSummary) => summary.publishedRevisionRef === undefined;
   const stateLabel = (summary: ExpertSummary) => isDraft(summary) ? '草稿' : AVAILABILITY_LABEL[summary.availability];
 
@@ -219,7 +219,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     finally { setActing(false); }
   };
 
-  return <section className="wd-experts" data-testid="workdsh-experts">
+  return <section className="wd-experts" data-testid="expertworkshop-experts">
     <style>{expertsCss}</style>
     <header className="cap-header">
       <button className="nav-toggle" onClick={toggleNavigation} aria-label="切换导航">导航</button>

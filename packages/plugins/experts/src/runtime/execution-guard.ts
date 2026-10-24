@@ -20,7 +20,7 @@ export function registerExpertExecutionGuard(ctx: Context, options: { agentsHome
     const actor = await resolveActor(ctx, { sessionId: String(root.id) }, signal);
     let role;
     try {
-      role = await ctx.workdshExperts.resolveNativeRole(actor, String(root.id), membership?.role === 'teammate' ? membership.name : undefined, signal);
+      role = await ctx.expertworkshopExperts.resolveNativeRole(actor, String(root.id), membership?.role === 'teammate' ? membership.name : undefined, signal);
     } catch (error) {
       const unbound = error instanceof ExpertsError && error.code === 'experts/not-found' && error.details?.reason === 'unbound';
       // The trusted create endpoint stores a Lead asset binding after Agent creation.

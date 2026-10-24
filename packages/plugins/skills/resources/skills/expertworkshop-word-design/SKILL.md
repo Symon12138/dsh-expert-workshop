@@ -1,5 +1,5 @@
 ---
-name: workdsh-word-design
+name: expertworkshop-word-design
 description: "创作或美化 Word 报告、方案、纪要等文档时按体裁组织内容、层级、表格和版式，并通过当前内容工具交付真实 DOCX。"
 ---
 

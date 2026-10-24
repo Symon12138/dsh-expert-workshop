@@ -1,7 +1,7 @@
 import { controlsCss, modalCss } from 'expert-workshop-ui';
 
 export const projectsCss = `${modalCss}
-@layer workdsh-business {
+@layer expertworkshop-business {
 
 
 

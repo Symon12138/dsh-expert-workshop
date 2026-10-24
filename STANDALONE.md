@@ -21,7 +21,7 @@
 
 ## 下载
 
-发布页：https://github.com/Symon12138/symon-studio/releases/tag/expert-workshop-v0.1.0
+发布页：https://github.com/Symon12138/dsh-expert-workshop/releases/tag/expert-workshop-v0.2.0
 
 7 个 `.tgz` 都在该 Release 的 Assets 中，下载后按下面的顺序安装。
 
@@ -30,13 +30,13 @@
 按依赖顺序安装：
 
 ```bash
-dsh plugin --profile web add file:/path/expert-workshop-provider-identity-local-0.1.0-alpha.7.tgz
-dsh plugin --profile web add file:/path/expert-workshop-plugin-audit-0.1.0-alpha.6.tgz
-dsh plugin --profile web add file:/path/expert-workshop-plugin-access-0.1.0-alpha.7.tgz
-dsh plugin --profile web add file:/path/expert-workshop-plugin-skills-0.1.0-alpha.59.tgz
-dsh plugin --profile web add file:/path/expert-workshop-plugin-experts-0.1.0-alpha.24.tgz
-dsh plugin --profile web add file:/path/expert-workshop-plugin-connectors-0.1.0-alpha.10.tgz
-dsh plugin --profile web add file:/path/expert-workshop-plugin-projects-0.1.0-alpha.5.tgz
+dsh plugin --profile web add file:/path/expert-workshop-provider-identity-local-0.1.0-alpha.8.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-audit-0.1.0-alpha.7.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-access-0.1.0-alpha.8.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-skills-0.1.0-alpha.60.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-experts-0.1.0-alpha.25.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-connectors-0.1.0-alpha.11.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-projects-0.1.0-alpha.6.tgz
 dsh --profile web
 ```
 
@@ -60,8 +60,8 @@ dsh --profile web
 单装示例（专家 + 技能）：
 
 ```bash
-dsh plugin --profile web add file:/path/expert-workshop-plugin-skills-0.1.0-alpha.59.tgz
-dsh plugin --profile web add file:/path/expert-workshop-plugin-experts-0.1.0-alpha.24.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-skills-0.1.0-alpha.60.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-experts-0.1.0-alpha.25.tgz
 dsh --profile web
 ```
 
@@ -75,13 +75,13 @@ dsh --profile web
 
 | 数据 | 位置 |
 | --- | --- |
-| 专家目录 | `~/.dsh/storages/workdsh_experts` |
-| 专家 preset | `~/.agents/.workdsh-state/experts/presets` |
+| 专家目录 | `~/.dsh/storages/expertworkshop_experts` |
+| 专家 preset | `~/.agents/.expertworkshop-state/experts/presets` |
 | 技能 | `~/.agents/skills`（Windows 默认 `C:\Users\<user>\.agents\skills`） |
 | 连接器配置 | profile 的 connector storage + 凭据服务 |
-| 项目 | `~/.dsh/storages/workdsh_projects` |
+| 项目 | `~/.dsh/storages/expertworkshop_projects` |
 
-重置专家目录：删除 `~/.dsh/storages/workdsh_experts` 和 `~/.agents/.workdsh-state/experts/presets`，重启后插件会重新从包内 seed 写入。删除前请先备份。
+重置专家目录：删除 `~/.dsh/storages/expertworkshop_experts` 和 `~/.agents/.expertworkshop-state/experts/presets`，重启后插件会重新从包内 seed 写入。删除前请先备份。
 
 ## 技能市场
 

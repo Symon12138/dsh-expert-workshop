@@ -10,8 +10,8 @@ const manifests=new Map();
 for(const directory of directories){try{const manifest=JSON.parse(await readFile(join(base,directory,'package.json'),'utf8'));manifests.set(manifest.name,{manifest,directory});}catch(error){if(error.code!=='ENOENT')throw error;}}
 return manifests;
 }
-export const defaults=['expert-workshop-provider-identity-local','expert-workshop-provider-browser-session','expert-workshop-plugin-audit','expert-workshop-plugin-access','expert-workshop-plugin-skills','expert-workshop-plugin-experts','expert-workshop-plugin-connectors','expert-workshop-plugin-library','expert-workshop-plugin-workbenches','workdsh-bundle'];
-const allowed=new Set([...defaults,'expert-workshop-contracts','expert-workshop-ui','expert-workshop-plugin-workbench','workdsh-tabular']);
+export const defaults=['expert-workshop-provider-identity-local','expert-workshop-provider-browser-session','expert-workshop-plugin-audit','expert-workshop-plugin-access','expert-workshop-plugin-skills','expert-workshop-plugin-experts','expert-workshop-plugin-connectors','expert-workshop-plugin-library','expert-workshop-plugin-workbenches','expertworkshop-bundle'];
+const allowed=new Set([...defaults,'expert-workshop-contracts','expert-workshop-ui','expert-workshop-plugin-workbench','expertworkshop-tabular']);
 export async function auditDefaultPluginDelivery(){
 const manifests=await readOwnedManifests();
 const installer=await readFile(join(root,'scripts/install-project-release.mjs'),'utf8');
@@ -39,7 +39,7 @@ const visit=name=>{
  const row=manifests.get(name);assert.ok(row,'Owned package must have a manifest: '+name);
  // Also inspect build dependencies: bundled Client code can carry workspace-only modules.
  for(const field of ['dependencies','optionalDependencies','peerDependencies','devDependencies'])for(const dependency of Object.keys(row.manifest[field]??{})){
-  if(!dependency.startsWith('workdsh-'))continue;
+  if(!dependency.startsWith('expertworkshop-'))continue;
   assert.ok(allowed.has(dependency),'Default package closure contains an external feature: '+name+' -> '+dependency);
   edges.push({from:name,to:dependency,field});visit(dependency);
  }

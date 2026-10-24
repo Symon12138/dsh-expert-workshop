@@ -7,13 +7,13 @@ export function provideSessionAuthority(ctx, actor, options = {}) {
   }]));
   const inspections = [];
   const membership = { organizationId: actor.organizationId, principalId: actor.principalId, state: 'active' };
-  ctx.provide('workdshIdentity', {
-    id: options.enterprise ? 'workdsh-enterprise-desktop' : 'workdsh-identity-local',
+  ctx.provide('expertworkshopIdentity', {
+    id: options.enterprise ? 'expertworkshop-enterprise-desktop' : 'expertworkshop-identity-local',
     resolve: async (_evidence, signal) => { signal?.throwIfAborted(); return actor; },
     profile: () => ({ principalId: actor.principalId, organization: { id: actor.organizationId, kind: options.enterprise ? 'team' : 'personal' }, membership, resolvedBy: actor.resolvedBy }),
     membership: (organizationId, principalId) => organizationId === actor.organizationId && principalId === actor.principalId ? membership : undefined,
   });
-  ctx.provide('workdshAccess', {
+  ctx.provide('expertworkshopAccess', {
     sessionOwner: sessionId => owners.get(sessionId),
     bindSession: async (current, { sessionId }, signal) => {
       signal?.throwIfAborted();

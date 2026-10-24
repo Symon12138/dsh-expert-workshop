@@ -15,14 +15,14 @@ import { SessionAccessBridge } from '../../access/dist/index.js';
 
 const actor = { principalId: 'alice', organizationId: 'org', requestId: 'association', resolvedBy: 'test' };
 async function withProjects(work, options = {}) {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-project-session-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-project-session-'));
   const ctx = new Context();
   try {
     await ctx.plugin(Storage); await ctx.plugin(JsonStorage, { root }); await ctx.plugin(StorageDomain, { backend: 'json' });
     const authority = provideSessionAuthority(ctx, actor, options);
     if (options.seed) await options.seed(ctx);
     await ctx.plugin(ProjectManager);
-    await work(ctx.workdshProjects, authority, ctx);
+    await work(ctx.expertworkshopProjects, authority, ctx);
   } finally { await ctx.fiber.dispose(); await rm(root, { recursive: true, force: true }); }
 }
 
@@ -81,7 +81,7 @@ test('an unbound enterprise session cannot be claimed through a project request'
 }, { enterprise: true }));
 
 test('enterprise project linking uses the existing fixed-member SessionAccessBridge', () => withProjects(async (manager, authority, ctx) => {
-  ctx.provide('workdshAudit', { append: async () => {}, flush: async () => {} });
+  ctx.provide('expertworkshopAudit', { append: async () => {}, flush: async () => {} });
   await ctx.plugin(SessionAccessBridge, { autoBindFixedMemberSessions: true });
   const project = await manager.create(actor, { name: 'Protected enterprise' });
   authority.sessions.add('native-enterprise');
@@ -115,7 +115,7 @@ test('the existing project RPC also rejects a foreign session', () => withProjec
   let handler;
   ctx.provide('connection', { fetch: { register: registration => { handler = registration.fetch; return () => {}; } } });
   registerProjectConnection(ctx);
-  const response = await handler(new Request('http://localhost/api/workdsh-projects', { method: 'POST', body: JSON.stringify({ endpoint: 'link-task', payload: { projectId: project.project.id, sessionId: 'foreign', title: 'wrong owner' } }) }));
+  const response = await handler(new Request('http://localhost/api/expertworkshop-projects', { method: 'POST', body: JSON.stringify({ endpoint: 'link-task', payload: { projectId: project.project.id, sessionId: 'foreign', title: 'wrong owner' } }) }));
   const result = await response.json();
   assert.equal(result.ok, false);
   assert.equal(result.error.code, 'projects/session-access-denied');

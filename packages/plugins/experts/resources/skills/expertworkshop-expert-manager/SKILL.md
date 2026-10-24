@@ -1,5 +1,5 @@
 ---
-name: workdsh-expert-manager
+name: expertworkshop-expert-manager
 description: 通过对话制作、修改和交付可复用的专家或专家团，把行业经验、专业方法、成员分工与真实技能保存为一个完整作品。
 when-to-use: 用户要求创建或修改专家、专家团，将材料或个人经验变成专家，或导入导出专家作品时使用。
 ---

@@ -14,7 +14,7 @@ const value = (name, fallback) => {
   return index === -1 ? fallback : argv[index + 1];
 };
 const has = name => argv.includes(name);
-const profile = value('--profile', 'workdsh');
+const profile = value('--profile', 'expertworkshop');
 const directory = resolve(value('--directory', dirname(fileURLToPath(import.meta.url))));
 const dsh = value('--dsh', 'dsh');
 const dryRun = has('--dry-run');
@@ -44,7 +44,7 @@ const defaultInstallOrder = [
   'expert-workshop-plugin-connectors',
   'expert-workshop-plugin-library',
   'expert-workshop-plugin-workbenches',
-  'workdsh-bundle',
+  'expertworkshop-bundle',
 ];
 
 const optionalFeatures = {
@@ -74,7 +74,7 @@ for (const name of installOrder) {
 let installationEnv = process.env;
 if (!dryRun) {
   if (!/^pnpm@\d+\.\d+\.\d+$/.test(manifest.packageManager ?? '')) throw new Error('Release must pin pnpm');
-  const shimDirectory = mkdtempSync(join(tmpdir(), 'workdsh-pnpm-'));
+  const shimDirectory = mkdtempSync(join(tmpdir(), 'expertworkshop-pnpm-'));
   process.once('exit', () => rmSync(shimDirectory, { recursive: true, force: true }));
   const runner = join(shimDirectory, 'pnpm-runner.cjs');
   writeFileSync(runner, `const {spawnSync}=require('node:child_process');const result=spawnSync(${JSON.stringify(corepack)},['pnpm',...process.argv.slice(2)],{stdio:'inherit',env:{...process.env,COREPACK_ENABLE_PROJECT_SPEC:'1'}});if(result.error)throw result.error;process.exit(result.status??1);\n`);
@@ -163,7 +163,7 @@ if (!dryRun && existsSync(workspaceFile)) {
 }
 
 // Retain installation assets independently of the download/candidate directory.
-const installAssets = join(dshHome, 'profiles', profile, 'workdsh-package-assets');
+const installAssets = join(dshHome, 'profiles', profile, 'expertworkshop-package-assets');
 const selectedAssets = installOrder.map(name => {
   const item = packages.get(name);
   if (dryRun) return join(directory, item.filename);

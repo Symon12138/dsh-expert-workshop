@@ -8,7 +8,7 @@ import { chromium, expect } from '@playwright/test';
 const root=new URL('../',import.meta.url).pathname,evidence=join(root,'.artifacts/plugin-delivery');
 const baseline=JSON.parse(await readFile(join(evidence,'personal-default-runtime.json'),'utf8'));
 const home=await realpath(baseline.home);
-assert.match(home,/\/T\/workdsh-personal-default-[\w-]+$/);
+assert.match(home,/\/T\/expertworkshop-personal-default-[\w-]+$/);
 const manifestPath=join(home,'profiles/personal/package.json');
 const before=JSON.parse(await readFile(manifestPath,'utf8'));assert.ok(!before.dependencies['expert-workshop-plugin-projects']);
 const env={PATH:`${root}/node_modules/.bin:${dirname(process.execPath)}:/usr/bin:/bin`,HOME:process.env.HOME,DSH_HOME:home,DSH_AGENTS_HOME:join(home,'agents'),npm_config_offline:'true'};

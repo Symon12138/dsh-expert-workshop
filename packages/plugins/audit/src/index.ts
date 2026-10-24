@@ -22,7 +22,7 @@ const auditEventSchema: z.ZodType<AuditEvent> = z.object({
 });
 
 export const auditDomainSpec = defineDomain({
-  name: 'workdsh_audit',
+  name: 'expertworkshop_audit',
   version: 1,
   layout: 'per-record',
   tables: { events: domainTable<string, AuditEvent>(auditEventSchema) },
@@ -30,7 +30,7 @@ export const auditDomainSpec = defineDomain({
 
 declare module '@deepseek-ai/cordis' {
   interface Context {
-    workdshAudit: AuditService;
+    expertworkshopAudit: AuditService;
   }
 }
 
@@ -57,14 +57,14 @@ export class AuditJournal extends Service implements AuditService {
   private appendTail: Promise<void> = Promise.resolve();
 
   constructor(ctx: Context) {
-    super(ctx, 'workdshAudit');
+    super(ctx, 'expertworkshopAudit');
   }
 
   async [Service.init](): Promise<void> {
     const domain = await this.ctx.storageDomain.open(auditDomainSpec);
-    this.ctx.effect(() => () => domain.close(), 'workdshAudit.domainClose');
+    this.ctx.effect(() => () => domain.close(), 'expertworkshopAudit.domainClose');
     this.events = domain.table('events');
-    this.ctx.effect(() => async () => this.flush(), 'workdshAudit.flush');
+    this.ctx.effect(() => async () => this.flush(), 'expertworkshopAudit.flush');
   }
 
   append(event: AuditEvent, signal?: AbortSignal): Promise<void> {

@@ -4,11 +4,11 @@ import { contextBridge } from 'electron'
 
 contextBridge.exposeInMainWorld('dshDesktop', { protocolVersion: 1 })
 
-// WORKDSH TEST PATCH: inset-title-bar integration for the shell window. The macOS traffic
+// EXPERTWORKSHOP TEST PATCH: inset-title-bar integration for the shell window. The macOS traffic
 // lights float over the top-left of the web content, so the sidebar logo row reserves
 // clearance for them and the drag regions make the frame movable again. Selectors match
 // the stable CSS-modules class suffixes of the official layout, not build hashes.
-const WORKDSH_SHELL_CSS = `
+const EXPERTWORKSHOP_SHELL_CSS = `
 [class$="_logoRow"] {
   padding-top: 48px !important;
   height: auto !important;
@@ -40,11 +40,11 @@ header[class$="_header"] [class$="_headerCorner"] {
 
 function applyWorkdshShell(): void {
   if (process.platform !== 'darwin') return
-  if (document.querySelector('style[data-workdsh-shell]') !== null) return
-  document.documentElement.dataset.workdshShell = 'inset'
+  if (document.querySelector('style[data-expertworkshop-shell]') !== null) return
+  document.documentElement.dataset.expertworkshopShell = 'inset'
   const style = document.createElement('style')
-  style.dataset.workdshShell = 'inset'
-  style.textContent = WORKDSH_SHELL_CSS
+  style.dataset.expertworkshopShell = 'inset'
+  style.textContent = EXPERTWORKSHOP_SHELL_CSS
   ;(document.head ?? document.documentElement).append(style)
 }
 

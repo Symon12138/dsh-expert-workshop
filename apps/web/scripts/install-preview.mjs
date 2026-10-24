@@ -28,7 +28,7 @@ const home = resolvePreviewHome();
 const artifacts = join(root, '.artifacts');
 // pnpm includes local archive paths in its store index filename. Keep the
 // immutable archive path short even when this checkout is a nested worktree.
-const previewPacks = resolve(process.env.WORKDSH_PREVIEW_PACKS_HOME ?? join(homedir(), '.cache/workdsh-preview-packs'));
+const previewPacks = resolve(process.env.EXPERTWORKSHOP_PREVIEW_PACKS_HOME ?? join(homedir(), '.cache/expertworkshop-preview-packs'));
 const env = { ...process.env, DSH_HOME: home, DSH_AGENTS_HOME: process.env.DSH_AGENTS_HOME ?? join(home, 'agents'), PATH: `${join(root, 'node_modules/.bin')}:${dirname(process.execPath)}:${process.env.PATH}` };
 const exec = promisify(execFile);
 const run = async (tool, args) => {
@@ -188,11 +188,11 @@ for (const { directory, manifest } of packages) {
   }
 }
 // Preserve authentic CLI-installed workbench archives for Host verification.
-const archiveDirectory = join(profile, 'workdsh-bootstrap-archives');
+const archiveDirectory = join(profile, 'expertworkshop-bootstrap-archives');
 await mkdir(archiveDirectory, { recursive: true });
 const archiveEntries = [];
 for (const [index, { manifest }] of packages.entries()) {
-  const descriptor = manifest.workdsh?.workbench;
+  const descriptor = manifest.expertworkshop?.workbench;
   if (!descriptor) continue;
   const fileName = `${manifest.name}-${manifest.version}.tgz`;
   const bytes = await readFile(tarballs[index]);

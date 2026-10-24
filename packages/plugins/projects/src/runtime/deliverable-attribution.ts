@@ -6,7 +6,7 @@ import type {} from '@deepseek-ai/dsh-fs';
 import type {} from '@deepseek-ai/dsh-session';
 import type { PresentedFile } from '@deepseek-ai/dsh-tool-present/types';
 import type { ActorContext, IdentityService, LibraryService, LibraryTreeEntry, ProjectService } from 'expert-workshop-contracts';
-declare module '@deepseek-ai/cordis' { interface Context { workdshLibrary: LibraryService; } }
+declare module '@deepseek-ai/cordis' { interface Context { expertworkshopLibrary: LibraryService; } }
 
 /**
  * Project deliverable attribution: files the model presents through the official
@@ -127,15 +127,15 @@ export async function attributePresentedFiles(
 
 /** Subscribe to the official delivery signal on the root context (all Sessions). */
 export function registerDeliverableAttribution(ctx: Context): void {
-  const logger = ctx.logger('workdsh-projects');
+  const logger = ctx.logger('expertworkshop-projects');
   const deps: DeliverableAttributionDeps = {
     identity: { resolve: (evidence, signal) => resolveProjectActor(ctx, evidence, signal) },
     projects: {
-      taskContext: (actor, sessionId, signal) => ctx.workdshProjects.taskContext(actor, sessionId, signal),
-      addAsset: (actor, projectId, asset, signal) => ctx.workdshProjects.addAsset(actor, projectId, asset, signal),
-      noteDeliveryGap: (actor, projectId, text, signal) => ctx.workdshProjects.noteDeliveryGap(actor, projectId, text, signal),
+      taskContext: (actor, sessionId, signal) => ctx.expertworkshopProjects.taskContext(actor, sessionId, signal),
+      addAsset: (actor, projectId, asset, signal) => ctx.expertworkshopProjects.addAsset(actor, projectId, asset, signal),
+      noteDeliveryGap: (actor, projectId, text, signal) => ctx.expertworkshopProjects.noteDeliveryGap(actor, projectId, text, signal),
     },
-    library: { importAsset: (actor, input, signal) => ctx.workdshLibrary.importAsset(actor, input, signal) },
+    library: { importAsset: (actor, input, signal) => ctx.expertworkshopLibrary.importAsset(actor, input, signal) },
     readBytes: async (path, cwd, signal) => ctx.fs.readBytes(await ctx.fs.resolve(path, { cwd, signal }), signal, MAX_DELIVERABLE_BYTES),
     warn: message => { logger.warn(message); },
   };

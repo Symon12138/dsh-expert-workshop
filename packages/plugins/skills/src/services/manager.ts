@@ -13,7 +13,7 @@ import type { SkillManagementService, SkillDependencyInspector, SkillDisplayMeta
 import type { RetainedSkillRevision, SkillConsumerRef, SkillRevisionCheck, SkillRevisionRef, SkillRevisionStatus } from 'expert-workshop-contracts';
 
 declare module '@deepseek-ai/cordis' {
-  interface Context { workdshSkills: SkillManagementService; }
+  interface Context { expertworkshopSkills: SkillManagementService; }
 }
 
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
@@ -173,20 +173,20 @@ export class SkillManager extends Service implements SkillManagementService {
   private bundledSeeded = false;
 
   constructor(ctx: Context, options: SkillManagerOptions = {}) {
-    super(ctx, 'workdshSkills');
+    super(ctx, 'expertworkshopSkills');
     this.importRoot = options.importRoot === undefined ? undefined : resolve(options.importRoot);
     const dshHome = resolve(options.dshHome ?? process.env.DSH_HOME ?? join(homedir(), '.dsh'));
     const agentsHome = resolve(options.agentsHome ?? process.env.DSH_AGENTS_HOME ?? join(dshHome, 'agents'));
     this.activeRoots = [join(agentsHome, 'skills'), join(dshHome, 'skills')];
-    this.disabledRoot = join(agentsHome, '.workdsh-disabled', 'skills');
-    this.trashRoot = join(agentsHome, '.workdsh-trash', 'skills');
-    this.stateRoot = join(agentsHome, '.workdsh-state', 'skills');
+    this.disabledRoot = join(agentsHome, '.expertworkshop-disabled', 'skills');
+    this.trashRoot = join(agentsHome, '.expertworkshop-trash', 'skills');
+    this.stateRoot = join(agentsHome, '.expertworkshop-state', 'skills');
     this.lockRoot = join(this.stateRoot, 'locks');
     this.originRoot = join(this.stateRoot, 'disabled-origins');
     this.receiptRoot = join(this.stateRoot, 'trash-receipts');
     this.draftRoot = join(this.stateRoot, 'drafts');
     this.catalogStore = new SkillCatalogStore(options.catalogRoot ??
-      (options.agentsHome === undefined ? process.env.WORKDSH_SKILL_CATALOG : undefined));
+      (options.agentsHome === undefined ? process.env.EXPERTWORKSHOP_SKILL_CATALOG : undefined));
     this.imports = new SkillImportStaging(
       join(this.stateRoot, 'imports'),
       (source, signal) => this.inspectImport(source, signal),
@@ -274,7 +274,7 @@ export class SkillManager extends Service implements SkillManagementService {
   }
 
   registerDisplayMetadata(namespace: string, entries: readonly SkillDisplayMetadata[]): () => void {
-    if (!skillNamePattern.test(namespace) || namespace === 'workdsh' || entries.length > 256) throw new Error('skill/display-invalid');
+    if (!skillNamePattern.test(namespace) || namespace === 'expertworkshop' || entries.length > 256) throw new Error('skill/display-invalid');
     if (this.displayContributions.has(namespace)) throw new Error('skill/display-conflict');
     const rows = new Map<string, SkillDisplayMetadata>();
     for (const entry of entries) {
@@ -501,7 +501,7 @@ export class SkillManager extends Service implements SkillManagementService {
       const root = request.scope === 'profile' ? this.activeRoots[1] : this.activeRoots[0];
       const target = join(root, name);
       await this.assertAbsent(target); await this.assertAbsent(`${target}.md`); await mkdir(root, { recursive: true });
-      const temporary = join(root, `.workdsh-import-${name}-${process.pid}-${Date.now()}`);
+      const temporary = join(root, `.expertworkshop-import-${name}-${process.pid}-${Date.now()}`);
       try {
         await copyImportTree(source, temporary, signal);
         const copied = await inspectImportTree(temporary, signal);
@@ -835,7 +835,7 @@ export class SkillManager extends Service implements SkillManagementService {
     } catch (error) { if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined; throw error; }
   }
   private async atomicWrite(path: string, content: string): Promise<void> {
-    const temporary = `${path}.workdsh-${process.pid}-${Date.now()}.tmp`;
+    const temporary = `${path}.expertworkshop-${process.pid}-${Date.now()}.tmp`;
     await writeFile(temporary, content, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
     try { await rename(temporary, path); }
     catch (error) { await unlink(temporary).catch(() => {}); throw error; }

@@ -92,7 +92,7 @@ export function ConversationExperts({ useInput, sessionId, management, summon, o
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [open, management]);
-  const FINANCE_NOTICE_KEY = 'workdsh.experts.financeNoticeHidden';
+  const FINANCE_NOTICE_KEY = 'expertworkshop.experts.financeNoticeHidden';
   const performSummon = async (row: ExpertSummary) => {
     setActing(true); setError('');
     try { await summon(row.id, row.publishedRevisionRef?.revisionId, input.draft || undefined, { sessionId: String(sessionId), draft: input.draft, references: input.occurrences }); setOpen(false); }

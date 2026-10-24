@@ -11,7 +11,7 @@ assert.ok(process.argv[2], 'Usage: node scripts/recheck-expert-professional.mjs 
 const artifacts = await realpath(process.argv[2]);
 const evidence = await checkProfessionalSession(artifacts, process.argv[3] || 'normal');
 assert.equal(dirname(await realpath(evidence.home)), await realpath(tmpdir()), 'Only the system temporary root may be used');
-assert.ok(basename(evidence.home).startsWith('workdsh-experts-professional-'), 'Only temporary synthetic acceptance homes may be restarted');
+assert.ok(basename(evidence.home).startsWith('expertworkshop-experts-professional-'), 'Only temporary synthetic acceptance homes may be restarted');
 const server = spawn(process.execPath, [join(root, 'node_modules/@deepseek-ai/dsh/lib/bin.js'), '--profile', 'experts', '--host', '127.0.0.1', '--port', '0', '--no-open'], {
   cwd: evidence.home, env: { ...process.env, DSH_HOME: evidence.home, DSH_AGENTS_HOME: join(evidence.home, 'agents'), PATH: `${dirname(process.execPath)}:${process.env.PATH}` }, stdio: ['ignore', 'pipe', 'pipe'],
 });
@@ -27,7 +27,7 @@ try {
     if (!response) await new Promise(resolve => setTimeout(resolve, 100));
   }
   const cookie = response.headers.getSetCookie().map(value => value.split(';')[0]).join('; ');
-  const result = await fetch(`${address}/api/workdsh-experts`, { method: 'POST', headers: { cookie, 'content-type': 'application/json' },
+  const result = await fetch(`${address}/api/expertworkshop-experts`, { method: 'POST', headers: { cookie, 'content-type': 'application/json' },
     body: JSON.stringify({ endpoint: 'verify-binding', payload: { sessionId: evidence.sessionId } }), signal: AbortSignal.timeout(15_000) });
   assert.equal(result.status, 200); assert.equal((await result.json()).ok, true);
   evidence.coldRestart = 'binding verified';

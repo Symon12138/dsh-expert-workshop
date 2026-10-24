@@ -11,25 +11,25 @@ import { compilePersonaPrefix, compilePersonaSuffix } from '../domain/definition
 import { sha256, shortDigest } from '../domain/digest.js';
 
 /** Expert revisions declare official presets; Loader and AgentPresetRegistry own activation. */
-export const COMPILER_VERSION = 'workdsh-expert-compiler/0.4-declarative-presets';
+export const COMPILER_VERSION = 'expertworkshop-expert-compiler/0.4-declarative-presets';
 
 const PERSONA_MODULE = '@deepseek-ai/dsh-persona';
 const SKILL_FS_MODULE = '@deepseek-ai/dsh-skill-filesystem';
 const TOOL_SKILL_MODULE = '@deepseek-ai/dsh-tool-skill';
 
 const LEGACY_TEAM_TOOL_REPLACEMENTS: Readonly<Record<string, string>> = {
-  workdsh_expert_team_start: '官方 Team 已随当前会话建立（无需调用建团工具）',
-  workdsh_expert_team_ask: '`spawn_teammate`、`send_message` 与 `wait_agent`',
-  workdsh_expert_team_delegate: '`spawn_teammate`、`team_task_create` 与 `send_message`',
-  workdsh_expert_team_status: '`list_agents`、`team_task_list` 与 `team_task_get`',
-  workdsh_expert_team_complete: '`team_task_update`',
-  workdsh_expert_team_deliver: '完成共享任务后直接汇总交付',
-  workdsh_expert_team_cancel: '`interrupt_agent` 或更新共享任务状态',
+  expertworkshop_expert_team_start: '官方 Team 已随当前会话建立（无需调用建团工具）',
+  expertworkshop_expert_team_ask: '`spawn_teammate`、`send_message` 与 `wait_agent`',
+  expertworkshop_expert_team_delegate: '`spawn_teammate`、`team_task_create` 与 `send_message`',
+  expertworkshop_expert_team_status: '`list_agents`、`team_task_list` 与 `team_task_get`',
+  expertworkshop_expert_team_complete: '`team_task_update`',
+  expertworkshop_expert_team_deliver: '完成共享任务后直接汇总交付',
+  expertworkshop_expert_team_cancel: '`interrupt_agent` 或更新共享任务状态',
 };
 
 /** Keep older published team assets usable after the 0.1.6 official Team migration. */
 export function migrateLegacyTeamInstructions(text: string): string {
-  return text.replace(/workdsh_expert_team_(?:start|ask|delegate|status|complete|deliver|cancel)\b/g, tool => LEGACY_TEAM_TOOL_REPLACEMENTS[tool] ?? tool);
+  return text.replace(/expertworkshop_expert_team_(?:start|ask|delegate|status|complete|deliver|cancel)\b/g, tool => LEGACY_TEAM_TOOL_REPLACEMENTS[tool] ?? tool);
 }
 
 export interface CompiledPreset {
@@ -86,7 +86,7 @@ export function resolveAgentsHome(explicit?: string): string {
  */
 export function expertPresetDir(presetId: string, agentsHome?: string): string {
   if (!/^wd-exp-[a-z0-9-]+$/.test(presetId)) throw new Error('experts/invalid-preset-id');
-  return join(resolveAgentsHome(agentsHome), '.workdsh-state', 'experts', 'presets', presetId);
+  return join(resolveAgentsHome(agentsHome), '.expertworkshop-state', 'experts', 'presets', presetId);
 }
 
 const registrations = new WeakMap<Context, Map<string, Promise<void>>>();
@@ -121,7 +121,7 @@ export async function compileExpertPreset(ctx: Context, input: CompileInput, age
   const files = input.definition.packageDocuments ?? {};
   const assets = input.definition.packageAssets ?? {};
   validateResources(files, assets);
-  const manifestPath = join(presetDir, 'workdsh-expert-manifest.json');
+  const manifestPath = join(presetDir, 'expertworkshop-expert-manifest.json');
   const inputDigest = sha256(renderComposition(input));
   try {
     const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
@@ -165,7 +165,7 @@ export async function compileExpertPreset(ctx: Context, input: CompileInput, age
     }
     await writeFile(join(staging, 'preset.json'), text, { flag: 'wx' });
     const compositionDigest = sha256(text);
-    await writeFile(join(staging, 'workdsh-expert-manifest.json'), JSON.stringify({ inputDigest, compositionDigest }), { flag: 'wx' });
+    await writeFile(join(staging, 'expertworkshop-expert-manifest.json'), JSON.stringify({ inputDigest, compositionDigest }), { flag: 'wx' });
     try { await rename(staging, presetDir); }
     catch (error) {
       if (!['EEXIST', 'ENOTEMPTY'].includes((error as NodeJS.ErrnoException).code ?? '')) throw error;
@@ -221,7 +221,7 @@ export async function verifyPackageFiles(presetDir: string, files: Readonly<Reco
 export function expertPersonaConfig(input: Pick<CompileInput, 'definition' | 'packageRoot' | 'teamMembers'>) {
   const authoredPersona = compilePersonaPrefix(input.definition);
   const prefix = [...(input.teamMembers ? [
-    readFileSync(new URL('../../resources/skills/workdsh-expert-manager/runtime/team-lead.md', import.meta.url), 'utf8'),
+    readFileSync(new URL('../../resources/skills/expertworkshop-expert-manager/runtime/team-lead.md', import.meta.url), 'utf8'),
     JSON.stringify({ members: input.teamMembers, workflows: input.definition.team?.workflows }),
     migrateLegacyTeamInstructions(authoredPersona),
   ] : [authoredPersona]), ...(input.packageRoot ? [`专家作品资源目录：${input.packageRoot}。bin 下的工具已随发布版本安装；用原生 bash 按此路径调用，仍遵守沙箱和审批。`] : [])].join('\n\n');

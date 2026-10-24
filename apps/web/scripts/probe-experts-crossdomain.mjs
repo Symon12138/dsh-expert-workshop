@@ -17,7 +17,7 @@ assert.ok(['writing','research','code'].includes(scenario));
 const variant=process.argv[3]||'original';
 assert.ok(['original','holdout'].includes(variant));
 const artifacts = join(root, `.artifacts/experts-crossdomain-${scenario}${variant==='holdout'?'-holdout':''}-20260913`);
-const home = await realpath(await mkdtemp(join(tmpdir(), 'workdsh-experts-crossdomain-')));
+const home = await realpath(await mkdtemp(join(tmpdir(), 'expertworkshop-experts-crossdomain-')));
 await mkdir(artifacts,{recursive:true});
 await unlink(join(artifacts,'failure.json')).catch(()=>{});
 const workspace=join(home,'workspace');await mkdir(workspace);
@@ -86,7 +86,7 @@ async function stop() {
   await stopped; clearTimeout(timer);
 }
 async function api(host, endpoint, payload = {}) {
-  const response = await fetch(`${host.address}/api/workdsh-experts`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(15_000) });
+  const response = await fetch(`${host.address}/api/expertworkshop-experts`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(15_000) });
   assert.equal(response.status, 200);
   const result = await response.json();
   assert.equal(result.ok, true, JSON.stringify(result));
@@ -125,12 +125,12 @@ try {
     await page.getByRole('button',{name:'发布',exact:true}).click();
     await page.getByRole('button',{name:'确认发布此版本',exact:true}).click();
     await expect(page.getByRole('dialog',{name:'发布成功',exact:true})).toBeVisible();
-    const response=page.waitForResponse(r=>r.url().endsWith('/api/workdsh-experts')&&r.request().postDataJSON()?.endpoint==='create-execution');
+    const response=page.waitForResponse(r=>r.url().endsWith('/api/expertworkshop-experts')&&r.request().postDataJSON()?.endpoint==='create-execution');
     await page.getByRole('button',{name:'去试试',exact:true}).click();
     const creation=(await(await response).json()).value;await api(host,'verify-binding',{sessionId:creation.sessionId});
     await expect(page.locator('[contenteditable="true"]').first()).toBeVisible();return creation.sessionId;
   }
-  await page.route('**/api/workdsh-experts',async route=>{const b=route.request().postDataJSON();if(b.endpoint==='prepare-execution'){b.payload={...b.payload,workspaceRef:workspace,workspaceId};return route.continue({postData:JSON.stringify(b)})}return route.continue()});
+  await page.route('**/api/expertworkshop-experts',async route=>{const b=route.request().postDataJSON();if(b.endpoint==='prepare-execution'){b.payload={...b.payload,workspaceRef:workspace,workspaceId};return route.continue({postData:JSON.stringify(b)})}return route.continue()});
   async function eventsFor(sid){const rel=(await readdir(join(home,'sessions'),{recursive:true})).find(x=>x.endsWith(`${sid}/session.v3.jsonl.zstd`));if(!rel)return[];const {stdout}=await exec('zstd',['-dc',join(home,'sessions',rel)],{maxBuffer:32*1024*1024});return stdout.trim().split('\n').map(JSON.parse)}
   async function runTurn(sid,prompt,label){
     const editor=page.locator('[contenteditable="true"]').first();await editor.fill(prompt);await editor.press('Enter');
@@ -141,11 +141,11 @@ try {
     const calls=rows.filter(x=>x.type==='tool/call').map(x=>x.data);
     await writeFile(join(artifacts,label+'-trace.json'),JSON.stringify({sessionId:sid,preset:rows[0].agentPreset,tools:calls.map(c=>({name:c.name,arguments:c.arguments})),completed:true},null,2));return calls;
   }
-  const seed=await api(host,'create-draft',{operationId:'creator-seed',definition:{name:'公共专家制作验收引导',description:'调用已安装的公共制作指南处理合成需求。',role:'使用 workdsh-expert-manager 引导制作，必须实际加载技能与相关参考。',methodology:'先读取真实指南，按用户需求调用公开专家管理工具创建草稿并校验。',boundaries:'只操作当前隔离合成资料，不联网、不读取凭据、不修改原始材料。不代替用户发布。',deliverables:'可审阅的专家草稿、实际能力与成果标准。',tags:[],examples:[],skillRequirements:[],futureRequirements:[]}});
+  const seed=await api(host,'create-draft',{operationId:'creator-seed',definition:{name:'公共专家制作验收引导',description:'调用已安装的公共制作指南处理合成需求。',role:'使用 expertworkshop-expert-manager 引导制作，必须实际加载技能与相关参考。',methodology:'先读取真实指南，按用户需求调用公开专家管理工具创建草稿并校验。',boundaries:'只操作当前隔离合成资料，不联网、不读取凭据、不修改原始材料。不代替用户发布。',deliverables:'可审阅的专家草稿、实际能力与成果标准。',tags:[],examples:[],skillRequirements:[],futureRequirements:[]}});
   const creatorSid=await publishAndSummon(seed.expertId);
   await writeFile(join(artifacts,'running.json'),JSON.stringify({home,workspace,scenario,inputHash,creatorSid},null,2));
-  const creatorCalls=await runTurn(creatorSid,`请实际加载 workdsh-expert-manager 并读取相关参考。根据以下需求创建名称为「${test.name}」的一个专家草稿，保留可复用方法、边界和成果标准，调用校验并给出摘要即可，禁止发布或创建重复专家：${test.need} 已知信息足够，不需要追问。`, 'creation');
-  assert.ok(creatorCalls.some(c=>c.name==='skill'&&c.arguments.includes('workdsh-expert-manager')),'Real manager Skill load required');
+  const creatorCalls=await runTurn(creatorSid,`请实际加载 expertworkshop-expert-manager 并读取相关参考。根据以下需求创建名称为「${test.name}」的一个专家草稿，保留可复用方法、边界和成果标准，调用校验并给出摘要即可，禁止发布或创建重复专家：${test.need} 已知信息足够，不需要追问。`, 'creation');
+  assert.ok(creatorCalls.some(c=>c.name==='skill'&&c.arguments.includes('expertworkshop-expert-manager')),'Real manager Skill load required');
   assert.ok(creatorCalls.some(c=>c.name==='read'&&c.arguments.includes('material-and-methods')),'Material reference read required');
   const listed=await api(host,'list');const items=listed.items.filter(x=>x.name===test.name);assert.equal(items.length,1,'One model-created expert required');
   const created=await api(host,'get',{expertId:items[0].id});await writeFile(join(artifacts,'model-created-expert.json'),JSON.stringify(created,null,2));

@@ -1,5 +1,5 @@
 ---
-name: workdsh-workbench-dev
+name: expertworkshop-workbench-dev
 description: 在官方 Creator 插件开发流程上补充 Expert Workshop 业务 SDK、对象协作、身份和数据保护规范。
 ---
 

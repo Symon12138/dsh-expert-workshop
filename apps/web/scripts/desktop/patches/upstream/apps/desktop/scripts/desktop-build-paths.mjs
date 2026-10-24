@@ -50,8 +50,8 @@ export function desktopTargetBuildPaths(target) {
     packedDsh: join(packed, 'dsh'),
     packedVendor: join(packed, 'vendor'),
     packedLandlock: join(packed, 'landlock'),
-    // WORKDSH TEST PATCH: local Expert Workshop profile tarballs beside the official packed inputs.
-    packedWorkdsh: join(packed, 'workdsh'),
+    // EXPERTWORKSHOP TEST PATCH: local Expert Workshop profile tarballs beside the official packed inputs.
+    packedWorkdsh: join(packed, 'expertworkshop'),
     downloads: join(BUILD_ROOT, 'downloads'),
   }
 }

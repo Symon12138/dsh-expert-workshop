@@ -8,7 +8,7 @@ import { chromium, expect } from '@playwright/test';
 // Explicit previous synthetic personal acceptance Home, never the user's Home.
 const root = new URL('../', import.meta.url).pathname;
 const home = await realpath(process.argv[2]);
-assert.match(home, /^\/private\/tmp\/workdsh-experts-package-[\w-]+$/);
+assert.match(home, /^\/private\/tmp\/expertworkshop-experts-package-[\w-]+$/);
 const profile = join(home, 'profiles/experts');
 const manifest = JSON.parse(await readFile(join(profile, 'package.json'), 'utf8'));
 assert.ok(!JSON.stringify(manifest).includes('enterprise'));
@@ -50,7 +50,7 @@ async function start() {
   throw new Error('Owned personal Host did not start');
 }
 async function api(domain, endpoint, payload={}) {
-  const response = await fetch(host.address+'/api/workdsh-'+domain, { method:'POST', headers:{cookie:host.cookie,'content-type':'application/json'}, body:JSON.stringify({endpoint,payload}), signal:AbortSignal.timeout(15000) });
+  const response = await fetch(host.address+'/api/expertworkshop-'+domain, { method:'POST', headers:{cookie:host.cookie,'content-type':'application/json'}, body:JSON.stringify({endpoint,payload}), signal:AbortSignal.timeout(15000) });
   assert.equal(response.status,200); const result=await response.json(); assert.equal(result.ok,true,JSON.stringify(result.error)); return result.value;
 }
 async function dismiss(page) {
@@ -73,12 +73,12 @@ try {
   await page.getByRole('button',{name:'专家 · 技能 · 连接器',exact:true}).click();
   await page.getByRole('button',{name:'专家',exact:true}).click();
   await page.getByRole('button',{name:`查看专家 ${expert.name}`,exact:true}).click();
-  const creationReply=page.waitForResponse(r=>r.url().endsWith('/api/workdsh-experts')&&r.request().postDataJSON()?.endpoint==='create-execution');
+  const creationReply=page.waitForResponse(r=>r.url().endsWith('/api/expertworkshop-experts')&&r.request().postDataJSON()?.endpoint==='create-execution');
   await page.getByRole('button',{name:'召唤专家',exact:true}).click();
   const creation=await (await creationReply).json(); assert.equal(creation.ok,true);
   const sessionId=creation.value.sessionId;
   assert.deepEqual(await api('connectors','selection',{sessionId}),[]);
-  const rows=await api('connectors','list'); const example=rows.find(row=>row.id==='workdsh-example'); assert.equal(example.state,'ready');
+  const rows=await api('connectors','list'); const example=rows.find(row=>row.id==='expertworkshop-example'); assert.equal(example.state,'ready');
   await page.getByRole('button',{name:'连接器',exact:true}).click();
   await page.getByRole('button',{name:`用于本次对话 ${example.title}`,exact:true}).click();
   await expect(page.getByRole('button',{name:`从本次对话移除 ${example.title}`,exact:true})).toBeVisible();

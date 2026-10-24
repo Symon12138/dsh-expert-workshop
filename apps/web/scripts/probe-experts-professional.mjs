@@ -20,7 +20,7 @@ assert.ok(!process.argv[4]||confirmed,'Only --confirmed is supported');
 assert.ok(!confirmed||scenario==='dirty','Confirmed scope applies only to dirty fixture');
 assert.ok(!runLabel || /^[a-z0-9-]{1,40}$/.test(runLabel), 'Run label must contain lowercase letters, digits or hyphens');
 const artifacts = join(root, `.artifacts/experts-professional-${scenario}${runLabel ? `-${runLabel}` : ''}`);
-const home = await realpath(await mkdtemp(join(tmpdir(), 'workdsh-experts-professional-')));
+const home = await realpath(await mkdtemp(join(tmpdir(), 'expertworkshop-experts-professional-')));
 await mkdir(artifacts, { recursive: true });
 await unlink(join(artifacts, 'report.json')).catch(() => {});
 const workspace = join(home, 'workspace');
@@ -80,7 +80,7 @@ async function stop() {
   await stopped; clearTimeout(timer);
 }
 async function api(host, endpoint, payload = {}) {
-  const response = await fetch(`${host.address}/api/workdsh-experts`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(15_000) });
+  const response = await fetch(`${host.address}/api/expertworkshop-experts`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(15_000) });
   assert.equal(response.status, 200);
   const result = await response.json();
   assert.equal(result.ok, true, JSON.stringify(result));
@@ -127,7 +127,7 @@ try {
   await expect(page.getByRole('dialog', { name: '发布成功', exact: true })).toBeVisible();
   const published = await api(host, 'get', { expertId: drafted.expertId });
   assert.equal(published.revision.dependencyLock.length, 1);
-  await page.route('**/api/workdsh-experts', async route => {
+  await page.route('**/api/expertworkshop-experts', async route => {
     const body = route.request().postDataJSON();
     if (body.endpoint === 'prepare-execution') {
       body.payload = { ...body.payload, workspaceRef: workspace, workspaceId };
@@ -135,7 +135,7 @@ try {
     }
     return route.continue();
   });
-  const createdResponse = page.waitForResponse(response => response.url().endsWith('/api/workdsh-experts') && response.request().postDataJSON()?.endpoint === 'create-execution');
+  const createdResponse = page.waitForResponse(response => response.url().endsWith('/api/expertworkshop-experts') && response.request().postDataJSON()?.endpoint === 'create-execution');
   await page.getByRole('button', { name: '去试试', exact: true }).click();
   const creation = (await (await createdResponse).json()).value;
   assert.ok(creation.sessionId);

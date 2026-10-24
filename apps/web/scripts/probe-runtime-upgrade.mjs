@@ -12,7 +12,7 @@ const source=fileURLToPath(new URL('../../../',import.meta.url));
 const target=process.argv[2];
 if(!/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(target??''))throw Error('Usage: node probe-runtime-upgrade.mjs <published-version>');
 if(target!=='0.2.1-rc.1')throw Error('Historical probe: only the reviewed rc.1 vendor baseline is supported; do not use it to validate rc.2 or later upgrades.');
-const root=await mkdtemp(join(tmpdir(),'workdsh-runtime-upgrade-'));
+const root=await mkdtemp(join(tmpdir(),'expertworkshop-runtime-upgrade-'));
 const web=join(root,'apps/web');await mkdir(web,{recursive:true});
 const ignored=new Set(['node_modules','.git','.artifacts','dist','coverage','.cache']);
 const filter=path=>!ignored.has(basename(path));

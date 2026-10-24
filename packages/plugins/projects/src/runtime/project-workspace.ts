@@ -8,10 +8,10 @@ import type { ActorContext } from 'expert-workshop-contracts';
 
 /** Official registry remains the only workspace identity and persistence owner. */
 export async function ensureProjectWorkspace(ctx: Context, actor: ActorContext, projectId: string, signal?: AbortSignal, workspaceRoot?: string) {
-  const { project } = await ctx.workdshProjects.get(actor, projectId, signal);
+  const { project } = await ctx.expertworkshopProjects.get(actor, projectId, signal);
   signal?.throwIfAborted();
   const key = createHash('sha256').update(JSON.stringify([actor.organizationId, actor.principalId, project.id])).digest('hex');
-  const path = workspaceRoot ? join(workspaceRoot, key) : join(process.env.DSH_HOME || join(homedir(), '.workdsh'), 'workdsh-projects', key);
+  const path = workspaceRoot ? join(workspaceRoot, key) : join(process.env.DSH_HOME || join(homedir(), '.expertworkshop'), 'expertworkshop-projects', key);
   await mkdir(path, { recursive: true });
   signal?.throwIfAborted();
   const { workspace } = await ctx.workspaceController.create({ path });

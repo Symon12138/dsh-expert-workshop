@@ -13,7 +13,7 @@ import type {
   ProjectWorkItem,
 } from 'expert-workshop-contracts/projects';
 
-const path = '/api/workdsh-projects';
+const path = '/api/expertworkshop-projects';
 
 /**
  * Projects are Host-owned domain objects. A browser fallback would turn an

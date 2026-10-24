@@ -5,18 +5,18 @@ import { resolveProjectActor } from './identity.js';
 
 /** Inject the immutable project configuration captured when this task was created. */
 export function registerProjectContextInjection(ctx: Context): void {
-  const logger = ctx.logger('workdsh-projects');
+  const logger = ctx.logger('expertworkshop-projects');
   ctx.on('system-prompt/assemble', async (_assembly, context, next) => {
     const resolved = await next();
     try {
       const sessionId = context.agent ? String(context.agent.id) : undefined;
       if (!sessionId) return resolved;
       const actor = await resolveProjectActor(ctx, { sessionId }, context.signal);
-      const selected = await ctx.workdshProjects.taskContext(actor, sessionId, context.signal);
+      const selected = await ctx.expertworkshopProjects.taskContext(actor, sessionId, context.signal);
       if (!selected) return resolved;
       const references = selected.task.references.filter(row => row.kind !== 'asset').map(row => `- ${row.kind === 'work-item' ? '计划待办' : '技能'}：${row.label}（修订 ${row.revision}）`);
       resolved.contexts.push({
-        name: 'workdsh:project-task',
+        name: 'expertworkshop:project-task',
         text: [
           `当前任务属于项目“${selected.project.name}”，使用项目配置修订 ${selected.config.number}。`,
           selected.config.instruction.trim() ? `项目指令：\n${selected.config.instruction.trim()}` : '',

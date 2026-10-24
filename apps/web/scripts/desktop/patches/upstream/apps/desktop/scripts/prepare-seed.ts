@@ -162,8 +162,8 @@ async function main(): Promise<void> {
     const targetPlatform = process.env.DSH_DESKTOP_TARGET_PLATFORM ?? process.platform
     let signedMachOFiles: number | undefined
     let macOSSigning: ReturnType<typeof resolveMacOSSigningEnvironment> | undefined
-    // WORKDSH TEST PATCH: unsigned local test builds skip Developer ID store signing.
-    if (targetPlatform === 'darwin' && process.env.WORKDSH_DESKTOP_UNSIGNED !== '1') {
+    // EXPERTWORKSHOP TEST PATCH: unsigned local test builds skip Developer ID store signing.
+    if (targetPlatform === 'darwin' && process.env.EXPERTWORKSHOP_DESKTOP_UNSIGNED !== '1') {
       macOSSigning = resolveMacOSSigningEnvironment(process.env)
       const signing = await signMacOSSeedStore(
         STORE_ROOT,

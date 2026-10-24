@@ -15,7 +15,7 @@ test('invalid YAML and global trigger produce advisory diagnostics', () => {
   assert.ok(inspectSkill('---\nname: global\ndescription: Use for every task\n---\nBody', 'SKILL.md').findings.some(f => f.code === 'trigger-broad'));
 });
 test('scan deduplicates selected files, skips symlinks, reports duplicate descriptions and preserves source', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-quality-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-quality-'));
   try {
     const source = '---\nname: example\ndescription: Review migrations\n---\nBody';
     for (const name of ['one', 'two']) { await mkdir(join(root, name)); await writeFile(join(root, name, 'SKILL.md'), source); }

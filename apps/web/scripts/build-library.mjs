@@ -12,9 +12,9 @@ await build({
   entryPoints: [fileURLToPath(new URL('src/index.ts', entry))],
   bundle: true, format: 'esm', platform: 'node', target: 'node22', packages: 'external',
   plugins: [{ name: 'shared-tabular-only', setup(builder) {
-    builder.onResolve({ filter: /^workdsh-tabular$/ }, () => ({ path: requireTabular.resolve('workdsh-tabular') }));
+    builder.onResolve({ filter: /^expertworkshop-tabular$/ }, () => ({ path: requireTabular.resolve('expertworkshop-tabular') }));
   } }],
   outfile: fileURLToPath(new URL('dist/index.js', entry)),
 });
 
-await copyFile(requireTabular.resolve('workdsh-tabular/licenses'),new URL('dist/THIRD-PARTY-TABULAR-LICENSES.txt',entry));
+await copyFile(requireTabular.resolve('expertworkshop-tabular/licenses'),new URL('dist/THIRD-PARTY-TABULAR-LICENSES.txt',entry));

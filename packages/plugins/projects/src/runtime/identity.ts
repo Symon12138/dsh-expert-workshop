@@ -6,14 +6,14 @@ export function localProjectActor(evidence?: { sessionId?: string; runId?: strin
     principalId: 'local-user',
     organizationId: 'local-personal',
     requestId: `projects-local-${Date.now().toString(36)}`,
-    resolvedBy: 'workdsh-local',
+    resolvedBy: 'expertworkshop-local',
     ...(evidence?.sessionId === undefined ? {} : { sessionId: evidence.sessionId }),
     ...(evidence?.runId === undefined ? {} : { runId: evidence.runId }),
   };
 }
 
 export function projectIdentity(ctx: Context): IdentityService | undefined {
-  return ctx.reflect.get('workdshIdentity') as IdentityService | undefined;
+  return ctx.reflect.get('expertworkshopIdentity') as IdentityService | undefined;
 }
 
 export function projectProfile(ctx: Context): Pick<IdentityProfile, 'principalId' | 'organization' | 'resolvedBy'> {
@@ -22,7 +22,7 @@ export function projectProfile(ctx: Context): Pick<IdentityProfile, 'principalId
   return {
     principalId: 'local-user',
     organization: { id: 'local-personal', kind: 'personal', name: '本地个人' } as IdentityProfile['organization'],
-    resolvedBy: 'workdsh-local',
+    resolvedBy: 'expertworkshop-local',
   } as Pick<IdentityProfile, 'principalId' | 'organization' | 'resolvedBy'>;
 }
 

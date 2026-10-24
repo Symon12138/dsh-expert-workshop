@@ -12,7 +12,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const artifacts = join(root, '.artifacts/skills-standalone');
 await mkdir(artifacts, { recursive: true });
 // Outside the checkout: an undeclared dependency cannot leak from ancestor node_modules.
-const home = await mkdtemp(join(tmpdir(), 'workdsh-skills-package-'));
+const home = await mkdtemp(join(tmpdir(), 'expertworkshop-skills-package-'));
 const workspace = join(home, 'workspace');
 await mkdir(workspace);
 const env = { ...process.env, DSH_HOME: home, DSH_AGENTS_HOME: join(home, 'agents'), PATH: `${join(root, 'node_modules/.bin')}:${dirname(process.execPath)}:${process.env.PATH}` };
@@ -31,14 +31,14 @@ await writeFile(skillFile, `---\nname: ${fixture}\ndescription: Standalone packa
 // the same managed import path the browser upload uses.
 const catalogSkill = 'catalog-fixture';
 const catalogRoot = join(home, 'selected-catalog');
-env.WORKDSH_SKILL_CATALOG = catalogRoot;
+env.EXPERTWORKSHOP_SKILL_CATALOG = catalogRoot;
 await mkdir(join(catalogRoot, 'icons'), { recursive: true });
 await mkdir(join(catalogRoot, 'payloads', catalogSkill), { recursive: true });
 await writeFile(join(catalogRoot, 'icons/tiny.svg'), '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#3ba55d"/></svg>');
 await writeFile(join(catalogRoot, 'payloads', catalogSkill, 'SKILL.md'), `---\nname: ${catalogSkill}\ndescription: Catalog install fixture\n---\nCATALOG\n`);
 await writeFile(join(catalogRoot, 'catalog.json'), `${JSON.stringify({
   schema: 1,
-  kind: 'workdsh-skill-catalog',
+  kind: 'expertworkshop-skill-catalog',
   generatedAt: new Date().toISOString(),
   categories: ['开发工具'],
   entries: [
@@ -88,7 +88,7 @@ async function pageFor({ address, cookie }) {
   return page;
 }
 async function api(host, endpoint, payload = {}) {
-  const response = await fetch(`${host.address}/api/workdsh-skills`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(10_000) });
+  const response = await fetch(`${host.address}/api/expertworkshop-skills`, { method: 'POST', headers: { cookie: host.cookie, 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: AbortSignal.timeout(10_000) });
   return response.json();
 }
 try {
@@ -96,8 +96,8 @@ try {
   await cli('--profile', 'skills', '--from-default-profile', 'web', '--dump-config');
   await cli('plugin', '--profile', 'skills', 'add', tarball, '--offline');
   const config = await cli('--profile', 'skills', '--dump-config');
-  assert.equal(config.split('id: workdsh-skills').length - 1, 1);
-  assert.ok(!config.includes('workdsh-bundle'));
+  assert.equal(config.split('id: expertworkshop-skills').length - 1, 1);
+  assert.ok(!config.includes('expertworkshop-bundle'));
   const installedRoot = join(home, 'profiles/skills/node_modules/expert-workshop-plugin-skills');
   const installed = JSON.parse(await readFile(join(installedRoot, 'package.json'), 'utf8'));
   assert.equal(installed.version, manifest.version);
@@ -111,7 +111,7 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   const graph = await page.evaluate(() => window.__DSH_BOOT__.entries.map(row => row.id));
   assert.equal(graph.filter(id => id === manifest.name).length, 1);
-  assert.ok(!graph.includes('workdsh-bundle'));
+  assert.ok(!graph.includes('expertworkshop-bundle'));
   // Catalog reads: status, metadata merge, icon bytes and eligibility keep
   // Host as the only reader of catalog files.
   const catalogSummary = await api(host, 'catalog');
@@ -123,7 +123,7 @@ try {
   assert.deepEqual(catalogEntry.categories, ['开发工具']);
   assert.equal(catalogEntry.installed, false);
   assert.equal(catalogEntry.installable, true);
-  assert.match(catalogEntry.iconUrl, /^\/api\/workdsh-skills\/icon\?name=catalog-fixture&rev=[0-9a-f]{12}$/);
+  assert.match(catalogEntry.iconUrl, /^\/api\/expertworkshop-skills\/icon\?name=catalog-fixture&rev=[0-9a-f]{12}$/);
   const limitedEntry = catalogSummary.value.entries.find(row => row.name === 'catalog-over-limit');
   assert.equal(limitedEntry.installable, false);
   assert.deepEqual(limitedEntry.installLimits, ['文件 481 个超过 400 上限']);
@@ -176,14 +176,14 @@ try {
   // first, count heading, in-page search and the shared card/batch management.
   const installedEntry = page.getByRole('button', { name: /查看我安装的 \d+ 个技能/ });
   await expect(installedEntry).toBeVisible();
-  await page.getByTestId('workdsh-skills').evaluate(element => { element.scrollTop = element.scrollHeight; });
+  await page.getByTestId('expertworkshop-skills').evaluate(element => { element.scrollTop = element.scrollHeight; });
   await installedEntry.click();
   await expect(page.getByTestId('skills-installed')).toBeVisible();
   await expect(page.getByTestId('skills-installed').getByRole('heading', { name: /^我安装的 \d+$/ })).toBeVisible();
   await expect(page.getByRole('heading', { name: '技能市场', exact: true })).toHaveCount(0);
   const backToMarket = page.getByRole('button', { name: '返回全部技能', exact: true });
   await expect(backToMarket).toBeFocused();
-  await expect.poll(() => page.getByTestId('workdsh-skills').evaluate(element => element.scrollTop)).toBe(0);
+  await expect.poll(() => page.getByTestId('expertworkshop-skills').evaluate(element => element.scrollTop)).toBe(0);
   const installedSearch = page.getByRole('textbox', { name: '搜索已安装的技能', exact: true });
   await installedSearch.fill(catalogSkill);
   await expect(page.getByRole('button', { name: `查看技能 ${catalogSkill}`, exact: true })).toBeVisible();
@@ -204,7 +204,7 @@ try {
   // Bundled skills keep the Expert Workshop prefix so the unprefixed `skill-creator`
   // name stays available to the user's own skills; each registers exactly once.
   const bundledSkills = (await api(host, 'list')).value;
-  for (const name of ['workdsh-skill-creator', 'workdsh-ppt-design', 'workdsh-word-design', 'workdsh-excel-design', 'workdsh-web-design']) {
+  for (const name of ['expertworkshop-skill-creator', 'expertworkshop-ppt-design', 'expertworkshop-word-design', 'expertworkshop-excel-design', 'expertworkshop-web-design']) {
     assert.equal(bundledSkills.filter(row => row.name === name).length, 1, `${name} is registered exactly once`);
   }
   await page.getByRole('button', { name: `查看技能 ${fixture}`, exact: true }).click();
@@ -235,19 +235,19 @@ try {
   pass('Independent Client navigation, edit/save/conflict, enable/disable, uninstall/restore write real files');
   await page.close(); await stop();
   await cli('plugin', '--profile', 'skills', 'remove', manifest.name);
-  assert.ok(!(await cli('--profile', 'skills', '--dump-config')).includes('id: workdsh-skills'));
+  assert.ok(!(await cli('--profile', 'skills', '--dump-config')).includes('id: expertworkshop-skills'));
   host = await start(); page = await pageFor(host);
   await expect(page.getByRole('button', { name: '专家 · 技能 · 连接器', exact: true })).toHaveCount(0);
   await expect(page.getByText(/新会话|New Session/, { exact: true }).first()).toBeVisible();
   assert.ok(!(await page.evaluate(() => window.__DSH_BOOT__.entries.map(row => row.id))).includes(manifest.name));
-  assert.equal((await fetch(`${host.address}/api/workdsh-skills`, { method: 'POST', headers: { cookie: host.cookie }, body: '{}' })).status, 404);
+  assert.equal((await fetch(`${host.address}/api/expertworkshop-skills`, { method: 'POST', headers: { cookie: host.cookie }, body: '{}' })).status, 404);
   assert.equal(await readFile(skillFile, 'utf8'), modified);
   pass('Cold removal withdraws Host route and Client/navigation while preserving native Web and user skill files');
   await page.close(); await stop();
   await cli('plugin', '--profile', 'skills', 'add', tarball, '--offline');
   // Repeating the same installation must not add another layer or registration.
   await cli('plugin', '--profile', 'skills', 'add', tarball, '--offline');
-  assert.equal((await cli('--profile', 'skills', '--dump-config')).split('id: workdsh-skills').length - 1, 1);
+  assert.equal((await cli('--profile', 'skills', '--dump-config')).split('id: expertworkshop-skills').length - 1, 1);
   host = await start(); page = await pageFor(host);
   await page.getByRole('button', { name: '专家 · 技能 · 连接器', exact: true }).click();
   await expect(page.getByRole('button', { name: `查看技能 ${fixture}`, exact: true })).toHaveCount(1);
@@ -256,14 +256,14 @@ try {
   await page.close(); await stop();
   // Absent and corrupted catalogs report honest diagnostics and never break
   // installed-skill management or fabricate an empty marketplace.
-  env.WORKDSH_SKILL_CATALOG = join(home, 'agents/.workdsh-catalog-absent');
+  env.EXPERTWORKSHOP_SKILL_CATALOG = join(home, 'agents/.expertworkshop-catalog-absent');
   host = await start();
   const missing = await api(host, 'catalog');
   assert.equal(missing.value.status, 'missing');
   assert.equal(missing.value.diagnostics[0].code, 'skill/catalog-missing');
   assert.ok((await api(host, 'list')).value.some(row => row.name === catalogSkill));
   await stop();
-  env.WORKDSH_SKILL_CATALOG = catalogRoot;
+  env.EXPERTWORKSHOP_SKILL_CATALOG = catalogRoot;
   await writeFile(join(catalogRoot, 'catalog.json'), '{ not json');
   host = await start();
   const invalid = await api(host, 'catalog');

@@ -17,8 +17,8 @@ export const inject = ['connection', 'tools', 'mcpResources', 'storageDomain', '
 export async function apply(ctx: Context, options: ConnectorManagerOptions = {}): Promise<void> {
   await ctx.plugin(ConnectorManager, options);
   await ctx.plugin({
-    name: 'workdsh-connectors-integration',
-    inject: [...inject, 'workdshConnectors'],
+    name: 'expertworkshop-connectors-integration',
+    inject: [...inject, 'expertworkshopConnectors'],
     apply: registerConnectorManagementConnection,
   });
 }
