@@ -7,7 +7,7 @@ import { checkExpertResults } from '../../scripts/check-expert-results.mjs';
 
 const fixture = new URL('../fixtures/experts/retail-analysis/expected.json', import.meta.url);
 async function withResults(fn) {
-  const home = await mkdtemp(join(tmpdir(), 'workdsh-results-check-'));
+  const home = await mkdtemp(join(tmpdir(), 'expertworkshop-results-check-'));
   const expected = JSON.parse(await readFile(fixture, 'utf8'));
   const result = { ...expected, stores: Object.entries(expected.stores).map(([storeId, row]) => ({ storeId, ...row })), inputIssues: [] };
   await writeFile(join(home, 'analysis-results.json'), JSON.stringify(result));

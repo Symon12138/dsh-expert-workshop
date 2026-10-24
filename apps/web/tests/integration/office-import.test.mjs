@@ -10,8 +10,8 @@ test('Browser DOCX importer handles rich text and complex-file warnings and reje
   const browser = await chromium.launch({headless:true});
   try {
     const page = await browser.newPage();
-    await page.route('https://workdsh-import.test/**',r => r.fulfill({contentType:'text/html',body:'<!doctype html><html><body></body></html>'}));
-    await page.goto('https://workdsh-import.test/');
+    await page.route('https://expertworkshop-import.test/**',r => r.fulfill({contentType:'text/html',body:'<!doctype html><html><body></body></html>'}));
+    await page.goto('https://expertworkshop-import.test/');
     await page.addScriptTag({content:bundle.outputFiles[0].text});
     const parse = async (xml, extras={}) => {
       // Stable archive bytes are necessary when asserting import idempotency.

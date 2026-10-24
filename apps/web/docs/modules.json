@@ -85,7 +85,7 @@
       "src/client/components",
       "src/harness",
       "tests",
-      "resources/skills/workdsh-expert-manager",
+      "resources/skills/expertworkshop-expert-manager",
       "resources/templates",
       "src/services/preferences"
     ],
@@ -107,7 +107,7 @@
       "src/client/components",
       "src/harness",
       "tests",
-      "resources/skills/workdsh-skill-creator",
+      "resources/skills/expertworkshop-skill-creator",
       "resources/templates",
       "src/services/discovery",
       "src/services/preferences"

@@ -6,14 +6,14 @@ import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client';
 import { handoffWorkbenchDevelopmentDraft } from './development-draft.js';
 
 declare module '@deepseek-ai/dsh-api-session-controller/client' {
-  interface SessionReferenceSourceMap { workdshWorkbenchDraft: unknown }
+  interface SessionReferenceSourceMap { expertworkshopWorkbenchDraft: unknown }
 }
 /** Hold the official Session generation while handing the prompt to its native
  * input. The user sends it using the existing model/permission controls. */
 export async function handoffNativeWorkbenchDraft(ctx: Pick<Context, 'sessions' | 'conversation' | 'uiWorkspace' | 'layout'>,
   sessionId: Parameters<ISessions['retain']>[0], instruction: string, signal?: AbortSignal) {
   signal?.throwIfAborted();
-  const reference = ctx.sessions.retain(sessionId, { source: 'workdshWorkbenchDraft', signal });
+  const reference = ctx.sessions.retain(sessionId, { source: 'expertworkshopWorkbenchDraft', signal });
   try {
     await reference.ready;
     signal?.throwIfAborted();

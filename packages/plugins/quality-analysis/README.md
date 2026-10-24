@@ -70,7 +70,7 @@ CSV locations 区分数据行、原始记录号及物理起始行，空记录不
 
 记录Client代理`src/client/record-client.ts`已对接上述处理器协议，固定同源路由，不接收凭据或身份字段；结果结构、重复ID及创建回执匹配均校验。创建重试沿用调用方保存的operationId，取消及30秒超时由请求信号传播。该代理尚未挂接真实连接服务或工作台页面。
 
-`records-host.ts`新增内部Cordis装配函数，使用已有storageDomain/workdshIdentity/connection服务注册streaming POST，并随插件生命周期撤销路由和关闭持久服务。内部装配在真实Cordis及官方存储中验证了卸载与重开恢复；connection注册使用测试适配，尚非安装版Profile接入或网络准入验收。Worker executor归外层Host所有，仍须最终组合及关闭。
+`records-host.ts`新增内部Cordis装配函数，使用已有storageDomain/expertworkshopIdentity/connection服务注册streaming POST，并随插件生命周期撤销路由和关闭持久服务。内部装配在真实Cordis及官方存储中验证了卸载与重开恢复；connection注册使用测试适配，尚非安装版Profile接入或网络准入验收。Worker executor归外层Host所有，仍须最终组合及关闭。
 
 `record-controller.ts`及`QualityRecords.tsx`连接记录列表、新建名称、刷新和打开回调。创建结果未知时保留同一operationId，刷新可按已确认记录解除待核对状态；取消/身份作用域结束后不接收迟到结果。控制器按身份单独创建，外层Client负责最终dispose。组件尚未接入正式Slot及QualityWorkbench的完整业务控制器；当前操作意图仅内存保存，跨重启未知创建恢复仍待实现。
 

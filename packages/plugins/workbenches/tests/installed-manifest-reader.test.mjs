@@ -12,12 +12,12 @@ const { InstalledWorkbenchManifestReader } = await import(`data:text/javascript;
 const descriptor = { id: 'techflag.quality-analysis', title: '质量分析', description: '', protocolVersion: '1.0', layout: 'full-page', hostCompatibility: { sdk: '^1.0.0', harness: '0.2.1-rc.1' }, capabilities: [] };
 
 test('read real installed package metadata without importing its executable entry', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-workbench-inventory-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-workbench-inventory-'));
   try {
     const directory = join(root, 'node_modules', '@company', 'quality');
     await mkdir(directory, { recursive: true });
     await writeFile(join(directory, 'index.js'), 'throw new Error("PACKAGE_CODE_MUST_NOT_RUN");');
-    await writeFile(join(directory, 'package.json'), JSON.stringify({ name: '@company/quality', version: '1.0.0', main: 'index.js', workdsh: { workbench: descriptor } }));
+    await writeFile(join(directory, 'package.json'), JSON.stringify({ name: '@company/quality', version: '1.0.0', main: 'index.js', expertworkshop: { workbench: descriptor } }));
     const reader = new InstalledWorkbenchManifestReader(root);
     assert.equal((await reader.read('@company/quality')).descriptor.id, descriptor.id);
     await assert.rejects(reader.read('../quality'), /invalid-package-name/);
@@ -26,7 +26,7 @@ test('read real installed package metadata without importing its executable entr
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 test('reject external package symlinks and oversized metadata; honour cancellation', async () => {
-  const fixture = await mkdtemp(join(tmpdir(), 'workdsh-workbench-paths-'));
+  const fixture = await mkdtemp(join(tmpdir(), 'expertworkshop-workbench-paths-'));
   const root = join(fixture, 'installation');
   try {
     const outside = join(fixture, 'outside');

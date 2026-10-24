@@ -83,7 +83,7 @@ test('fixed runtime lookups are mandatory production dependencies, including pub
 });
 
 test('installer loads real public APIs from an isolated declared Profile root', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'workdsh-profile-closure-'));
+  const directory = await mkdtemp(join(tmpdir(), 'expertworkshop-profile-closure-'));
   try {
     const profile = await isolatedProfile(directory);
     const require = createRequire(profile.installAnchor);
@@ -94,7 +94,7 @@ test('installer loads real public APIs from an isolated declared Profile root', 
 });
 
 test('Profile closure check detects each missing dynamically loaded installer package', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'workdsh-profile-missing-'));
+  const directory = await mkdtemp(join(tmpdir(), 'expertworkshop-profile-missing-'));
   try {
     for (const name of ['@deepseek-ai/dsh-atomic-write', '@deepseek-ai/dsh-plugin-manager']) {
       const profile = await isolatedProfile(join(directory, name.split('/').at(-1)), [name]);

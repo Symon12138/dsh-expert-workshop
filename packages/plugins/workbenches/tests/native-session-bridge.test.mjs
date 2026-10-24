@@ -76,7 +76,7 @@ test('bridge prepares only the native draft, retains one owner across rerenders 
   const h = mount({ native: f.native, sessionId: 'session-1', identityScopeKey: 'user:record', draftRequest: request, onDraftReady: id => ready.push(id), onToolSettled: event => oldEvents.push(event) });
   try {
     await h.settle(); assert.equal(h.tree(), null); assert.deepEqual(ready, [request.id]); assert.equal(oldEvents.length, 0);
-    assert.deepEqual(f.calls, [['retain', 'session-1', 'workdshWorkbenchConversation'], ['initialize', 'session-1', { prompt: request.instruction, clearPreviousDraft: false }]]);
+    assert.deepEqual(f.calls, [['retain', 'session-1', 'expertworkshopWorkbenchConversation'], ['initialize', 'session-1', { prompt: request.instruction, clearPreviousDraft: false }]]);
     h.setProps({ draftRequest: { ...request }, onToolSettled: event => newEvents.push(event) }); await h.settle();
     f.binding('session-1').eventSource.append(result(2));
     assert.equal(oldEvents.length, 0); assert.equal(newEvents.length, 1); assert.equal(newEvents[0].callId, 'call-2'); assert.equal(f.calls.length, 2); assert.deepEqual(ready, [request.id]);
@@ -89,7 +89,7 @@ test('switching record identity releases the old tool scope before retaining the
   try {
     await h.settle(); f.binding('session-1').eventSource.append(result(1)); const oldSignal = events[0].signal;
     h.setProps({ identityScopeKey: 'user:record-b' }); await h.settle();
-    assert.equal(oldSignal.aborted, true); assert.deepEqual(f.calls.slice(-2), [['release', 'session-1'], ['retain', 'session-1', 'workdshWorkbenchConversation']]);
+    assert.equal(oldSignal.aborted, true); assert.deepEqual(f.calls.slice(-2), [['release', 'session-1'], ['retain', 'session-1', 'expertworkshopWorkbenchConversation']]);
     f.binding('session-1').eventSource.append(result(2)); assert.equal(events.length, 2); assert.notEqual(events[1].signal, oldSignal); assert.equal(events[1].signal.aborted, false);
     h.setProps({ sessionId: undefined }); await h.settle(); assert.equal(events[1].signal.aborted, true); assert.equal(f.binding('session-1').eventSource.listeners(), 0); assert.equal(h.tree(), null);
   } finally { h.unmount(); }

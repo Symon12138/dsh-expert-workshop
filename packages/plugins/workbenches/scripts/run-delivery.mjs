@@ -22,7 +22,7 @@ function verifyNoRuntimeRecord(bytes){
   if(!/^[0-7]+$/.test(sizeText))throw Error('workbench/delivery-invalid-pack-result');
   const size=Number.parseInt(sizeText,8);if(!Number.isSafeInteger(size)||offset+512+size>tar.length)throw Error('workbench/delivery-invalid-pack-result');
   const extended=['x','g','L'].includes(field(156,157))?tar.subarray(offset+512,offset+512+size).toString('utf8'):'';
-  if(name.split('/').includes('.workdsh-runtime.json')||/(?:^|[=/])\.workdsh-runtime\.json(?:\0|\n|$)/.test(extended))throw Error('workbench/delivery-runtime-record-in-archive');
+  if(name.split('/').includes('.expertworkshop-runtime.json')||/(?:^|[=/])\.expertworkshop-runtime\.json(?:\0|\n|$)/.test(extended))throw Error('workbench/delivery-runtime-record-in-archive');
   offset+=512+Math.ceil(size/512)*512;
  }
  throw Error('workbench/delivery-invalid-pack-result');
@@ -58,8 +58,8 @@ export async function resolveWorkbenchPackageManager(directory,{environment=proc
 // Run ONLY inside the official development tool's authorization/sandbox.
 // This runner is not a sandbox or an installation/acceptance receipt.
 export async function runWorkbenchDelivery(directory,{signal,commandTimeoutMs=120000,startupTimeoutMs=15000,environment=process.env}={}){
- const source=await realpath(directory),work=await mkdtemp(join(tmpdir(),'workdsh-delivery-'));
- const reportPath=join(work,'report.json'),packDirectory=await mkdtemp(join(tmpdir(),'workdsh-pack-'));
+ const source=await realpath(directory),work=await mkdtemp(join(tmpdir(),'expertworkshop-delivery-'));
+ const reportPath=join(work,'report.json'),packDirectory=await mkdtemp(join(tmpdir(),'expertworkshop-pack-'));
  const report={schemaVersion:1,status:'running',startedAt:new Date().toISOString(),scope:'development-build-startup-pack',stages:[],installation:'not-checked',clientPage:'not-checked',businessAcceptance:'not-checked'};
  const total=performance.now();
  let packageManager;

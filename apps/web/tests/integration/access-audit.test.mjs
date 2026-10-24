@@ -39,7 +39,7 @@ const actor = (principalId, organizationId = 'organization-a') => ({
 async function boot(root) {
   const ctx = new Context();
   try {
-    ctx.provide('workdshIdentity', identity);
+    ctx.provide('expertworkshopIdentity', identity);
     await ctx.plugin(Storage);
     await ctx.plugin(JsonStorage, { root });
     await ctx.plugin(StorageDomain, { backend: 'json' });
@@ -53,15 +53,15 @@ async function boot(root) {
 }
 
 test('access denies cross-organization and admin private reads, grants explicitly, then revokes immediately', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-access-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-access-'));
   let ctx;
   try {
     ctx = await boot(root);
-    assert.equal((await ctx.workdshAccess.authorize({ actor: actor('owner-a'), action: 'manage', resource, owner })).effect, 'allow');
-    const adminDecision = await ctx.workdshAccess.authorize({ actor: actor('admin-a'), action: 'read', resource, owner });
+    assert.equal((await ctx.expertworkshopAccess.authorize({ actor: actor('owner-a'), action: 'manage', resource, owner })).effect, 'allow');
+    const adminDecision = await ctx.expertworkshopAccess.authorize({ actor: actor('admin-a'), action: 'read', resource, owner });
     assert.equal(adminDecision.effect, 'deny');
     assert.equal(adminDecision.code, 'access/not-granted');
-    const crossOrganization = await ctx.workdshAccess.authorize({
+    const crossOrganization = await ctx.expertworkshopAccess.authorize({
       actor: actor('owner-b', 'organization-b'), action: 'read', resource, owner,
     });
     assert.equal(crossOrganization.effect, 'deny');
@@ -75,31 +75,31 @@ test('access denies cross-organization and admin private reads, grants explicitl
       actions: ['read'],
       revision: 'grant-revision-1',
     };
-    await ctx.workdshAccess.putGrant(actor('owner-a'), owner, grant);
-    const granted = await ctx.workdshAccess.authorize({ actor: actor('member-a'), action: 'read', resource, owner });
+    await ctx.expertworkshopAccess.putGrant(actor('owner-a'), owner, grant);
+    const granted = await ctx.expertworkshopAccess.authorize({ actor: actor('member-a'), action: 'read', resource, owner });
     assert.equal(granted.effect, 'allow');
     assert.equal(granted.code, 'access/explicit-grant');
     assert.deepEqual(granted.grantIds, ['grant-member-a-read']);
     const activeMembership = membershipDirectory.get('organization-a:member-a');
     membershipDirectory.set('organization-a:member-a', { ...activeMembership, state: 'suspended', revision: 'membership-member-a-2' });
     try {
-      const suspended = await ctx.workdshAccess.authorize({ actor: actor('member-a'), action: 'read', resource, owner });
+      const suspended = await ctx.expertworkshopAccess.authorize({ actor: actor('member-a'), action: 'read', resource, owner });
       assert.equal(suspended.effect, 'deny');
       assert.equal(suspended.code, 'access/inactive-membership');
     } finally {
       membershipDirectory.set('organization-a:member-a', activeMembership);
     }
-    assert.equal((await ctx.workdshAccess.authorize({ actor: actor('member-a'), action: 'edit', resource, owner })).effect, 'deny');
+    assert.equal((await ctx.expertworkshopAccess.authorize({ actor: actor('member-a'), action: 'edit', resource, owner })).effect, 'deny');
     await assert.rejects(
-      ctx.workdshAccess.putGrant(actor('owner-a'), owner, { ...grant, revision: 'grant-revision-2' }),
+      ctx.expertworkshopAccess.putGrant(actor('owner-a'), owner, { ...grant, revision: 'grant-revision-2' }),
       { code: 'access/revision-conflict' },
     );
-    assert.equal(await ctx.workdshAccess.revokeGrant(actor('owner-a'), owner, grant.id, grant.revision), true);
-    const revoked = await ctx.workdshAccess.authorize({ actor: actor('member-a'), action: 'read', resource, owner });
+    assert.equal(await ctx.expertworkshopAccess.revokeGrant(actor('owner-a'), owner, grant.id, grant.revision), true);
+    const revoked = await ctx.expertworkshopAccess.authorize({ actor: actor('member-a'), action: 'read', resource, owner });
     assert.equal(revoked.effect, 'deny');
     assert.equal(revoked.code, 'access/not-granted');
 
-    const events = ctx.workdshAudit.snapshot();
+    const events = ctx.expertworkshopAudit.snapshot();
     assert.ok(events.some((event) => event.code === 'access/cross-organization' && event.outcome === 'denied'));
     assert.ok(events.some((event) => event.code === 'access/grant-succeeded'));
     assert.ok(events.some((event) => event.code === 'access/revoke-succeeded'));
@@ -111,7 +111,7 @@ test('access denies cross-organization and admin private reads, grants explicitl
 });
 
 test('access grants and audit records survive a cold Host restart', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-access-cold-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-access-cold-'));
   let first;
   let second;
   try {
@@ -120,16 +120,16 @@ test('access grants and audit records survive a cold Host restart', async () => 
       id: 'grant-cold-restart', organizationId: 'organization-a', subjectPrincipalId: 'member-a',
       resource, actions: ['use'], revision: 'grant-cold-1',
     };
-    await first.workdshAccess.putGrant(actor('owner-a'), owner, grant);
-    const eventCount = first.workdshAudit.snapshot().length;
+    await first.expertworkshopAccess.putGrant(actor('owner-a'), owner, grant);
+    const eventCount = first.expertworkshopAudit.snapshot().length;
     await first.fiber.dispose();
     first = undefined;
 
     second = await boot(root);
-    const decision = await second.workdshAccess.authorize({ actor: actor('member-a'), action: 'use', resource, owner });
+    const decision = await second.expertworkshopAccess.authorize({ actor: actor('member-a'), action: 'use', resource, owner });
     assert.equal(decision.effect, 'allow');
     assert.deepEqual(decision.grantIds, ['grant-cold-restart']);
-    assert.ok(second.workdshAudit.snapshot().length > eventCount);
+    assert.ok(second.expertworkshopAudit.snapshot().length > eventCount);
   } finally {
     if (first) await first.fiber.dispose();
     if (second) await second.fiber.dispose();
@@ -138,7 +138,7 @@ test('access grants and audit records survive a cold Host restart', async () => 
 });
 
 test('audit rejects duplicate IDs and sensitive references', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-audit-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-audit-'));
   let ctx;
   try {
     ctx = await boot(root);
@@ -147,10 +147,10 @@ test('audit rejects duplicate IDs and sensitive references', async () => {
       principalId: 'owner-a', organizationId: 'organization-a', action: 'test.audit',
       outcome: 'succeeded', code: 'test/succeeded', references: { operationId: 'safe-reference' },
     };
-    await ctx.workdshAudit.append(event);
-    await assert.rejects(ctx.workdshAudit.append(event), { code: 'audit/duplicate-event' });
+    await ctx.expertworkshopAudit.append(event);
+    await assert.rejects(ctx.expertworkshopAudit.append(event), { code: 'audit/duplicate-event' });
     await assert.rejects(
-      ctx.workdshAudit.append({ ...event, id: 'audit-sensitive', references: { accessToken: 'forbidden' } }),
+      ctx.expertworkshopAudit.append({ ...event, id: 'audit-sensitive', references: { accessToken: 'forbidden' } }),
       { code: 'audit/sensitive-reference' },
     );
   } finally {

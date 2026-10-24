@@ -9,7 +9,7 @@ export function createWorkbenchActivationClient(transport: typeof fetch = fetch)
     lifetime.throwIfAborted();
     let response: Response, result: any;
     try {
-      response = await transport('/api/workdsh-workbench-activation', { method: 'POST', credentials: 'same-origin',
+      response = await transport('/api/expertworkshop-workbench-activation', { method: 'POST', credentials: 'same-origin',
         headers: { 'content-type': 'application/json' }, body: JSON.stringify(input), signal: lifetime });
       result = await response.json();
     } catch (cause) { lifetime.throwIfAborted(); throw new Error('workbench/activation-unconfirmed', { cause }); }

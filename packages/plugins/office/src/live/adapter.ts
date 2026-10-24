@@ -11,7 +11,7 @@ import type {
 
 /** Semantic styles cross the Host boundary; editor HTML/JSON never does. */
 export const BlockIdentity = Extension.create({
-  name: "workdshBlockIdentity",
+  name: "expertworkshopBlockIdentity",
   addGlobalAttributes() {
     return [
       {

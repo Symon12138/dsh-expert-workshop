@@ -42,37 +42,37 @@ const {default:Storage}=await official('@deepseek-ai/dsh-storage');
 const JsonStorage=await official('@deepseek-ai/dsh-storage-json');
 const StorageDomain=await official('@deepseek-ai/dsh-storage-domain');
 async function bootJournal(root){const ctx=new Context();await ctx.plugin(Storage);await ctx.plugin(JsonStorage,{root});await ctx.plugin(StorageDomain,{backend:'json'});return ctx;}
-const descriptor={id:'workdsh.install-probe',title:'安装核验探针',description:'',protocolVersion:'1.0',layout:'full-page',
+const descriptor={id:'expertworkshop.install-probe',title:'安装核验探针',description:'',protocolVersion:'1.0',layout:'full-page',
  hostCompatibility:{sdk:'^1.0.0',harness:'0.2.1-rc.1'},capabilities:[]};
 // Actual published package manager and pnpm in a synthetic profile. This fixture
 // verifies package mutation, not SDK registration, installed Desktop or GUI.
 test('official manager installs, updates and removes a local archive without evaluating its entry',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-official-install-'));
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-official-install-'));
  const profile=join(root,'profile'),source=join(root,'source'),packed=join(root,'packed');
  try{
   await Promise.all([mkdir(profile),mkdir(source),mkdir(packed)]);
-  await writeFile(join(profile,'package.json'),JSON.stringify({name:'isolated-workdsh-profile',version:'0.0.0',private:true,dsh:{bundles:[]}}));
+  await writeFile(join(profile,'package.json'),JSON.stringify({name:'isolated-expertworkshop-profile',version:'0.0.0',private:true,dsh:{bundles:[]}}));
   await writeFile(join(profile,'pnpm-workspace.yaml'),'packages: []\n');
-  const context={profile:'workdsh-isolated-test',dir:profile,cwd:root,home:root,installAnchor:anchor};
+  const context={profile:'expertworkshop-isolated-test',dir:profile,cwd:root,home:root,installAnchor:anchor};
   const options={command:process.execPath,args:[pnpm],execution:'service',outputBytes:16384,activateNewBundles:false,lockWaitMs:5000,idleTimeoutMs:15000,lookupTimeoutMs:5000};
   const profileContext={name:context.profile,dir:profile,cwd:root,home:root,installAnchor:anchor,packageManager:{command:process.execPath,args:[pnpm],env:{}}};
   const nativeInstall=await createProfileWorkbenchInstaller({get:()=>profileContext,fiber:{assertActive(){}}},()=>{});
   await assert.rejects(nativeInstall(join(source,'not-retained.tgz')));
   let previous;
   for(const version of ['0.1.0','0.1.1']){
-   await writeFile(join(source,'package.json'),JSON.stringify({name:'workdsh-install-probe',version,type:'module',files:['index.js','index.d.ts','client.js','client.d.ts','cordis.patch.yml'],
+   await writeFile(join(source,'package.json'),JSON.stringify({name:'expertworkshop-install-probe',version,type:'module',files:['index.js','index.d.ts','client.js','client.d.ts','cordis.patch.yml'],
     exports:{'.':{default:'./index.js',types:'./index.d.ts'},'./client':{default:'./client.js',types:'./client.d.ts'}},
-    dsh:{bundle:{patch:'./cordis.patch.yml'},client:{platform:'web'}},workdsh:{workbench:descriptor}}));
+    dsh:{bundle:{patch:'./cordis.patch.yml'},client:{platform:'web'}},expertworkshop:{workbench:descriptor}}));
    await writeFile(join(source,'index.js'),`throw new Error('entry-must-not-run-${version}');`);
    await Promise.all(['index.d.ts','client.d.ts'].map(name=>writeFile(join(source,name),'export {};')));
    await writeFile(join(source,'client.js'),'throw new Error("client-must-not-run");');
    await writeFile(join(source,'cordis.patch.yml'),'- insert: []\n');
    await promisify(execFile)(process.execPath,[pnpm,'--dir',source,'pack','--pack-destination',packed],{cwd:source,timeout:15000});
-   const archive=join(packed,`workdsh-install-probe-${version}.tgz`);
-   const candidate=await inspectWorkbenchPackageArtifact(archive,{packageName:'workdsh-install-probe',version,workbenchId:descriptor.id});
+   const archive=join(packed,`expertworkshop-install-probe-${version}.tgz`);
+   const candidate=await inspectWorkbenchPackageArtifact(archive,{packageName:'expertworkshop-install-probe',version,workbenchId:descriptor.id});
    let verifiedCommits=0;
    const request={installationRoot:profile,archivePath:archive,
-    expected:{packageName:'workdsh-install-probe',version,workbenchId:descriptor.id},
+    expected:{packageName:'expertworkshop-install-probe',version,workbenchId:descriptor.id},
     host:{harnessVersion:'0.2.1-rc.1',cordisVersion:'4.0.5'},isCompatible:()=>true,authorize:()=>{},
     install:async (retained,signal,beforeInstall)=>{
      assert.notEqual(retained,archive);
@@ -128,30 +128,30 @@ test('official manager installs, updates and removes a local archive without eva
     assert.deepEqual(journal.list()[0].receipt.package,candidate.receipt,'verified recovery receipt survives another restart');
     assert.deepEqual(journal.list()[0].candidate,{...candidate.receipt,workbenchId:descriptor.id},'candidate identity survives restart for recovery without file reselection');
    } finally {await journal?.close();await storageContext.fiber.dispose();}
-   const installed=JSON.parse(await readFile(join(profile,'node_modules/workdsh-install-probe/package.json'),'utf8'));
+   const installed=JSON.parse(await readFile(join(profile,'node_modules/expertworkshop-install-probe/package.json'),'utf8'));
    assert.equal(installed.version,version);
-   assert.match(await readFile(join(profile,'node_modules/workdsh-install-probe/index.js'),'utf8'),new RegExp(version.replaceAll('.','\\.')));
-   assert.ok(JSON.parse(await readFile(join(profile,'package.json'),'utf8')).dependencies['workdsh-install-probe']);
+   assert.match(await readFile(join(profile,'node_modules/expertworkshop-install-probe/index.js'),'utf8'),new RegExp(version.replaceAll('.','\\.')));
+   assert.ok(JSON.parse(await readFile(join(profile,'package.json'),'utf8')).dependencies['expertworkshop-install-probe']);
    const verified=await verifyInstalledWorkbenchArtifact(profile,archive,{packageName:candidate.receipt.packageName,version,
     sha256:candidate.receipt.sha256,workbenchId:descriptor.id});
    assert.deepEqual(verified.receipt,candidate.receipt);
    previous={...candidate.receipt,workbenchId:descriptor.id,path:archive};
    await assert.rejects(adapter.preflight(operation),/installation-(?:already-present|baseline)/);
   }
-  const removed=await runPluginCommand(context,['remove','workdsh-install-probe','--config.offline=true'],options);
+  const removed=await runPluginCommand(context,['remove','expertworkshop-install-probe','--config.offline=true'],options);
   assert.equal(removed.exitCode,0,removed.output);
   const manifest=JSON.parse(await readFile(join(profile,'package.json'),'utf8'));
-  assert.equal(manifest.dependencies?.['workdsh-install-probe'],undefined);
+  assert.equal(manifest.dependencies?.['expertworkshop-install-probe'],undefined);
   // Call the mounted Host service itself using official storage and the real installer.
   const storageContext=await bootJournal(join(root,'service-journal'));
   const actor={principalId:'service-user',organizationId:'personal',requestId:'service-test',resolvedBy:'trusted-test'};
   let principal=actor.principalId;const disposers=[];const provided=new Map();
   const identity={resolve:async()=>({...actor,principalId:principal}),profile:()=>({principalId:principal,organization:{id:actor.organizationId},resolvedBy:actor.resolvedBy}),membership:()=>({state:'active'})};
-  const ctx={get:key=>key==='profileContext'?profileContext:key==='storageDomain'?storageContext.storageDomain:key==='workdshIdentity'?identity:provided.get(key),
+  const ctx={get:key=>key==='profileContext'?profileContext:key==='storageDomain'?storageContext.storageDomain:key==='expertworkshopIdentity'?identity:provided.get(key),
    fiber:{assertActive(){}},effect:fn=>disposers.push(fn()),provide:(key,value)=>provided.set(key,value)};
   const target=await (await createProfileWorkbenchTarget(ctx))(actor);
-  const archive=join(packed,'workdsh-install-probe-0.1.1.tgz');
-  const candidate=await inspectWorkbenchPackageArtifact(archive,{packageName:'workdsh-install-probe',version:'0.1.1',workbenchId:descriptor.id});
+  const archive=join(packed,'expertworkshop-install-probe-0.1.1.tgz');
+  const candidate=await inspectWorkbenchPackageArtifact(archive,{packageName:'expertworkshop-install-probe',version:'0.1.1',workbenchId:descriptor.id});
   const expected={...candidate.receipt,workbenchId:descriptor.id};
   const uploaded=await receiveWorkbenchArtifact(profile,new Response(await readFile(archive)).body,expected,()=>{});
   assert.equal(uploaded.expected.sha256,candidate.receipt.sha256);
@@ -160,8 +160,8 @@ test('official manager installs, updates and removes a local archive without eva
   assert.deepEqual(discovered.expected,{...candidate.receipt,workbenchId:descriptor.id});
   assert.equal(discovered.path,uploaded.path);
   const metadata={developmentId:'service-development',packageName:expected.packageName,version:expected.version,workbenchId:expected.workbenchId};
-  const uploadRequest=(fields=metadata)=>new Request('https://workdsh.invalid/api/workdsh-workbench-upload',{method:'POST',headers:{'content-type':'application/octet-stream','x-workdsh-upload':JSON.stringify(fields)},body:new Uint8Array([1])});
-  const response=await handleWorkbenchUploadRequest(new Request('https://workdsh.invalid/api/workdsh-workbench-upload',{method:'POST',headers:{'content-type':'application/octet-stream','x-workdsh-upload':JSON.stringify(metadata)},body:await readFile(archive)}),profile,async()=>()=>{});
+  const uploadRequest=(fields=metadata)=>new Request('https://expertworkshop.invalid/api/expertworkshop-workbench-upload',{method:'POST',headers:{'content-type':'application/octet-stream','x-expertworkshop-upload':JSON.stringify(fields)},body:new Uint8Array([1])});
+  const response=await handleWorkbenchUploadRequest(new Request('https://expertworkshop.invalid/api/expertworkshop-workbench-upload',{method:'POST',headers:{'content-type':'application/octet-stream','x-expertworkshop-upload':JSON.stringify(metadata)},body:await readFile(archive)}),profile,async()=>()=>{});
   assert.equal(response.status,200);const uploadReply=await response.json();
   assert.equal(uploadReply.value.sha256,candidate.receipt.sha256);assert.equal(uploadReply.value.path,undefined);
   let accesses=0;
@@ -173,14 +173,14 @@ test('official manager installs, updates and removes a local archive without eva
   let uploadAuthorized=true;
   const revoked=new ReadableStream({pull(controller){uploadAuthorized=false;controller.enqueue(new Uint8Array([1]));}});
   await assert.rejects(receiveWorkbenchArtifact(profile,revoked,expected,()=>{if(!uploadAuthorized)throw new Error('workbench/development-access-denied');}),/development-access-denied/);
-  assert.deepEqual(await readdir(join(profile,'.workdsh-workbench-uploads')),[],'failed upload leaves no staging file');
+  assert.deepEqual(await readdir(join(profile,'.expertworkshop-workbench-uploads')),[],'failed upload leaves no staging file');
   const abort=new AbortController();abort.abort();
   await assert.rejects(receiveWorkbenchArtifact(profile,new Response('data').body,expected,()=>{},abort.signal),error=>error.name==='AbortError');
-  const entries=[{title:'安装探针',development:{id:'service-development',workbenchId:descriptor.id,packageName:'workdsh-install-probe',iterationId:'service-iteration',requirementsRevision:'service-requirements',target}}];
+  const entries=[{title:'安装探针',development:{id:'service-development',workbenchId:descriptor.id,packageName:'expertworkshop-install-probe',iterationId:'service-iteration',requirementsRevision:'service-requirements',target}}];
   const archives={resolve:()=>{throw new Error('workbench/installation-archive-unavailable');},retainVerified:async facts=>verifyInstalledWorkbenchArtifact(profile,facts.path,facts)};
   try {
    const service=await mountProfileWorkbenchImportHost(ctx,{list:async()=>principal===actor.principalId?entries:[]},()=>true,'4.0.5',archives);
-   assert.equal(provided.get('workdshWorkbenchImport'),service);
+   assert.equal(provided.get('expertworkshopWorkbenchImport'),service);
    const request={developmentId:'service-development',intent:{id:'service-install',iterationId:'service-iteration',kind:'install',target,inputHash:expected.sha256},expected,archivePath:uploaded.path};
    await assert.rejects(service.run({...request,developmentId:'foreign-development'}),/development-owner-mismatch/);
    await assert.rejects(service.run({...request,expected:{...expected,packageName:'other-package'}}),/development-owner-mismatch/);
@@ -214,10 +214,10 @@ test('official manager installs, updates and removes a local archive without eva
 // A separate process uses the same published Profile lock as the official CLI.
 // The competitor changes a baseline marker; no package installation is faked.
 test('native installer checks baseline only after a competing process releases the official lock',async()=>{
- const root=realpathSync(await mkdtemp(join(tmpdir(),'workdsh-profile-lock-')));
+ const root=realpathSync(await mkdtemp(join(tmpdir(),'expertworkshop-profile-lock-')));
  let competitor;
  try{
-  const manifest=join(root,'package.json'),archives=join(root,'.workdsh-workbench-archives');
+  const manifest=join(root,'package.json'),archives=join(root,'.expertworkshop-workbench-archives');
   await mkdir(archives);await writeFile(manifest,JSON.stringify({name:'lock-probe',private:true,baseline:'old'}));
   const archive=join(archives,'a'.repeat(64)+'.tgz');await writeFile(archive,'not consumed because baseline check rejects');
   const atomic=pathToFileURL(officialRequire.resolve('@deepseek-ai/dsh-atomic-write')).href;
@@ -237,7 +237,7 @@ test('native installer checks baseline only after a competing process releases t
 });
 
 test('competing real package update invalidates queued native update baseline',async()=>{
- const root=realpathSync(await mkdtemp(join(tmpdir(),'workdsh-competing-update-')));
+ const root=realpathSync(await mkdtemp(join(tmpdir(),'expertworkshop-competing-update-')));
  let competitor;
  try{
   const profile=join(root,'profile'),source=join(root,'source'),packed=join(root,'packed');
@@ -246,17 +246,17 @@ test('competing real package update invalidates queued native update baseline',a
   await writeFile(join(profile,'pnpm-workspace.yaml'),'packages: []\n');
   const tarballs=[];
   for(const version of ['1.0.0','1.0.1','1.0.2']){
-   await writeFile(join(source,'package.json'),JSON.stringify({name:'workdsh-lock-update-probe',version,files:['index.js'],main:'index.js'}));
+   await writeFile(join(source,'package.json'),JSON.stringify({name:'expertworkshop-lock-update-probe',version,files:['index.js'],main:'index.js'}));
    await writeFile(join(source,'index.js'),`throw new Error('probe entry must not execute');`);
    await promisify(execFile)(process.execPath,[pnpm,'--dir',source,'pack','--pack-destination',packed],{cwd:source,timeout:15000});
-   tarballs.push(join(packed,`workdsh-lock-update-probe-${version}.tgz`));
+   tarballs.push(join(packed,`expertworkshop-lock-update-probe-${version}.tgz`));
   }
   const context={profile:'competing-profile',dir:profile,cwd:root,home:root,installAnchor:anchor};
   const options={command:process.execPath,args:[pnpm],env:{npm_config_offline:'true'},execution:'service',outputBytes:4096,activateNewBundles:false,lockWaitMs:5000,idleTimeoutMs:15000,lookupTimeoutMs:5000};
   assert.equal((await runPluginCommand(context,['add',tarballs[0],'--ignore-scripts'],options)).exitCode,0);
-  const installed=join(profile,'node_modules/workdsh-lock-update-probe/package.json');
+  const installed=join(profile,'node_modules/expertworkshop-lock-update-probe/package.json');
   assert.equal(JSON.parse(await readFile(installed,'utf8')).version,'1.0.0');
-  const archives=join(profile,'.workdsh-workbench-archives');await mkdir(archives);
+  const archives=join(profile,'.expertworkshop-workbench-archives');await mkdir(archives);
   const candidate=join(archives,'b'.repeat(64)+'.tgz');await writeFile(candidate,await readFile(tarballs[2]));
   const atomic=pathToFileURL(officialRequire.resolve('@deepseek-ai/dsh-atomic-write')).href;
   const operations=pathToFileURL(officialRequire.resolve('@deepseek-ai/dsh-plugin-manager/operations')).href;

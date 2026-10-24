@@ -29,7 +29,7 @@ test('captures the action browser for its owning session only', async () => {
   assert.equal(result, decision);
   await new Promise(resolve => setImmediate(resolve));
   const frameFor = async sessionId => {
-    const response = await fetchHandler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId }) }));
+    const response = await fetchHandler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId }) }));
     return (await response.json()).frame;
   };
   assert.deepEqual(calls.map(call => call.name), ['mcp__playwright-mcp__browser_take_screenshot']);
@@ -64,7 +64,7 @@ test('uses raw MCP screenshots when model-facing image projection is unavailable
     agent, callId: 'call-raw', rootCallId: 'call-raw', token: Symbol('raw'),
   }, { isError: false, content: [] }, async () => undefined);
   await new Promise(resolve => setImmediate(resolve));
-  const response = await fetchHandler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'session-raw' }) }));
+  const response = await fetchHandler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'session-raw' }) }));
   assert.equal((await response.json()).frame.image, 'data:image/png;base64,AQIDBA==');
 });
 
@@ -77,7 +77,7 @@ function fixture(execute=async()=>({isError:false,content:[],value:{content:[{ty
   handlers.get('agent/created')({agent});
   return {calls,
     post:async(name,args={},isError=false)=>handlers.get('tools/post-execute')({name:'mcp__playwright-mcp__'+name,arguments:args,agent,rootCallId:'root',token:Symbol('call')},{isError,content:[]},async()=>undefined),
-    async status(){return (await (await fetchHandler(new Request('http://localhost/api/workdsh-agent-browser',{method:'POST',body:JSON.stringify({sessionId:agent.session.id})}))).json());},
+    async status(){return (await (await fetchHandler(new Request('http://localhost/api/expertworkshop-agent-browser',{method:'POST',body:JSON.stringify({sessionId:agent.session.id})}))).json());},
     async frame(){return (await this.status()).frame;},
   };
 }
@@ -137,7 +137,7 @@ test('close during attachment decoding cannot restore the old frame',async()=>{
   assert.equal(await f.frame(),null);assert.equal(f.calls.length,1);
 });
 
-const browserKind='workdsh-agent-browser';
+const browserKind='expertworkshop-agent-browser';
 const clientCode=await readFile(new URL('../dist/client.js',import.meta.url),'utf8');
 const require=createRequire(new URL('../package.json',import.meta.url));
 function clientFixture(status,{providerEnabled=false}={}) {

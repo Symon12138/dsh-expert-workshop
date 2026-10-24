@@ -7,7 +7,7 @@ import { validateAcceptance } from '../../scripts/validate-acceptance.mjs';
 const root = fileURLToPath(new URL('../..', import.meta.url));
 import { fileURLToPath } from 'node:url';
 function fixture(mutate) {
-  const path = mkdtempSync(resolve(tmpdir(), 'workdsh-acceptance-'));
+  const path = mkdtempSync(resolve(tmpdir(), 'expertworkshop-acceptance-'));
   try {
     cpSync(resolve(root, 'docs'), resolve(path, 'docs'), { recursive: true });
     const file = resolve(path, 'docs/acceptance.json');

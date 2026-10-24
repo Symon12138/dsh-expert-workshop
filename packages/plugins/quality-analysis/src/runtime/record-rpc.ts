@@ -10,7 +10,7 @@ import {qualitySaveReportDraftInputSchema} from '../domain/report-draft.js';
 import {qualityAiReportTargetSchema} from './ai-session-store.js';
 import {qualityFocusSelectionSchema,type QualityFocusSelection} from '../domain/analysis-focus.js';
 import type {QualityAiRunSessionRequest} from './run-session.js';
-export const qualityRecordsPath='/api/workdsh-quality-records';
+export const qualityRecordsPath='/api/expertworkshop-quality-records';
 const object=(value:unknown):Record<string,unknown>|undefined=>value!==null&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:undefined;
 const fail=(code:string,message:string,status:number)=>Response.json({ok:false,error:{code,message}},{status});
 async function readBody(request:Request):Promise<unknown>{

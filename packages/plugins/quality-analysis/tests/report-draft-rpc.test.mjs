@@ -3,7 +3,7 @@ const require=createRequire(new URL('../../../../apps/web/package.json',import.m
 const {build}=require('esbuild');const built=await build({entryPoints:[fileURLToPath(new URL('../src/runtime/record-rpc.ts',import.meta.url))],bundle:true,platform:'node',format:'esm',write:false,plugins:[{name:'zod',setup(b){b.onResolve({filter:/^zod$/},()=>({path:pathToFileURL(runtime.resolve('zod')).href,external:true}));}}]});
 const {handleQualityRecordsRequest:handle}=await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
 const source={recordId:'record',runId:'run',contentHash:'a'.repeat(64)},fields={title:'',analysis:'草稿原文\r\n',conclusion:'',recommendations:''};
-function request(endpoint,payload){return new Request('http://fixture/api/workdsh-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})});}
+function request(endpoint,payload){return new Request('http://fixture/api/expertworkshop-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})});}
 test('draft RPC admits only finite editable text and fixed analysis identity',async()=>{
  let saved;const service={async saveReportDraft(...args){saved=args;return {verified:true};}};
  assert.equal((await handle(request('save-report-draft',{...source,operationId:'intent',fields}),service,undefined,undefined,{})).status,200);assert.deepEqual(saved.slice(0,4),['record','run',source.contentHash,{operationId:'intent',fields}]);assert.equal(saved[5] instanceof AbortSignal,true);

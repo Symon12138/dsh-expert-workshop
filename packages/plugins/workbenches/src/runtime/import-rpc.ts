@@ -1,5 +1,5 @@
 import { readWorkbenchRequestBody } from './request-body.js';
-export const workbenchImportPath = '/api/workdsh-workbench-import';
+export const workbenchImportPath = '/api/expertworkshop-workbench-import';
 export interface WorkbenchImportRequest {
   developmentId: string; operationId: string; iterationId: string;
   packageName: string; version: string; workbenchId: string; sha256: string;

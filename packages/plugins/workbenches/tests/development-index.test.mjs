@@ -32,7 +32,7 @@ async function boot(root) { const ctx = new Context(); await ctx.plugin(Storage)
 const target = { hostId: 'host', installationId: 'desktop', profileId: 'default', harnessVersion: '0.2.0-rc.2' };
 const requirement = (patch = {}) => ({ id: 'req-1', developmentId: 'dev-1', owner: { organizationId: actor.organizationId, ownerPrincipalId: actor.principalId, scope: 'personal' }, requirements: draft, createdBy: actor.principalId, createdAt: '2026-10-10T00:00:00.000Z', ...patch });
 test('native development Session survives cold reopen and cannot be silently replaced', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-dev-session-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-dev-session-'));
   let ctx, index;
   try {
     ctx = await boot(root); index = await WorkbenchDevelopmentIndex.open(ctx.storageDomain, actor);
@@ -48,7 +48,7 @@ test('native development Session survives cold reopen and cannot be silently rep
   } finally { await index?.close(); await ctx?.fiber.dispose(); await rm(root, { recursive: true, force: true }); }
 });
 test('development remains discoverable after cold restart without an installed plugin or original chat', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-development-index-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-development-index-'));
   let ctx, index;
   try {
     ctx = await boot(root);
@@ -76,7 +76,7 @@ test('development remains discoverable after cold restart without an installed p
   } finally { await index?.close(); await ctx?.fiber.dispose(); await rm(root, { recursive: true, force: true }); }
 });
 test('requirements updates detect concurrent revisions and shutdown preserves an already accepted write', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-development-index-revisions-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-development-index-revisions-'));
   const ctx = await boot(root);
   const index = await WorkbenchDevelopmentIndex.open(ctx.storageDomain, actor);
   try {
@@ -106,7 +106,7 @@ test('requirements updates detect concurrent revisions and shutdown preserves an
   } finally { await index.close(); await ctx.fiber.dispose(); await rm(root, { recursive: true, force: true }); }
 });
 test('Host development service reads saved requirements and isolates member switches and revoked access', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-development-service-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-development-service-'));
   const ctx = await boot(root);
   let selected = actor, active = true, switchDuringTarget = false;
   const identity = {
@@ -176,11 +176,11 @@ test('Host development service reads saved requirements and isolates member swit
   } finally { await service.close(); await requirements.close(); await ctx.fiber.dispose(); await rm(root, { recursive: true, force: true }); }
 });
 test('Host authoring mount owns both streaming routes and closes indexes on plugin unload', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-authoring-host-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-authoring-host-'));
   const ctx = await boot(root);
   const routes = new Map();
   let plugin, requirements, developments;
-  ctx.provide('workdshIdentity', { async resolve() { return actor; }, profile() { return { principalId: actor.principalId, organization: { id: actor.organizationId }, resolvedBy: actor.resolvedBy }; }, membership() { return { state: 'active' }; } });
+  ctx.provide('expertworkshopIdentity', { async resolve() { return actor; }, profile() { return { principalId: actor.principalId, organization: { id: actor.organizationId }, resolvedBy: actor.resolvedBy }; }, membership() { return { state: 'active' }; } });
   // Observes connection route lifetime; this is not actual network admission testing.
   ctx.provide('connection', { fetch: { register(route) {
     assert.equal(route.requestBody, 'streaming');
@@ -200,10 +200,10 @@ test('Host authoring mount owns both streaming routes and closes indexes on plug
       requirements = mounted.requirements;
       developments = mounted.development;
     } });
-    const saved = await invoke('/api/workdsh-workbench-requirements', 'append', { developmentId: 'dev-1', requirements: draft });
-    const created = await invoke('/api/workdsh-workbench-development', 'create', { developmentId: 'dev-1', workbenchId: 'company.quality', packageName: 'quality-plugin', expectedRequirementsRevision: saved.id });
+    const saved = await invoke('/api/expertworkshop-workbench-requirements', 'append', { developmentId: 'dev-1', requirements: draft });
+    const created = await invoke('/api/expertworkshop-workbench-development', 'create', { developmentId: 'dev-1', workbenchId: 'company.quality', packageName: 'quality-plugin', expectedRequirementsRevision: saved.id });
     assert.equal(created.development.requirementsRevision, saved.id);
-    assert.equal((await invoke('/api/workdsh-workbench-development', 'list', {})).length, 1);
+    assert.equal((await invoke('/api/expertworkshop-workbench-development', 'list', {})).length, 1);
     await plugin.dispose(); plugin = undefined;
     assert.equal(routes.size, 0);
     await assert.rejects(developments.list(), /development-service-closed/);
@@ -212,7 +212,7 @@ test('Host authoring mount owns both streaming routes and closes indexes on plug
 });
 
 test('Host source binding survives restart and rejects stale revisions and other hosts', async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-source-binding-'));let ctx,index;
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-source-binding-'));let ctx,index;
  try{
   ctx=await boot(root);index=await WorkbenchDevelopmentIndex.open(ctx.storageDomain,actor);
   const entry=await index.create(requirement(),'company.quality','quality-plugin',target);
@@ -229,7 +229,7 @@ test('Host source binding survives restart and rejects stale revisions and other
 });
 
 test('ensure Session persists prepared source before native launch and resumes after launch failure', async () => {
- const root = await mkdtemp(join(tmpdir(), 'workdsh-source-session-')); const ctx = await boot(root);
+ const root = await mkdtemp(join(tmpdir(), 'expertworkshop-source-session-')); const ctx = await boot(root);
  const identity = { async resolve() { return actor; }, profile() { return { principalId: actor.principalId, organization: { id: actor.organizationId }, resolvedBy: actor.resolvedBy }; }, membership() { return { state: 'active' }; } };
  const requirements = new WorkbenchRequirementsService(ctx.storageDomain, identity);
  let fail = true, prepares = 0;
@@ -251,7 +251,7 @@ test('ensure Session persists prepared source before native launch and resumes a
 });
 
 test('requirement changes during source preparation prevent native Session launch', async () => {
- const root = await mkdtemp(join(tmpdir(), 'workdsh-baseline-launch-')); const ctx = await boot(root);
+ const root = await mkdtemp(join(tmpdir(), 'expertworkshop-baseline-launch-')); const ctx = await boot(root);
  const identity = { async resolve() { return actor; }, profile() { return { principalId: actor.principalId, organization: { id: actor.organizationId }, resolvedBy: actor.resolvedBy }; }, membership() { return { state: 'active' }; } };
  const requirements = new WorkbenchRequirementsService(ctx.storageDomain, identity);
  let launched = 0, saved;
@@ -266,7 +266,7 @@ test('requirement changes during source preparation prevent native Session launc
 });
 
 test('source revision changes retain native Session workspace and reject redirection',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-source-session-guard-'));let ctx,index;
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-source-session-guard-'));let ctx,index;
  try{
   ctx=await boot(root);index=await WorkbenchDevelopmentIndex.open(ctx.storageDomain,actor);
   const created=await index.create(requirement(),'company.quality','quality-plugin',target);
@@ -282,7 +282,7 @@ test('source revision changes retain native Session workspace and reject redirec
 });
 
 test('recovery preparer rejects stale development and revoked authority without accepting a receipt',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-recovery-authority-')),ctx=await boot(root);let active=true,calls=0,revoke=false;
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-recovery-authority-')),ctx=await boot(root);let active=true,calls=0,revoke=false;
  const identity={async resolve(){return actor;},profile(){return {principalId:actor.principalId,organization:{id:actor.organizationId},resolvedBy:actor.resolvedBy};},membership(){return {state:active?'active':'revoked'};}};
  const requirements=new WorkbenchRequirementsService(ctx.storageDomain,identity);
  const service=new WorkbenchDevelopmentService(ctx.storageDomain,identity,requirements,async()=>target,undefined,undefined,undefined,undefined,async(_development,hash,check)=>{calls++;if(revoke)active=false;check();return {journalId:'operation',beforeSha256:hash,targetSha256:hash,state:'prepared'};});
@@ -296,7 +296,7 @@ test('recovery preparer rejects stale development and revoked authority without 
 });
 
 test('cold continuation preserves requirement/source/Session and rejects moved installation before touching files',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-cold-continuation-'));let ctx,requirements,service;let moved=false,sourceCalls=0,sessionCalls=0;
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-cold-continuation-'));let ctx,requirements,service;let moved=false,sourceCalls=0,sessionCalls=0;
  const identity={async resolve(){return actor;},profile(){return {principalId:actor.principalId,organization:{id:actor.organizationId},resolvedBy:actor.resolvedBy};},membership(){return {state:'active'};}};
  async function reopen(){
   ctx=await boot(root);requirements=new WorkbenchRequirementsService(ctx.storageDomain,identity);
@@ -317,7 +317,7 @@ test('cold continuation preserves requirement/source/Session and rejects moved i
 });
 
 test('Host runtime upgrade preserves source/session and requirements, starts a new unchecked iteration, and rejects other installations or downgrade',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-runtime-migration-'));let ctx,index;
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-runtime-migration-'));let ctx,index;
  try{
   ctx=await boot(root);index=await WorkbenchDevelopmentIndex.open(ctx.storageDomain,actor);
   const first=await index.create(requirement(),'company.quality','quality-plugin',{...target,harnessVersion:'0.2.1-alpha.2'});

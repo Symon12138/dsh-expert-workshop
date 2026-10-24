@@ -13,7 +13,7 @@ test('local identity resolves one Host-configured actor and ignores forged ident
   });
   assert.equal(actor.principalId, 'principal-local');
   assert.equal(actor.organizationId, 'organization-personal');
-  assert.equal(actor.resolvedBy, 'workdsh-identity-local');
+  assert.equal(actor.resolvedBy, 'expertworkshop-identity-local');
   assert.equal(actor.sessionId, 'session-1');
   assert.match(actor.requestId, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   assert.equal(Object.isFrozen(actor), true);

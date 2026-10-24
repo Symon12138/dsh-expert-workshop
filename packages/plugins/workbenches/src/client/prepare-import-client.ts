@@ -10,7 +10,7 @@ export function createWorkbenchImportPreparationClient(transport: typeof fetch =
       workbenchId: selection.workbenchId, sha256: selection.sha256 };
     const lifetime = AbortSignal.any([AbortSignal.timeout(30_000), ...(signal ? [signal] : [])]);
     lifetime.throwIfAborted();
-    const response = await transport('/api/workdsh-workbench-import-prepare', { method: 'POST', credentials: 'same-origin',
+    const response = await transport('/api/expertworkshop-workbench-import-prepare', { method: 'POST', credentials: 'same-origin',
       headers: { 'content-type': 'application/json' }, body: JSON.stringify(input), signal: lifetime });
     const result = await response.json(); lifetime.throwIfAborted();
     if (!response.ok || result?.ok !== true) throw new Error(typeof result?.error?.code==='string'&&/^workbench\/[a-z-]+$/.test(result.error.code)?result.error.code:'workbench/import-prepare-failed');
@@ -31,7 +31,7 @@ export function createWorkbenchOfflinePreparationClient(transport: typeof fetch 
     let importId: string | undefined;
     const prepare = createWorkbenchImportPreparationClient(async (_path, options) => {
       const {developmentId: _unused, ...input} = JSON.parse(options!.body as string);
-      const response = await transport('/api/workdsh-workbench-offline-prepare', {...options, body:JSON.stringify(input)});
+      const response = await transport('/api/expertworkshop-workbench-offline-prepare', {...options, body:JSON.stringify(input)});
       const envelope = await response.json();
       if (response.ok && envelope?.ok === true) {
         const id = envelope.value?.importId;

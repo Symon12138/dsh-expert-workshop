@@ -2,7 +2,7 @@ import * as React from 'react';
 import { LogoMark } from 'expert-workshop-ui';
 
 export function BrandName() {
-  return <span data-testid="workdsh-brand">Expert Workshop</span>;
+  return <span data-testid="expertworkshop-brand">Expert Workshop</span>;
 }
 
 export function BrandMark() {

@@ -7,7 +7,7 @@ export async function listSourceCheckpoints(directory:string,authorize:()=>void,
  const result=[];
  for(const sha256 of hashes){
   check();const root=join(directory,sha256);if(await realpath(root)!==root)throw Error('workbench/checkpoint-corrupt');
-  const handle=await open(join(root,'.workdsh-checkpoint.json'),constants.O_RDONLY|constants.O_NOFOLLOW);let bytes:Buffer;
+  const handle=await open(join(root,'.expertworkshop-checkpoint.json'),constants.O_RDONLY|constants.O_NOFOLLOW);let bytes:Buffer;
   try{const stat=await handle.stat();if(!stat.isFile()||stat.size>1024*1024)throw Error('workbench/checkpoint-corrupt');const buffer=Buffer.alloc(1024*1024+1);let length=0;while(length<buffer.length){const part=await handle.read(buffer,length,buffer.length-length,length);if(!part.bytesRead)break;length+=part.bytesRead;}if(length>1024*1024)throw Error('workbench/checkpoint-corrupt');bytes=buffer.subarray(0,length);}finally{await handle.close();}
   if(createHash('sha256').update(bytes).digest('hex')!==sha256)throw Error('workbench/checkpoint-corrupt');
   const manifest=JSON.parse(bytes.toString('utf8'));if(manifest.schemaVersion!==1||!Array.isArray(manifest.files)||manifest.files.length>2000)throw Error('workbench/checkpoint-corrupt');

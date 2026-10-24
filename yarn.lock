@@ -1218,9 +1218,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"app-builder-lib@patch:app-builder-lib@npm%3A26.15.7#./patches/app-builder-lib@26.15.7.patch::locator=workdsh-desktop-workspace%40workspace%3A.":
+"app-builder-lib@patch:app-builder-lib@npm%3A26.15.7#./patches/app-builder-lib@26.15.7.patch::locator=expertworkshop-desktop-workspace%40workspace%3A.":
   version: 26.15.7
-  resolution: "app-builder-lib@patch:app-builder-lib@npm%3A26.15.7#./patches/app-builder-lib@26.15.7.patch::version=26.15.7&hash=5ac45c&locator=workdsh-desktop-workspace%40workspace%3A."
+  resolution: "app-builder-lib@patch:app-builder-lib@npm%3A26.15.7#./patches/app-builder-lib@26.15.7.patch::version=26.15.7&hash=5ac45c&locator=expertworkshop-desktop-workspace%40workspace%3A."
   dependencies:
     "@electron/asar": "npm:3.4.1"
     "@electron/fuses": "npm:^1.8.0"
@@ -4164,9 +4164,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"workdsh-desktop-workspace@workspace:.":
+"expertworkshop-desktop-workspace@workspace:.":
   version: 0.0.0-use.local
-  resolution: "workdsh-desktop-workspace@workspace:."
+  resolution: "expertworkshop-desktop-workspace@workspace:."
   dependenciesMeta:
     electron:
       built: true

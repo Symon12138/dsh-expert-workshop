@@ -30,7 +30,7 @@ test('authored expert package publishes complete MD and mounts retained bundled 
   const h = await boot();
   try {
     const a = actor('owner-a');
-    const files = { '.workdsh-expert/plugin.json': JSON.stringify({ name: 'package-expert', expertType: 'agent', agentName: 'package-expert', agents: ['./agents/package-expert.md'], skills: ['./skills/bundled-method'] }), 'agents/package-expert.md': '---\nname: package-expert\ndescription: Package expert\nskills: [bundled-method]\n---\n# Professional framework\n\nComplete independent Agent Markdown.', 'skills/bundled-method/SKILL.md': '---\nname: bundled-method\ndescription: A retained method\n---\nRead references/domain.md.', 'skills/bundled-method/references/domain.md': 'Domain method preserved.' };
+    const files = { '.expertworkshop-expert/plugin.json': JSON.stringify({ name: 'package-expert', expertType: 'agent', agentName: 'package-expert', agents: ['./agents/package-expert.md'], skills: ['./skills/bundled-method'] }), 'agents/package-expert.md': '---\nname: package-expert\ndescription: Package expert\nskills: [bundled-method]\n---\n# Professional framework\n\nComplete independent Agent Markdown.', 'skills/bundled-method/SKILL.md': '---\nname: bundled-method\ndescription: A retained method\n---\nRead references/domain.md.', 'skills/bundled-method/references/domain.md': 'Domain method preserved.' };
     const assets = { 'bin/inspect': { base64: Buffer.from('#!/bin/sh\necho inspect\n').toString('base64'), executable: true }, 'assets/table.bin': { base64: Buffer.from([0, 255, 1, 7]).toString('base64') } };
     const draft = await h.experts.createDraft(a, definitionFromDocuments(files, assets), { operationId: 'package-create' });
     const validation = await h.experts.validate(a, draft.expertId, draft.revision);
@@ -47,7 +47,7 @@ test('authored expert package publishes complete MD and mounts retained bundled 
     await assert.rejects(h.experts.updateDraft(a, draft.expertId, { methodology: 'Ignored replacement' }, { operationId: 'package-summary-edit', expectedRevision: published.expert.revision }), error => error.code === 'experts/invalid-definition');
     const edited = { ...files, 'agents/package-expert.md': files['agents/package-expert.md'].replace('Complete independent', 'Updated independent') };
     const updated = await h.experts.updateDraft(a, draft.expertId, { packageDocuments: edited }, { operationId: 'package-files-edit', expectedRevision: published.expert.revision });
-    const changedIdentity = { ...edited, '.workdsh-expert/plugin.json': JSON.stringify({ ...JSON.parse(edited['.workdsh-expert/plugin.json']), name: 'replacement-package' }) };
+    const changedIdentity = { ...edited, '.expertworkshop-expert/plugin.json': JSON.stringify({ ...JSON.parse(edited['.expertworkshop-expert/plugin.json']), name: 'replacement-package' }) };
     await assert.rejects(h.experts.updateDraft(a, draft.expertId, { packageDocuments: changedIdentity }, { operationId: 'package-identity-rejected' }), error => error.code === 'experts/invalid-definition');
     assert.match(updated.definition.agentDocument, /Updated independent/);
     assert.match(updated.definition.methodology, /Updated independent/);
@@ -83,9 +83,9 @@ test('authored expert package publishes complete MD and mounts retained bundled 
 //   • agentPresets — delegates to the OFFICIAL authoring functions
 //     (discoverPresets/readComposition/copyComposition) over the shipped preset root
 //     plus a per-test writable user root, so experts compile to real preset dirs.
-//   • sessionController / workdshSessionAccess — count native Session creates so we
+//   • sessionController / expertworkshopSessionAccess — count native Session creates so we
 //     can prove "at most one Session per operationId" without booting the agent loop.
-//   • workdshIdentity — a membership directory, exactly like the access/audit tests.
+//   • expertworkshopIdentity — a membership directory, exactly like the access/audit tests.
 // Coverage: AT-01 (list/search/filter/paging/visibility), AT-04 (authoring+validate+
 // limits), AT-05 (CAS), AT-06 (confirmation-bound publish security), AT-07/08 (freeze
 // Skill dependency, immutable revision, cold restart), AT-14 (default-immutable/copy/
@@ -142,7 +142,7 @@ function fullDefinition(name, overrides = {}) {
  * root this call created.
  */
 async function boot(existingRoot, { profileAgents = false, connectors } = {}) {
-  const root = existingRoot ?? await mkdtemp(join(tmpdir(), 'workdsh-experts-'));
+  const root = existingRoot ?? await mkdtemp(join(tmpdir(), 'expertworkshop-experts-'));
   const dshHome = join(root, 'dsh');
   const agentsHome = profileAgents ? join(dshHome, 'agents') : join(root, 'agents');
   const storageRoot = join(root, 'storage');
@@ -163,8 +163,8 @@ async function boot(existingRoot, { profileAgents = false, connectors } = {}) {
   ctx.provide('agentTeams', { tryMembership: () => undefined });
   const createCalls = [];
   try {
-    ctx.provide('workdshIdentity', createIdentity());
-    if (connectors) ctx.provide('workdshConnectors', connectors);
+    ctx.provide('expertworkshopIdentity', createIdentity());
+    if (connectors) ctx.provide('expertworkshopConnectors', connectors);
     await ctx.plugin(Storage);
     await ctx.plugin(JsonStorage, { root: storageRoot });
     await ctx.plugin(StorageDomain, { backend: 'json' });
@@ -192,7 +192,7 @@ async function boot(existingRoot, { profileAgents = false, connectors } = {}) {
       async resolveAgent(sessionId) { return { agent: { id: String(sessionId) } }; },
       async selectModel() { /* not exercised: tests pass no modelSelection */ },
     });
-    ctx.provide('workdshSessionAccess', {
+    ctx.provide('expertworkshopSessionAccess', {
       async create(request) { createCalls.push(String(request.sessionId)); return { sessionId: request.sessionId }; },
     });
 
@@ -202,7 +202,7 @@ async function boot(existingRoot, { profileAgents = false, connectors } = {}) {
 
     return {
       ctx, root, agentsHome, createCalls,
-      get experts() { return ctx.workdshExperts; },
+      get experts() { return ctx.expertworkshopExperts; },
       async cleanup() {
         await ctx.fiber.dispose();
         if (savedAgentsHome === undefined) delete process.env.DSH_AGENTS_HOME; else process.env.DSH_AGENTS_HOME = savedAgentsHome;
@@ -276,7 +276,7 @@ test('AT-01 experts list seeds defaults, searches, filters, pages and stays owne
     const otherOrg = await h.experts.list(actor('owner-b', 'organization-b'), {});
     assert.equal(otherOrg.total, 0, 'cross-organization catalog is empty');
 
-    const events = h.ctx.workdshAudit.snapshot();
+    const events = h.ctx.expertworkshopAudit.snapshot();
     assert.ok(events.some((event) => event.action === 'experts.list' && event.outcome === 'succeeded'));
   } finally { await h.cleanup(); }
 });
@@ -449,7 +449,7 @@ test('AT-07/AT-08 publish freezes a real Skill dependency into an immutable revi
     assert.match(presetRef, /^wd-exp-dependency-expert-[0-9a-f]{12}-[0-9a-f]{12}$/);
 
     // The frozen dependency is retained as an intact snapshot; the compiled preset is healthy.
-    const check = await h.ctx.workdshSkills.checkRevision(validation.dependencyLock[0], a);
+    const check = await h.ctx.expertworkshopSkills.checkRevision(validation.dependencyLock[0], a);
     assert.equal(check.status, 'intact');
     const compiled = await h.ctx.agentPresets.resolve(presetRef);
     assert.equal(compiled.broken, undefined, 'the compiled expert preset resolves healthy');
@@ -619,7 +619,7 @@ test('G03 native pre-step checks the actual immutable composition and rejects un
     const { expertId } = await publishCopyOfDefault(h, a, 'op-native-guard');
     const plan = await h.experts.prepareExecution(a, expertId);
     const created = await h.experts.createExecution(a, plan.executionPlanId, { operationId: 'op-native-create' });
-    h.ctx.workdshIdentity.resolve = async () => a;
+    h.ctx.expertworkshopIdentity.resolve = async () => a;
     await h.ctx.plugin(SystemPrompt);
     registerExpertExecutionGuard(h.ctx);
     const admit = (sessionId, agentPreset) => h.ctx.waterfall('agent/pre-step', {
@@ -653,7 +653,7 @@ test('G01 compiling identical content reuses the preset and refuses existing dri
 
 test('published legacy team instructions are migrated to official DSH Team tools at runtime', () => {
   const definition = fullDefinition('Legacy team');
-  definition.agentDocument = `---\nname: legacy-team\ndescription: Legacy team\n---\nCall workdsh_expert_team_start, workdsh_expert_team_delegate, workdsh_expert_team_status, workdsh_expert_team_ask and workdsh_expert_team_deliver.`;
+  definition.agentDocument = `---\nname: legacy-team\ndescription: Legacy team\n---\nCall expertworkshop_expert_team_start, expertworkshop_expert_team_delegate, expertworkshop_expert_team_status, expertworkshop_expert_team_ask and expertworkshop_expert_team_deliver.`;
   const persona = expertPersonaConfig({
     definition,
     teamMembers: { analyst: { expertId: 'member-1', revision: 'rev-1' } },
@@ -662,14 +662,14 @@ test('published legacy team instructions are migrated to official DSH Team tools
   assert.match(persona.prefix, /team_task_create/);
   assert.match(persona.prefix, /team_task_list/);
   assert.match(persona.prefix, /wait_agent/);
-  assert.doesNotMatch(persona.prefix, /workdsh_expert_team_/);
+  assert.doesNotMatch(persona.prefix, /expertworkshop_expert_team_/);
 });
 
 // Exercise official output validation/rendering, not only the execute JSON.
 test('authoring tool content preserves full definitions, CAS tokens and draft links without publish authority', async () => {
   const h = await boot();
   try {
-    h.ctx.workdshIdentity.resolve = async () => actor('owner-a');
+    h.ctx.expertworkshopIdentity.resolve = async () => actor('owner-a');
     h.ctx.provide('systemPrompt', { tools() {}, section() {}, getSectionOrder() { return 0; } });
     await h.ctx.plugin(Tools);
     registerExpertManagementTools(h.ctx);
@@ -677,34 +677,34 @@ test('authoring tool content preserves full definitions, CAS tokens and draft li
     const run = (name, args) => h.ctx.tools.execute({ callId: `author-${++call}`, name, arguments: args, signal: new AbortController().signal });
     const definition = fullDefinition('Authoring fixture');
     const { skillRequirements, futureRequirements, ...prose } = definition;
-    const drafted = await run('workdsh_expert_create_draft', { definition: { ...prose, skill_requirements: [], future_requirements: [] } });
+    const drafted = await run('expertworkshop_expert_create_draft', { definition: { ...prose, skill_requirements: [], future_requirements: [] } });
     assert.equal(drafted.isError, false, JSON.stringify(drafted));
     const value = drafted.value;
-    const catalog = await run('workdsh_expert_list_skills', { expert_id: drafted.value.id });
+    const catalog = await run('expertworkshop_expert_list_skills', { expert_id: drafted.value.id });
     assert.equal(catalog.isError, false, JSON.stringify(catalog));
     assert.ok(catalog.value.some(skill => skill.skill_id === 'sample-skill' && skill.name === 'sample-skill' && skill.selectable));
     assert.equal(JSON.stringify(catalog.value).includes(h.root), false, 'Model catalog must not disclose resource paths');
-    h.ctx.workdshIdentity.resolve = async () => actor('member-a');
-    const denied = await run('workdsh_expert_list_skills', { expert_id: drafted.value.id });
+    h.ctx.expertworkshopIdentity.resolve = async () => actor('member-a');
+    const denied = await run('expertworkshop_expert_list_skills', { expert_id: drafted.value.id });
     assert.equal(denied.isError, true, 'Another member cannot query an owner-only authoring catalog');
-    h.ctx.workdshIdentity.resolve = async () => actor('owner-a');
+    h.ctx.expertworkshopIdentity.resolve = async () => actor('owner-a');
     assert.match(JSON.stringify(drafted.content), new RegExp(value.revision));
     assert.match(JSON.stringify(drafted.content), /draft_url/);
     assert.equal(value.definition.role, definition.role);
-    const updated = await run('workdsh_expert_update_draft', { expert_id: value.id, expected_revision: value.revision, definition: { description: 'Updated using rendered CAS token.' } });
+    const updated = await run('expertworkshop_expert_update_draft', { expert_id: value.id, expected_revision: value.revision, definition: { description: 'Updated using rendered CAS token.' } });
     assert.equal(updated.isError, false, JSON.stringify(updated));
-    const refreshed = await run('workdsh_expert_get', { expert_id: value.id });
+    const refreshed = await run('expertworkshop_expert_get', { expert_id: value.id });
     assert.equal(refreshed.isError, false);
     assert.match(JSON.stringify(refreshed.content), /Updated using rendered CAS token/);
     assert.match(JSON.stringify(refreshed.content), /Work step by step/);
-    const requested = await run('workdsh_expert_request_publish', { expert_id: value.id, draft_revision: refreshed.value.draft_revision });
+    const requested = await run('expertworkshop_expert_request_publish', { expert_id: value.id, draft_revision: refreshed.value.draft_revision });
     assert.equal(requested.isError, false, JSON.stringify(requested));
     assert.equal(requested.value.status, 'needs-confirmation');
     assert.equal(new URL(requested.value.draft_url, 'http://localhost/').searchParams.get('expert-draft'), value.id);
     assert.equal((await h.experts.get(actor('owner-a'), value.id)).expert.publishedRevisionRef, undefined);
     assert.equal(requested.value.confirmationToken, undefined);
     assert.equal(requested.value.token, undefined);
-    assert.equal(h.ctx.tools.get('workdsh_expert_publish'), undefined);
+    assert.equal(h.ctx.tools.get('expertworkshop_expert_publish'), undefined);
   } finally { await h.cleanup(); }
 });
 
@@ -783,7 +783,7 @@ test('expert Skill catalog is edit-authorized, path-free and distinguishes unava
     const equipped = await h.experts.listSkills(a, draft.expertId, 'equipped');
     assert.equal(equipped.length, 2);
     assert.equal(equipped[1].state, 'missing');
-    await h.ctx.workdshSkills.setEnabled('sample-skill', false);
+    await h.ctx.expertworkshopSkills.setEnabled('sample-skill', false);
     const disabled = (await h.experts.listSkills(a, draft.expertId, 'available')).find(skill => skill.skillId === 'sample-skill');
     assert.equal(disabled.state, 'disabled'); assert.equal(disabled.selectable, false);
     const validation = await h.experts.validate(a, draft.expertId, draft.revision);
@@ -823,12 +823,12 @@ test('disabled equipped Skill blocks new expert tasks and existing native pre-st
     const { expertId } = await publishCopyOfDefault(h, a, 'disabled-dependency', { skillRequirements: [{ name: 'sample-skill' }] });
     const initial = await h.experts.prepareExecution(a, expertId);
     const created = await h.experts.createExecution(a, initial.executionPlanId, { operationId: 'before-disable' });
-    await h.ctx.workdshSkills.setEnabled('sample-skill', false);
+    await h.ctx.expertworkshopSkills.setEnabled('sample-skill', false);
     const unavailable = await h.experts.prepareExecution(a, expertId);
     assert.ok(unavailable.missing.length > 0);
     await assert.rejects(h.experts.createExecution(a, unavailable.executionPlanId, { operationId: 'after-disable' }), error => error.code === 'experts/dependency-missing');
     assert.equal(h.createCalls.length, 1, 'No replacement task is created');
-    h.ctx.workdshIdentity.resolve = async () => a;
+    h.ctx.expertworkshopIdentity.resolve = async () => a;
     await h.ctx.plugin(SystemPrompt);
     registerExpertExecutionGuard(h.ctx);
     await assert.rejects(h.ctx.waterfall('agent/pre-step', {
@@ -845,9 +845,9 @@ test('complete authored team publishes once with fixed hidden member revisions',
     const a = actor('owner-a');
     const doc = name => `---\nname: ${name}\ndescription: Team professional\n---\n# ${name}\n\nFull domain reasoning and professional delivery.`;
     const files = {
-      '.workdsh-expert/plugin.json': JSON.stringify({ name: 'public-team', expertType: 'team', agentName: 'public-team-team-lead', agents: ['./agents/public-team-team-lead.md', './agents/analyst.md', './agents/reviewer.md'], teamInfo: { leadAgent: 'public-team-team-lead', memberAgents: ['analyst', 'reviewer'] }, workflows: [{ id: 'report', title: 'Report', trigger: 'Produce a report', deliverable: 'Verified report', stages: [{ id: 'draft', worker: 'analyst', reviewer: 'reviewer', dependsOn: [] }] }] }),
+      '.expertworkshop-expert/plugin.json': JSON.stringify({ name: 'public-team', expertType: 'team', agentName: 'public-team-team-lead', agents: ['./agents/public-team-team-lead.md', './agents/analyst.md', './agents/reviewer.md'], teamInfo: { leadAgent: 'public-team-team-lead', memberAgents: ['analyst', 'reviewer'] }, workflows: [{ id: 'report', title: 'Report', trigger: 'Produce a report', deliverable: 'Verified report', stages: [{ id: 'draft', worker: 'analyst', reviewer: 'reviewer', dependsOn: [] }] }] }),
       'settings.json': JSON.stringify({ agent: 'public-team-team-lead' }),
-      'agents/public-team-team-lead.md': `${doc('public-team-team-lead')}\n\nCall workdsh_expert_team_start before workdsh_expert_team_delegate.`,
+      'agents/public-team-team-lead.md': `${doc('public-team-team-lead')}\n\nCall expertworkshop_expert_team_start before expertworkshop_expert_team_delegate.`,
       'agents/analyst.md': doc('analyst'), 'agents/reviewer.md': doc('reviewer'),
       'README.md': 'Complete reusable team.'
     };
@@ -883,7 +883,7 @@ test('complete authored team publishes once with fixed hidden member revisions',
       ...detail.revision,
       revisionId: legacyRevisionId,
       presetRevisionRef: 'standard',
-      compilerVersion: 'workdsh-expert-compiler/0.2-legacy-team',
+      compilerVersion: 'expertworkshop-expert-compiler/0.2-legacy-team',
       compositionDigest: 'legacy-composition-digest',
     });
     await h.experts.expertsTable().update(keys.expert(draft.expertId), row => ({
@@ -895,8 +895,8 @@ test('complete authored team publishes once with fixed hidden member revisions',
     assert.equal(migrated.revision.compilerVersion, COMPILER_VERSION);
     assert.equal(plan.expertRevisionRef.revisionId, migrated.revision.revisionId);
     assert.notEqual(plan.presetRevisionRef, 'standard');
-    assert.equal(h.experts.revisionsTable().get(keys.revision(draft.expertId, legacyRevisionId)).compilerVersion, 'workdsh-expert-compiler/0.2-legacy-team');
-    assert.doesNotMatch(await readExpertPreset(plan.presetRevisionRef), /workdsh_expert_team_/);
+    assert.equal(h.experts.revisionsTable().get(keys.revision(draft.expertId, legacyRevisionId)).compilerVersion, 'expertworkshop-expert-compiler/0.2-legacy-team');
+    assert.doesNotMatch(await readExpertPreset(plan.presetRevisionRef), /expertworkshop_expert_team_/);
     const execution = await h.experts.createExecution(a, plan.executionPlanId, { operationId: 'native-asset-binding' });
     assert.equal((await h.experts.resolveNativeRole(a, execution.sessionId, 'analyst')).revision.revisionId, migrated.revision.teamMembers.analyst.revisionId);
     await h.experts.setAvailability(a, draft.expertId, 'disabled', { operationId: 'native-team-disable' });
@@ -916,7 +916,7 @@ test('0.1.7 legacy directory expert stays immutable, blocks execution, and can b
   const a = actor('owner-a');
   const {expertId} = await publishCopyOfDefault(h,a,'legacy017');
   const detail = await h.experts.get(a,expertId);
-  const legacy = {...detail.revision, revisionId:'legacy-directory-017', presetRevisionRef:'wd-exp-legacy-directory-017', compilerVersion:'workdsh-expert-compiler/0.3', compositionDigest:'legacy-digest'};
+  const legacy = {...detail.revision, revisionId:'legacy-directory-017', presetRevisionRef:'wd-exp-legacy-directory-017', compilerVersion:'expertworkshop-expert-compiler/0.3', compositionDigest:'legacy-digest'};
   await h.experts.revisionsTable().put(keys.revision(expertId,legacy.revisionId),legacy);
   await h.experts.expertsTable().update(keys.expert(expertId), row=>({...row,publishedRevisionRef:{expertId,revisionId:legacy.revisionId}}));
   const cold = await boot(h.root);
@@ -946,7 +946,7 @@ function fixedMemberAdmission(ctx) {
   let active = true; let epoch = 0; let principalId = 'owner-a'; let organizationId = 'organization-a';
   let verificationHook; const evidence = [];
   const revoke = () => { active = false; epoch++; };
-  ctx.workdshIdentity.resolve = async (request, signal) => {
+  ctx.expertworkshopIdentity.resolve = async (request, signal) => {
     signal?.throwIfAborted(); evidence.push(request);
     const admittedEpoch = epoch; const verified = { principalId, organizationId };
     // The real process provider awaits the backend account response before admission.
@@ -971,7 +971,7 @@ test('expert tools use live fixed-member admission and deny expiry or foreign id
     const member = fixedMemberAdmission(h.ctx);
     const agent = { id: 'member-session' };
     registerExpertManagementTools(h.ctx);
-    const run = () => h.ctx.tools.execute({ callId: 'member-list', name: 'workdsh_expert_list', arguments: {}, agent, signal: new AbortController().signal });
+    const run = () => h.ctx.tools.execute({ callId: 'member-list', name: 'expertworkshop_expert_list', arguments: {}, agent, signal: new AbortController().signal });
     assert.equal((await run()).isError, false);
     member.revoke(); const expired = await run(); assert.equal(expired.isError, true); assert.match(expired.error.message, /Expired/);
     member.restore(); member.foreign(); const foreign = await run(); assert.equal(foreign.isError, true); assert.match(foreign.error.message, /identity mismatch/);
@@ -988,7 +988,7 @@ test('expert page routes reject expired, foreign or revoked live admission witho
     h.ctx.provide('connection', { fetch: { register(route) { routes.set(route.path, route); return async () => routes.delete(route.path); } } });
     registerExpertsConnection(h.ctx);
     const call = async () => {
-      const response = await routes.get('/api/workdsh-experts').fetch(new Request('http://localhost/api/workdsh-experts', {
+      const response = await routes.get('/api/expertworkshop-experts').fetch(new Request('http://localhost/api/expertworkshop-experts', {
         method: 'POST', body: JSON.stringify({ endpoint: 'list', payload: {}, principalId: 'forged' }),
       }));
       return response.json();
@@ -1038,7 +1038,7 @@ test('publish and the execution guard read $DSH_HOME/agents when DSH_AGENTS_HOME
     const a = actor('owner-a');
     const doc = name => `---\nname: ${name}\ndescription: Team professional\n---\n# ${name}\n\nFull domain reasoning and professional delivery.`;
     const files = {
-      '.workdsh-expert/plugin.json': JSON.stringify({ name: 'home-team', expertType: 'team', agentName: 'home-team-team-lead', agents: ['./agents/home-team-team-lead.md', './agents/analyst.md', './agents/reviewer.md'], teamInfo: { leadAgent: 'home-team-team-lead', memberAgents: ['analyst', 'reviewer'] }, workflows: [{ id: 'report', title: 'Report', trigger: 'Produce a report', deliverable: 'Verified report', stages: [{ id: 'draft', worker: 'analyst', reviewer: 'reviewer', dependsOn: [] }] }] }),
+      '.expertworkshop-expert/plugin.json': JSON.stringify({ name: 'home-team', expertType: 'team', agentName: 'home-team-team-lead', agents: ['./agents/home-team-team-lead.md', './agents/analyst.md', './agents/reviewer.md'], teamInfo: { leadAgent: 'home-team-team-lead', memberAgents: ['analyst', 'reviewer'] }, workflows: [{ id: 'report', title: 'Report', trigger: 'Produce a report', deliverable: 'Verified report', stages: [{ id: 'draft', worker: 'analyst', reviewer: 'reviewer', dependsOn: [] }] }] }),
       'settings.json': JSON.stringify({ agent: 'home-team-team-lead' }),
       'agents/home-team-team-lead.md': doc('home-team-team-lead'),
       'agents/analyst.md': doc('analyst'),
@@ -1056,7 +1056,7 @@ test('publish and the execution guard read $DSH_HOME/agents when DSH_AGENTS_HOME
     assert.equal(await readExpertPreset(receipt.presetRevisionRef), await readFile(join(publishedDir, 'preset.json'), 'utf8'));
     const plan = await h.experts.prepareExecution(a, draft.expertId);
     const created = await h.experts.createExecution(a, plan.executionPlanId, { operationId: 'home-team-exec' });
-    h.ctx.workdshIdentity.resolve = async () => a;
+    h.ctx.expertworkshopIdentity.resolve = async () => a;
     await h.ctx.plugin(SystemPrompt);
     const agentScope = createScope(h.ctx, created.sessionId);
     registerExpertExecutionGuard(h.ctx);
@@ -1070,7 +1070,7 @@ test('publish and the execution guard read $DSH_HOME/agents when DSH_AGENTS_HOME
 });
 
 test('one missing expert preset does not disable the manager after a cold restart', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-broken-expert-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-broken-expert-'));
   let h = await boot(root);
   try {
     const a = actor('owner-a');

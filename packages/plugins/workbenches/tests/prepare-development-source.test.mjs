@@ -62,7 +62,7 @@ test('concurrent initial preparation publishes complete files without temporary 
  try{
   const [first,second]=await Promise.all([prepare(root,development,descriptor,()=>{}),prepare(root,development,descriptor,()=>{})]);
   assert.equal(first.directory,second.directory);assert.equal(first.metadataSha256,second.metadataSha256);
-  const files=await readdir(first.directory);assert.equal(files.some(name=>name.startsWith('.workdsh-new-')),false);
+  const files=await readdir(first.directory);assert.equal(files.some(name=>name.startsWith('.expertworkshop-new-')),false);
   const manifest=JSON.parse(await readFile(join(first.directory,'package.json'),'utf8'));
   assert.equal(manifest.name,development.packageName);assert.ok((await readFile(join(first.directory,'client.jsx'),'utf8')).includes('registerManaged'));
  }finally{await rm(root,{recursive:true,force:true});}

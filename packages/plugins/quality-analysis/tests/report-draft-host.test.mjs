@@ -18,7 +18,7 @@ const fields={title:'',analysis:'  草稿正文只保存在资料库。\n\n第�
 const compiled=await build({stdin:{contents:"export * from './run-service';export * from './analysis-run';export * from './report-drafts';export {LibraryManager} from '../../../library/src/services/library-manager';",resolveDir:fileURLToPath(new URL('../src/runtime/',import.meta.url)),loader:'ts'},bundle:true,platform:'node',format:'esm',write:false,
   alias:{'expert-workshop-contracts':fileURLToPath(new URL('../../../contracts/src/index.ts',import.meta.url))},plugins:[{name:'shared-published-runtime',setup(b){
     b.onResolve({filter:/^(?:@deepseek-ai\/cordis|@deepseek-ai\/dsh-storage-domain|zod)$/},a=>({path:pathToFileURL(runtime.resolve(a.path)).href,external:true}));
-    b.onResolve({filter:/^(?:workdsh-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},a=>({path:pathToFileURL(libraryRequire.resolve(a.path)).href,external:true}));
+    b.onResolve({filter:/^(?:expertworkshop-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},a=>({path:pathToFileURL(libraryRequire.resolve(a.path)).href,external:true}));
   }}]});
 function proxy(object,overrides){return new Proxy(object,{get(target,key){if(Object.hasOwn(overrides,key))return overrides[key];const value=Reflect.get(target,key,target);return typeof value==='function'?value.bind(target):value;}});}
 function ports(library,overrides={}){return {readContentDraft:library.readContentDraft.bind(library),saveContentDraft:library.saveContentDraft.bind(library),archiveContentDraft:library.archiveContentDraft.bind(library),...overrides};}
@@ -28,9 +28,9 @@ async function fixture(t,{fault}={}){
   const identity={async resolve(){return {...state.actor};},profile(){return {principalId:state.actor.principalId,organization:{id:state.actor.organizationId},resolvedBy:state.actor.resolvedBy};},membership(){return {state:state.active?'active':'suspended'};}};
   const f={root,state,snapshots,...source};
   async function open(){
-    f.ctx=new Context();await f.ctx.plugin(Storage);await f.ctx.plugin(JsonStorage,{root:join(root,'storage')});await f.ctx.plugin(StorageDomain,{backend:'json'});await f.ctx.plugin(source.LibraryManager,{root:join(root,'library')});f.library=f.ctx.workdshLibrary;
+    f.ctx=new Context();await f.ctx.plugin(Storage);await f.ctx.plugin(JsonStorage,{root:join(root,'storage')});await f.ctx.plugin(StorageDomain,{backend:'json'});await f.ctx.plugin(source.LibraryManager,{root:join(root,'library')});f.library=f.ctx.expertworkshopLibrary;
     const storage=proxy(f.ctx.storageDomain,{open:async spec=>{
-      const domain=await f.ctx.storageDomain.open(spec);if(!spec.name.startsWith('workdsh_quality_'))return domain;
+      const domain=await f.ctx.storageDomain.open(spec);if(!spec.name.startsWith('expertworkshop_quality_'))return domain;
       return proxy(domain,{global:proxy(domain.global,{set:async value=>{
         snapshots.push(structuredClone(value));
         if(value.reportDrafts?.length&&fault?.armed){fault.armed=false;if(fault.afterCommit)await domain.global.set(value);throw Error('fixture/metadata-response-lost');}

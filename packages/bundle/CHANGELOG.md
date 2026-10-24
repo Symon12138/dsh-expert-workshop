@@ -12,12 +12,12 @@
 
 # 0.1.0-alpha.47 — 2026-09-20
 
-- 修复设置页「外观」切换不生效：工作台客户端不再注册并强制 `workdsh` 深色主题、不再拦截 `theme/change`；外观改由官方 ThemeRuntime 与用户偏好驱动，浅色/深色/跟随系统切换即时生效，三个选项的选中态恢复显示。
+- 修复设置页「外观」切换不生效：工作台客户端不再注册并强制 `expertworkshop` 深色主题、不再拦截 `theme/change`；外观改由官方 ThemeRuntime 与用户偏好驱动，浅色/深色/跟随系统切换即时生效，三个选项的选中态恢复显示。
 
 # 0.1.0-alpha.46 — 2026-09-18
 
 - 跟随 DSH 0.1.6-alpha.2 升级：组合包与功能插件的官方依赖精确锁定同步至 `0.1.6-alpha.2`；projects、experts、skills、library、office、activity 六个客户端插件完成 Client Session 迁移。
-- 外部 URL 契约一次性变化（随「助理」「定时任务」「更多」未实现入口隐藏）：`?workdsh-view=assistant|automation|more` 外部链接不再切换视图，静默回落到对话视图且不报错；项目任务改由原生会话导航打开，旧链接遗留的 `?task=` 参数在项目面板打开时被清理。
+- 外部 URL 契约一次性变化（随「助理」「定时任务」「更多」未实现入口隐藏）：`?expertworkshop-view=assistant|automation|more` 外部链接不再切换视图，静默回落到对话视图且不报错；项目任务改由原生会话导航打开，旧链接遗留的 `?task=` 参数在项目面板打开时被清理。
 
 # 0.1.0-alpha.45 — 2026-09-15
 
@@ -155,7 +155,7 @@
 
 # 0.1.0-alpha.10
 
-组合 workbench alpha.3：默认 home 改为 Expert Workshop 新任务入口，使用 Harness 官方工作区、Session 与 Conversation 服务创建任务；接入验证移至 `workdsh-view=diagnostics`。
+组合 workbench alpha.3：默认 home 改为 Expert Workshop 新任务入口，使用 Harness 官方工作区、Session 与 Conversation 服务创建任务；接入验证移至 `expertworkshop-view=diagnostics`。
 
 # 0.1.0-alpha.9
 

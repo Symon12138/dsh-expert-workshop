@@ -11,7 +11,7 @@ import type {
 import { convertToMarkdown, type ConversionResult } from './converters.js';
 import { libraryDomainSpec, stateKey, type LibraryState } from '../storage/domain.js';
 
-declare module '@deepseek-ai/cordis' { interface Context { workdshLibrary: LibraryService; workdshIdentity: IdentityService; } }
+declare module '@deepseek-ai/cordis' { interface Context { expertworkshopLibrary: LibraryService; expertworkshopIdentity: IdentityService; } }
 
 const MAX_BYTES = 50 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 5 * 1024 * 1024 * 1024;
@@ -57,7 +57,7 @@ export class LibraryManager extends Service implements LibraryService {
   private readonly maxSelectionAssets: number;
 
   constructor(ctx: Context, options: LibraryManagerOptions = {}) {
-    super(ctx, 'workdshLibrary');
+    super(ctx, 'expertworkshopLibrary');
     this.root = resolve(options.root ?? join(process.env.DSH_HOME ?? join(homedir(), '.dsh'), 'library'));
     this.maxBytes = options.maxBytes ?? MAX_BYTES;
     this.maxTotalBytes = options.maxTotalBytes ?? MAX_TOTAL_BYTES;
@@ -71,7 +71,7 @@ export class LibraryManager extends Service implements LibraryService {
     await mkdir(join(this.root, '.tmp'), { recursive: true, mode: 0o700 });
     const domain = await this.ctx.storageDomain.open(libraryDomainSpec);
     this.table = domain.table('states');
-    this.ctx.effect(() => () => domain.close(), 'workdshLibrary.domainClose');
+    this.ctx.effect(() => () => domain.close(), 'expertworkshopLibrary.domainClose');
   }
 
   space(actor: ActorContext, signal?: AbortSignal): Promise<LibrarySpace> {

@@ -27,7 +27,7 @@ async function fixture(t,kind='personal'){
  native.provide('sessionPersistence',{async list(){return [...sessions.values()].map(session=>({header:session.meta}));}});
  await native.plugin(WorkspaceRegistry);
  const actor={principalId:'member',organizationId:'org',resolvedBy:'identity'};
- const services={workdshIdentity:{resolve:async()=>actor,profile:()=>({principalId:principal,resolvedBy:'identity',organization:{id:'org',kind}}),membership:()=>({state:'active'})},workdshAccess:{sessionOwner:id=>owners.get(id),bindSession:async(actor,{sessionId,workspaceId})=>{const owner={ownerPrincipalId:actor.principalId,organizationId:actor.organizationId,...workspaceId?{workspaceId}:{}};const prior=owners.get(sessionId);if(prior){assert.deepEqual(prior,owner);return prior;}owners.set(sessionId,owner);return owner;}},
+ const services={expertworkshopIdentity:{resolve:async()=>actor,profile:()=>({principalId:principal,resolvedBy:'identity',organization:{id:'org',kind}}),membership:()=>({state:'active'})},expertworkshopAccess:{sessionOwner:id=>owners.get(id),bindSession:async(actor,{sessionId,workspaceId})=>{const owner={ownerPrincipalId:actor.principalId,organizationId:actor.organizationId,...workspaceId?{workspaceId}:{}};const prior=owners.get(sessionId);if(prior){assert.deepEqual(prior,owner);return prior;}owners.set(sessionId,owner);return owner;}},
  workspaceRegistry:native.workspaceRegistry,
  workspaceController:{async create({path}){const prior=native.workspaceRegistry.list().find(w=>w.path===path),workspace=await native.workspaceRegistry.create(path);return {workspace:{workspaceId:workspace.id,path:workspace.path},created:!prior};}},
  sessionController:{async create({sessionId,workspaceId}){creates++;const workspace=native.workspaceRegistry.get(workspaceId);assert.ok(workspace,'native creation requires a real registered Workspace');const prior=sessions.get(sessionId);if(prior)assert.equal(prior.meta.cwd,workspace.path,'native Session immutable cwd');else sessions.set(sessionId,{meta:{id:sessionId,cwd:workspace.path},events:[]});await workspace.attachSession(sessionId);return {sessionId};},async inspect(sessionId){const value=sessions.get(sessionId);if(!value)throw Error('fixture/session-not-found');return structuredClone(value);}}};
@@ -93,7 +93,7 @@ test('changed account during run verification cannot create a native session',as
 });
 test('enterprise mode requires protected creation and never adopts unowned native sessions',async t=>{
  const f=await fixture(t,'enterprise');await assert.rejects(ensure(f.ctx,view,async()=>{}),/session-unavailable/);assert.equal(f.creates(),0);
- f.services.workdshSessionAccess=f.services.sessionController;
+ f.services.expertworkshopSessionAccess=f.services.sessionController;
  await assert.rejects(ensure(f.ctx,view,async()=>{}),/access-denied/);assert.equal(f.owners.size,0);
 });
 test('native mismatched receipt and pre-cancelled requests cannot bind ownership',async t=>{
@@ -113,12 +113,12 @@ test('interpretation reads existing owned native history without another create 
 test('interpretation cannot adopt unowned Session or bypass enterprise inspector',async t=>{
  const f=await fixture(t);let inspected=false;f.services.sessionController.inspect=async()=>{inspected=true;return {events:[]};};
  await assert.rejects(readInterpretation(f.ctx,view,async()=>{}),/access-denied/);assert.equal(inspected,false);assert.equal(f.creates(),0);
- const enterprise=await fixture(t);await ensure(enterprise.ctx,view,async()=>{});const profile=enterprise.services.workdshIdentity.profile;enterprise.services.workdshIdentity.profile=()=>({...profile(),organization:{id:'org',kind:'enterprise'}});
+ const enterprise=await fixture(t);await ensure(enterprise.ctx,view,async()=>{});const profile=enterprise.services.expertworkshopIdentity.profile;enterprise.services.expertworkshopIdentity.profile=()=>({...profile(),organization:{id:'org',kind:'enterprise'}});
  await assert.rejects(readInterpretation(enterprise.ctx,view,async()=>{}),/session-unavailable/);
 });
 
 test('older owned Session gains native membership in its original cwd, without recreation or history mutation',async t=>{
- const f=await fixture(t),sessionId=`session-${createHash('sha256').update(JSON.stringify(['workdsh-quality-analysis','org','member',view.recordId,view.runId,view.contentHash])).digest('hex').slice(0,32)}`;
+ const f=await fixture(t),sessionId=`session-${createHash('sha256').update(JSON.stringify(['expertworkshop-quality-analysis','org','member',view.recordId,view.runId,view.contentHash])).digest('hex').slice(0,32)}`;
  const cwd=join(f.root,'older-authorized-cwd');await mkdir(cwd);
  const events=[{seq:0,type:'assistant/message',data:{message:'existing history'}}],owner={organizationId:'org',ownerPrincipalId:'member'};
  f.owners.set(sessionId,owner);f.sessions.set(sessionId,{meta:{id:sessionId,cwd},events});
@@ -129,7 +129,7 @@ test('older owned Session gains native membership in its original cwd, without r
 });
 
 test('legacy repair cannot attach a foreign owned Session, misrepresent its cwd, or run after identity revocation',async t=>{
- const f=await fixture(t),sessionId=`session-${createHash('sha256').update(JSON.stringify(['workdsh-quality-analysis','org','member',view.recordId,view.runId,view.contentHash])).digest('hex').slice(0,32)}`;
+ const f=await fixture(t),sessionId=`session-${createHash('sha256').update(JSON.stringify(['expertworkshop-quality-analysis','org','member',view.recordId,view.runId,view.contentHash])).digest('hex').slice(0,32)}`;
  const cwd=join(f.root,'legacy'),wrong=join(f.root,'other');await mkdir(cwd);await mkdir(wrong);
  f.sessions.set(sessionId,{meta:{id:sessionId,cwd},events:[]});f.owners.set(sessionId,{organizationId:'org',ownerPrincipalId:'other'});
  await assert.rejects(ensure(f.ctx,view,async()=>{}),/access-denied/);assert.equal(f.native.workspaceRegistry.list().length,0);
@@ -141,6 +141,6 @@ test('legacy repair cannot attach a foreign owned Session, misrepresent its cwd,
 });
 
 test('app-owned working directory rejects symlink escape before native creation',async t=>{
- const f=await fixture(t),scope=join(f.root,'workdsh-quality-analysis');await symlink(f.root,scope,'dir');
+ const f=await fixture(t),scope=join(f.root,'expertworkshop-quality-analysis');await symlink(f.root,scope,'dir');
  await assert.rejects(ensure(f.ctx,view,async()=>{}),/workspace-conflict/);assert.equal(f.creates(),0);assert.equal(f.owners.size,0);
 });

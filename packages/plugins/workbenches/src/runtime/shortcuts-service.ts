@@ -5,7 +5,7 @@ import {assertActorContext,type ActorContext,type IdentityService} from 'expert-
 
 function spec(actor:ActorContext){
   const key=createHash('sha256').update(JSON.stringify([actor.organizationId,actor.principalId])).digest('hex').slice(0,40);
-  return defineDomain({name:`workdsh_shortcuts_${key}`,version:1,global:{schema:z.object({organizationId:z.string(),principalId:z.string(),ids:z.array(z.string().min(1).max(128)).max(8)}),initial:{organizationId:actor.organizationId,principalId:actor.principalId,ids:[] as string[]}},tables:{}});
+  return defineDomain({name:`expertworkshop_shortcuts_${key}`,version:1,global:{schema:z.object({organizationId:z.string(),principalId:z.string(),ids:z.array(z.string().min(1).max(128)).max(8)}),initial:{organizationId:actor.organizationId,principalId:actor.principalId,ids:[] as string[]}},tables:{}});
 }
 /** Local Profile preferences, owned by the resolved account. A pin is navigation
  * intent only; live verified Client registration remains required to show it. */

@@ -14,7 +14,7 @@ const built=await build({
  stdin:{contents:"export {LibraryManager} from './library-manager';export {libraryStateSchema} from '../storage/domain';",resolveDir:fileURLToPath(new URL('../src/services/',import.meta.url)),loader:'ts'},
  bundle:true,platform:'node',format:'esm',write:false,
  plugins:[{name:'published-runtime-owner',setup(builder){
-  builder.onResolve({filter:/^(?:@deepseek-ai\/cordis|@deepseek-ai\/dsh-storage-domain|zod|workdsh-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},args=>({path:pathToFileURL(libraryRequire.resolve(args.path)).href,external:true}));
+  builder.onResolve({filter:/^(?:@deepseek-ai\/cordis|@deepseek-ai\/dsh-storage-domain|zod|expertworkshop-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},args=>({path:pathToFileURL(libraryRequire.resolve(args.path)).href,external:true}));
  }}],
 });
 const bundleRoot=await mkdtemp(join(tmpdir(),'library-content-draft-bundle-'));
@@ -35,7 +35,7 @@ async function fixture(t){
  const f={root};
  async function open(){
   f.ctx=new Context();await f.ctx.plugin(Storage);await f.ctx.plugin(JsonStorage,{root:join(root,'storage')});await f.ctx.plugin(StorageDomain,{backend:'json'});
-  await f.ctx.plugin(LibraryManager,{root:join(root,'library')});f.library=f.ctx.workdshLibrary;
+  await f.ctx.plugin(LibraryManager,{root:join(root,'library')});f.library=f.ctx.expertworkshopLibrary;
  }
  f.close=async()=>{await f.ctx?.fiber.dispose();f.ctx=undefined;};
  f.reopen=async()=>{await f.close();await open();};

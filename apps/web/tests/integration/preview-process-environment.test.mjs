@@ -4,7 +4,7 @@ import {mkdtemp,mkdir,writeFile,rm} from 'node:fs/promises';import {tmpdir} from
 import {previewProcessEnvironment} from '../../scripts/preview-process-environment.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 test('native preview children resolve the workspace pnpm even with a foreign pnpm first in inherited PATH',async()=>{
- const foreign=await mkdtemp(join(tmpdir(),'workdsh-foreign-pnpm-'));
+ const foreign=await mkdtemp(join(tmpdir(),'expertworkshop-foreign-pnpm-'));
  try{
   await writeFile(join(foreign,'pnpm'),'#!/bin/sh\necho 11.0.0\n',{mode:0o700});
   const original={...process.env,PATH:foreign+delimiter+process.env.PATH};
@@ -14,7 +14,7 @@ test('native preview children resolve the workspace pnpm even with a foreign pnp
  }finally{await rm(foreign,{recursive:true,force:true});}
 });
 test('mismatched workspace pnpm fails before launching instead of changing a Profile store',async()=>{
- const fixture=await mkdtemp(join(tmpdir(),'workdsh-pnpm-mismatch-'));
+ const fixture=await mkdtemp(join(tmpdir(),'expertworkshop-pnpm-mismatch-'));
  try{
   await mkdir(join(fixture,'node_modules/pnpm'),{recursive:true});
   await writeFile(join(fixture,'package.json'),JSON.stringify({packageManager:'pnpm@10.34.5'}));await writeFile(join(fixture,'node_modules/pnpm/package.json'),JSON.stringify({version:'11.0.0'}));

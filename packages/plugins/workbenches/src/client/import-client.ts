@@ -21,7 +21,7 @@ export function createWorkbenchImportClient(transport: typeof fetch = fetch) {
     lifetime.throwIfAborted();
     let result: unknown, response: Response;
     try {
-      response = await transport('/api/workdsh-workbench-import', { method: 'POST', credentials: 'same-origin',
+      response = await transport('/api/expertworkshop-workbench-import', { method: 'POST', credentials: 'same-origin',
         headers: { 'content-type': 'application/json' }, body: JSON.stringify(input), signal: lifetime });
       result = await response.json();
     } catch (cause) { lifetime.throwIfAborted(); throw new Error('workbench/import-unconfirmed', { cause }); }

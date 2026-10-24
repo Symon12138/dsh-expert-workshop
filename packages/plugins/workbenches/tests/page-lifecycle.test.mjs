@@ -17,7 +17,7 @@ function fixture() {
   const ports = {
     mountPage(mount, page) { mounts.push(mount); return slots.register({ name: 'main', key: mount.panelKey }, page); },
     selectedPanel() { return selected; },
-    openManager() { selected = 'workdsh-workbench-manager'; },
+    openManager() { selected = 'expertworkshop-workbench-manager'; },
   };
   return { slots, ports, mounts, select(value) { selected = value; }, selected: () => selected };
 }
@@ -29,7 +29,7 @@ test('two workbenches contribute independent native Slots and withdrawal leaves 
   assert.equal(f.slots.entriesOfSlot('sidebar.panellist').length, 0);
   f.select(f.mounts[0].panelKey);
   stop();
-  assert.equal(f.selected(), 'workdsh-workbench-manager');
+  assert.equal(f.selected(), 'expertworkshop-workbench-manager');
   assert.equal(f.mounts[0].signal.aborted, true);
   assert.equal(f.mounts[1].signal.aborted, false);
   assert.equal(f.slots.entriesOfSlot('main').length, 1);
@@ -43,7 +43,7 @@ test('two workbenches contribute independent native Slots and withdrawal leaves 
   assert.throws(() => lifecycle.mount(descriptor, () => null), /page-service-closed/);
 });
 test('page conflict preserves the existing page and cancels its lifetime', () => {
-  const f = fixture(), key = `workdsh-workbench:${descriptor.id}`;
+  const f = fixture(), key = `expertworkshop-workbench:${descriptor.id}`;
   f.slots.register({ name: 'main', key }, () => null);
   const lifecycle = new WorkbenchPageLifecycle(f.ports);
   assert.throws(() => lifecycle.mount(descriptor, () => null));

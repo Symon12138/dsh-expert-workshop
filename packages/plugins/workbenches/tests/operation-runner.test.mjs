@@ -26,7 +26,7 @@ const intent = { id: 'session-1', iterationId: 'iteration-1', kind: 'create-sess
 // Explicit executor/receipt fixtures verify orchestration only, not real native session creation.
 const success = { state: 'succeeded', receipt: { sessionId: 'native-session-fixture', pendingRestart: false } };
 test('runner persists running intent before execution and concurrent repeats submit exactly once', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-operation-runner-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-operation-runner-'));
   const ctx = await boot(root);
   const journal = await WorkbenchDevelopmentOperations.open(ctx.storageDomain, actor, 'dev-1');
   let submits = 0;
@@ -45,7 +45,7 @@ test('runner persists running intent before execution and concurrent repeats sub
   } finally { await journal.close(); await ctx.fiber.dispose(); await rm(root, { recursive: true, force: true }); }
 });
 test('lost receipt survives cold restart and recovery inspects without replaying the side effect', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-operation-recovery-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-operation-recovery-'));
   let ctx, journal;
   let submits = 0, inspections = 0;
   try {
@@ -66,7 +66,7 @@ test('lost receipt survives cold restart and recovery inspects without replaying
   } finally { await journal?.close(); await ctx?.fiber.dispose(); await rm(root, { recursive: true, force: true }); }
 });
 test('late success after cancellation remains unknown and a changed identity cannot inspect it', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-operation-cancel-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-operation-cancel-'));
   const ctx = await boot(root);
   const journal = await WorkbenchDevelopmentOperations.open(ctx.storageDomain, actor, 'dev-1');
   const controller = new AbortController();
@@ -86,7 +86,7 @@ test('late success after cancellation remains unknown and a changed identity can
 });
 
 test('a cancelled concurrent waiter cannot receive the shared receipt or cancel the submitted operation', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-operation-waiter-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-operation-waiter-'));
   const ctx = await boot(root);
   const journal = await WorkbenchDevelopmentOperations.open(ctx.storageDomain, actor, 'dev-1');
   let release, entered;

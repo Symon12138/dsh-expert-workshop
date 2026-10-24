@@ -16,8 +16,8 @@ import {mountWorkbenchShortcutsHost} from './runtime/shortcuts-host.js';
 const semver=createRequire(import.meta.url)('semver') as {
   satisfies(version:string,range:string,options:{includePrerelease:boolean}):boolean;
 };
-export const name='workdsh-workbenches';
-export const inject=['profileContext','loader','storageDomain','connection','workdshIdentity','workdshAccess','sessionController','workspaceController','tools'];
+export const name='expertworkshop-workbenches';
+export const inject=['profileContext','loader','storageDomain','connection','expertworkshopIdentity','expertworkshopAccess','sessionController','workspaceController','tools'];
 export async function apply(ctx:Context) {
   const kernel=getDshRuntimeVersion();
   const isCompatible = (descriptor: import('expert-workshop-contracts').WorkbenchDescriptor) =>

@@ -16,7 +16,7 @@ test('authorized rc.2 seam preserves the native subtree and refuses unknown byte
  assert.throws(()=>patchNativeWorkbenchFrame(source+'\n'),/unsupported runtime bytes/);
 });
 test('local copy applies idempotently, rolls back exactly and rejects unknown versions',async()=>{
- const profile=await mkdtemp(join(tmpdir(),'workdsh-frame-guard-'));
+ const profile=await mkdtemp(join(tmpdir(),'expertworkshop-frame-guard-'));
  const pkg=join(profile,'node_modules/@deepseek-ai/dsh-client-ui-conversation');
  try{
   await mkdir(join(pkg,'lib'),{recursive:true});await writeFile(join(profile,'package.json'),'{}');
@@ -41,10 +41,10 @@ test('local copy applies idempotently, rolls back exactly and rejects unknown ve
  }finally{await rm(profile,{recursive:true,force:true});}
 });
 test('packaged verification reads copied Resources bytes and refuses missing, changed or mismatched adapters',async()=>{
- const directory=await mkdtemp(join(tmpdir(),'workdsh-packaged-frame-'));
+ const directory=await mkdtemp(join(tmpdir(),'expertworkshop-packaged-frame-'));
  const sourceProfile=join(directory,'build/profile');
  const pkg=join(sourceProfile,'node_modules/@deepseek-ai/dsh-client-ui-conversation');
- const packaged=join(directory,'WorkDSH.app/Contents/Resources/workdsh-runtime/profiles/workdsh');
+ const packaged=join(directory,'Expert Workshop.app/Contents/Resources/expertworkshop-runtime/profiles/expertworkshop');
  try{
   await mkdir(join(pkg,'lib'),{recursive:true});await writeFile(join(sourceProfile,'package.json'),'{}');
   const manifest=JSON.parse(await readFile(manifestPath,'utf8'));

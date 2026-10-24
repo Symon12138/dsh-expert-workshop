@@ -5,7 +5,7 @@ import {assertActorContext,type ActorContext} from 'expert-workshop-contracts';
 const recordSchema=z.object({id:z.string(),title:z.string(),createdAt:z.string(),operationId:z.string()});
 const stateSchema=z.object({organizationId:z.string(),principalId:z.string(),records:z.array(recordSchema)});
 function spec(actor:ActorContext){const key=createHash('sha256').update(JSON.stringify([actor.organizationId,actor.principalId])).digest('hex').slice(0,40);
-  return defineDomain({name:`workdsh_quality_index_${key}`,version:1,global:{schema:stateSchema,initial:{organizationId:actor.organizationId,principalId:actor.principalId,records:[]}},tables:{}});}
+  return defineDomain({name:`expertworkshop_quality_index_${key}`,version:1,global:{schema:stateSchema,initial:{organizationId:actor.organizationId,principalId:actor.principalId,records:[]}},tables:{}});}
 export class QualityRecordIndex {
   private serial:Promise<unknown>=Promise.resolve();private closing?:Promise<void>;
   private constructor(private readonly domain:Domain<ReturnType<typeof spec>>,private readonly actor:ActorContext){}

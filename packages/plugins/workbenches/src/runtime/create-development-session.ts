@@ -8,12 +8,12 @@ import { ensureWorkbenchDevelopmentWorkspace } from './development-workspace.js'
  * create owns same-id adoption; source/access validation remains mandatory. */
 export async function createNativeWorkbenchDevelopmentSession(ctx: Context, actor: ActorContext,
   development: WorkbenchDevelopment, title: string, signal?: AbortSignal) {
-  const identity = ctx.get('workdshIdentity') as IdentityService | undefined;
-  const access = ctx.get('workdshAccess') as RuntimeBindingService | undefined;
+  const identity = ctx.get('expertworkshopIdentity') as IdentityService | undefined;
+  const access = ctx.get('expertworkshopAccess') as RuntimeBindingService | undefined;
   const native = ctx.get('sessionController') as Context['sessionController'] | undefined;
   type SessionRequest = Parameters<Context['sessionController']['create']>[0];
   type SessionResult = Awaited<ReturnType<Context['sessionController']['create']>>;
-  const protectedSessions = ctx.get('workdshSessionAccess') as { create(request: SessionRequest, signal?: AbortSignal): Promise<SessionResult> } | undefined;
+  const protectedSessions = ctx.get('expertworkshopSessionAccess') as { create(request: SessionRequest, signal?: AbortSignal): Promise<SessionResult> } | undefined;
   if (!identity || !access || !native) throw new Error('workbench/session-authority-unavailable');
   const authorize = () => {
     signal?.throwIfAborted(); ctx.fiber.assertActive();

@@ -1,14 +1,14 @@
 # 参与贡献
 
-感谢你愿意参与 WorkDSH。这是一个社区项目，无论你是普通用户、插件作者还是开发者，都有适合你的贡献方式。
+感谢你愿意参与 Expert Workshop。这是一个社区项目，无论你是普通用户、插件作者还是开发者，都有适合你的贡献方式。
 
 ## 普通用户：使用、反馈与传播
 
-- 遇到问题或异常，[提 issue](https://github.com/techflag/workdsh/issues)：说明操作系统（macOS / Windows）、应用版本和复现步骤。
+- 遇到问题或异常，[提 issue](https://github.com/techflag/expertworkshop/issues)：说明操作系统（macOS / Windows）、应用版本和复现步骤。
 - 有功能想法或改进建议，也欢迎提 issue 讨论。
 - 参与[社区交流](README.zh-CN.md#社区与致谢)（微信群、QQ 群、Discord），帮助其他用户解决问题。
 - 写使用教程、体验文章，或帮助完善和翻译文档。
-- 通过 [issue](https://github.com/techflag/workdsh/issues) 推荐生态项目。
+- 通过 [issue](https://github.com/techflag/expertworkshop/issues) 推荐生态项目。
 
 ## 插件作者：扩展生态
 
@@ -32,7 +32,7 @@ corepack yarn dev     # 有图形环境时启动应用
 ### 仓库边界（开始前务必了解）
 
 - 官方依赖使用 `upstream.json` 锁定的发布版本与校验摘要，构建不克隆或编译官方源码。
-- 桌面代码位于 `apps/desktop/`，WorkDSH 功能包位于 `apps/web/`；前者使用根目录 Yarn 工作区，后者保留独立 pnpm 工作区。
+- 桌面代码位于 `apps/desktop/`，Expert Workshop 功能包位于 `apps/web/`；前者使用根目录 Yarn 工作区，后者保留独立 pnpm 工作区。
 - 构建、类型检查、单元测试和冒烟检查必须保持 headless-safe。
 
 ### 提交与 PR
@@ -43,13 +43,13 @@ corepack yarn dev     # 有图形环境时启动应用
 
 - 提交信息使用 conventional commits 风格（例如 `fix(desktop): ...`、`docs: ...`）。
 - 提交前运行 `yarn check` 并保证全绿。
-- 变更打包依赖或 WorkDSH Profile 后，核对安装包内实际版本、许可证文件和 `apps/desktop/THIRD_PARTY_NOTICES.md`；不得沿用旧版本的依赖清单。
+- 变更打包依赖或 Expert Workshop Profile 后，核对安装包内实际版本、许可证文件和 `apps/desktop/THIRD_PARTY_NOTICES.md`；不得沿用旧版本的依赖清单。
 - 文档改动请中英同步，并更新 `README.i18n.yaml` 的双语 hash 记录。
 - PR 描述说明改动内容、动机和验证方式；CI 通过后再合并。
 
 ## 加入技术团队
 
-如果你希望参与维护 WorkDSH，请在 [GitHub Issues](https://github.com/techflag/workdsh/issues) 提出建议或说明可参与的方向。
+如果你希望参与维护 Expert Workshop，请在 [GitHub Issues](https://github.com/techflag/expertworkshop/issues) 提出建议或说明可参与的方向。
 
 ## 行为准则
 

@@ -1,25 +1,25 @@
-<p align="center"><img src="assets/brand/workdsh-logo.svg" width="104" alt="WorkDSH"></p>
-<h1 align="center">WorkDSH</h1>
+<p align="center"><img src="assets/brand/expertworkshop-logo.svg" width="104" alt="Expert Workshop"></p>
+<h1 align="center">Expert Workshop</h1>
 <p align="center"><strong>把工作交给 AI，看清过程，拿到成果。</strong></p>
 <p align="center"><a href="README.md">English</a> · 简体中文</p>
 
-WorkDSH 是基于官方 DeepSeek Harness 的开源 AI 工作台。把对话、资料与能力组织到项目里，复用本地资料库，在任务旁查看和编辑交付成果。
+Expert Workshop 是基于官方 DeepSeek Harness 的开源 AI 工作台。把对话、资料与能力组织到项目里，复用本地资料库，在任务旁查看和编辑交付成果。
 
 **桌面版 v2.0.6-alpha.1 · Web/插件 v0.1.0-alpha.14 · Alpha 预览版**
 
-[桌面版下载](https://github.com/techflag/workdsh/releases/tag/desktop-v2.0.6-alpha.1) · [Web/插件下载](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.14) · [更新说明](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.14) · [快速开始](#快速开始) · [官网](https://techflag.github.io/workdsh/) · [Gitee 镜像](https://gitee.com/techflag/workdsh)
+[桌面版下载](https://github.com/techflag/expertworkshop/releases/tag/desktop-v2.0.6-alpha.1) · [Web/插件下载](https://github.com/techflag/expertworkshop/releases/tag/v0.1.0-alpha.14) · [更新说明](https://github.com/techflag/expertworkshop/releases/tag/v0.1.0-alpha.14) · [快速开始](#快速开始) · [官网](https://techflag.github.io/expertworkshop/) · [Gitee 镜像](https://gitee.com/techflag/expertworkshop)
 
-## 下载 WorkDSH 桌面版
+## 下载 Expert Workshop 桌面版
 
 | 系统 | 安装包 |
 | --- | --- |
-| Windows x64 | [下载 Setup.exe](https://github.com/techflag/workdsh/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-windows-x64--WorkDSH-2.0.6-alpha.1-x64-Setup.exe) |
-| macOS Apple 芯片 | [下载 arm64 DMG](https://github.com/techflag/workdsh/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-macos-arm64--WorkDSH-2.0.6-alpha.1-arm64.dmg) |
-| macOS Intel | [下载 x64 DMG](https://github.com/techflag/workdsh/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-macos-x64--WorkDSH-2.0.6-alpha.1-x64.dmg) |
+| Windows x64 | [下载 Setup.exe](https://github.com/techflag/expertworkshop/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-windows-x64--Expert Workshop-2.0.6-alpha.1-x64-Setup.exe) |
+| macOS Apple 芯片 | [下载 arm64 DMG](https://github.com/techflag/expertworkshop/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-macos-arm64--Expert Workshop-2.0.6-alpha.1-arm64.dmg) |
+| macOS Intel | [下载 x64 DMG](https://github.com/techflag/expertworkshop/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-macos-x64--Expert Workshop-2.0.6-alpha.1-x64.dmg) |
 
-这批 Alpha 安装包内置 WorkDSH v0.1.0-alpha.14 和官方 Harness 0.1.7-rc.2 Profile，包含 Node 与 Python。任务浏览器复用 Electron，不额外打包浏览器。macOS DMG 是未签名预览包；校验文件见[桌面版 Release](https://github.com/techflag/workdsh/releases/tag/desktop-v2.0.6-alpha.1)。
+这批 Alpha 安装包内置 Expert Workshop v0.1.0-alpha.14 和官方 Harness 0.1.7-rc.2 Profile，包含 Node 与 Python。任务浏览器复用 Electron，不额外打包浏览器。macOS DMG 是未签名预览包；校验文件见[桌面版 Release](https://github.com/techflag/expertworkshop/releases/tag/desktop-v2.0.6-alpha.1)。
 
-![WorkDSH 深色项目主页，包含完整侧栏](assets/screenshots/workdsh-projects-alpha8-dark.png)
+![Expert Workshop 深色项目主页，包含完整侧栏](assets/screenshots/expertworkshop-projects-alpha8-dark.png)
 
 ## 可以做什么
 
@@ -41,14 +41,14 @@ alpha.14 整包包含 **12 个可安装模块**，包括项目、资料库和受
 <details>
 <summary>浅色主题：项目主页</summary>
 
-![WorkDSH 浅色项目主页，包含完整侧栏](assets/screenshots/workdsh-projects-alpha8-light.png)
+![Expert Workshop 浅色项目主页，包含完整侧栏](assets/screenshots/expertworkshop-projects-alpha8-light.png)
 
 </details>
 
 <details>
 <summary>Office 示例：对话与 HTML 成果</summary>
 
-![对话与 HTML 分析看板](assets/screenshots/workdsh-html-dashboard-preview.png)
+![对话与 HTML 分析看板](assets/screenshots/expertworkshop-html-dashboard-preview.png)
 
 此前的本地预览截图，用于展示成果工作流，不代表 alpha.8 所有文档格式均已验收。
 
@@ -56,11 +56,11 @@ alpha.14 整包包含 **12 个可安装模块**，包括项目、资料库和受
 
 ## Star 趋势
 
-<a href="https://www.star-history.com/?repos=techflag%2Fworkdsh&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=techflag%2Fexpertworkshop&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=techflag/workdsh&type=date&theme=dark&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=techflag/workdsh&type=date&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=techflag/workdsh&type=date&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=techflag/expertworkshop&type=date&theme=dark&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=techflag/expertworkshop&type=date&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=techflag/expertworkshop&type=date&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
  </picture>
 </a>
 
@@ -68,13 +68,13 @@ alpha.14 整包包含 **12 个可安装模块**，包括项目、资料库和受
 
 环境要求：Node.js `^22.19.0 || >=24.0.0`、Corepack/pnpm，以及与所下载发行包 `release-manifest.json` 的 `harness` 字段完全一致的官方 `dsh` CLI。不要使用源码目标版本替代已发布包的版本。
 
-1. 从 [alpha.14 Release](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.14) 下载全部 12 个 `.tgz`、`release-manifest.json`、`SHA256SUMS` 和 `install-workdsh.mjs`，放入同一目录。
+1. 从 [alpha.14 Release](https://github.com/techflag/expertworkshop/releases/tag/v0.1.0-alpha.14) 下载全部 12 个 `.tgz`、`release-manifest.json`、`SHA256SUMS` 和 `install-expertworkshop.mjs`，放入同一目录。
 2. 升级已有 Profile 时，先停止运行，并保留配置和数据的可恢复备份。
 3. 在下载目录执行：
 
 ```sh
-node install-workdsh.mjs --profile workdsh --dry-run
-node install-workdsh.mjs --profile workdsh
+node install-expertworkshop.mjs --profile expertworkshop --dry-run
+node install-expertworkshop.mjs --profile expertworkshop
 ```
 
 安装器校验包的校验和，锁定已验证的包管理器和 Harness 传递依赖，并在 Profile 内安装匹配的官方 base、Web 应用与 CLI。**启动时使用安装器打印的 Profile 内 CLI 命令**，避免全局 CLI 与 Profile 运行时来自不同安装位置。匹配的 CLI 不在 PATH 中时，可传入 `--dsh /absolute/path/to/dsh`。
@@ -98,7 +98,7 @@ corepack pnpm preview
 
 ## 架构与开发
 
-WorkDSH 通过插件、服务和 UI 插槽扩展官方已发布的 Harness 包，不维护修改版上游运行时。业务模块各自拥有领域数据，由整合包组合导航和展示。
+Expert Workshop 通过插件、服务和 UI 插槽扩展官方已发布的 Harness 包，不维护修改版上游运行时。业务模块各自拥有领域数据，由整合包组合导航和展示。
 
 ```sh
 corepack pnpm typecheck
@@ -108,7 +108,7 @@ corepack pnpm test:library
 corepack pnpm check:versions
 ```
 
-[发行记录](https://github.com/techflag/workdsh/releases) · [项目规划](https://github.com/techflag/workdsh/issues)
+[发行记录](https://github.com/techflag/expertworkshop/releases) · [项目规划](https://github.com/techflag/expertworkshop/issues)
 
 当前为 Alpha 预览版。跨平台安装、长时间真实模型专家团、任意 Office 文件保真和多人治理尚未完整验收。Harness 升级后需复验原生 UI 适配。具体测试范围以本次更新说明为准。
 
@@ -116,7 +116,7 @@ corepack pnpm check:versions
 
 感谢以下项目及其维护者。下表列出主要直接依赖和使用范围；完整依赖以各包清单、锁文件及构建产物中的许可清单为准。
 
-| 项目 | 在 WorkDSH 中的用途 | 许可 |
+| 项目 | 在 Expert Workshop 中的用途 | 许可 |
 | --- | --- | --- |
 | [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) / Cordis | 原生任务、模型执行、技能发现、插件加载、Profile、服务与 UI 扩展底座 | MIT |
 | [React](https://github.com/facebook/react) | 功能页面和编辑器 UI | MIT |
@@ -127,9 +127,9 @@ corepack pnpm check:versions
 | [Univer OSS](https://github.com/dream-num/univer) / [ExcelJS](https://github.com/exceljs/exceljs) | 开发版已有的实验性表格文件适配，不代表完整在线表格已交付 | Apache-2.0 / MIT |
 | [i18next](https://github.com/i18next/i18next) / [react-i18next](https://github.com/i18next/react-i18next) | PPT 编辑器中文本地化 | MIT |
 | [Lucide](https://github.com/lucide-icons/lucide) | PPT 工具栏图标 | ISC |
-| [dsh-cost-meter](https://github.com/Han-1413141/dsh-cost-meter) | 当前预览 Profile 单独安装的费用统计插件，不内置于 WorkDSH 发布包 | 以其独立项目许可为准 |
+| [dsh-cost-meter](https://github.com/Han-1413141/dsh-cost-meter) | 当前预览 Profile 单独安装的费用统计插件，不内置于 Expert Workshop 发布包 | 以其独立项目许可为准 |
 
-WorkDSH 明确以 **WorkBuddy / CodeBuddy** 作为产品体验参考：真实任务应展示工作过程，并以可编辑成果结束；技能市场组织、工具栏分组和 PPT 设计指导也吸收了相关经验。WorkDSH 是面向 DeepSeek Harness 的独立开源实现，不复用 WorkBuddy 品牌，也不代表官方合作、背书或集成了腾讯 PPT 引擎。
+Expert Workshop 明确以 **WorkBuddy / CodeBuddy** 作为产品体验参考：真实任务应展示工作过程，并以可编辑成果结束；技能市场组织、工具栏分组和 PPT 设计指导也吸收了相关经验。Expert Workshop 是面向 DeepSeek Harness 的独立开源实现，不复用 WorkBuddy 品牌，也不代表官方合作、背书或集成了腾讯 PPT 引擎。
 
 第三方技能和素材分别遵循其提供方的许可与使用条件。构建产物保留实际打包依赖的版权和许可文本，见 [Office 第三方声明](../../packages/plugins/office/THIRD-PARTY-NOTICES.md)。
 
@@ -138,6 +138,6 @@ WorkDSH 明确以 **WorkBuddy / CodeBuddy** 作为产品体验参考：真实任
 
 当前仓库不提供旧版 `deploy/docker` 配方。自行容器化时，持久化整个 `DSH_HOME`，并设置 `DSH_AGENTS_HOME` 为同一持久卷内的 `agents` 目录；持久化 Profile 不等于持久化另一个用户目录。当前专家服务未显式设置 `DSH_AGENTS_HOME` 时也会默认使用 `$DSH_HOME/agents`。
 
-出现 `SANDBOX_UNAVAILABLE` 表示主机没有可用的隔离执行后端，应先检查容器与宿主的隔离能力。需要不受限制的执行时，由用户在原生权限设置中显式选择；WorkDSH 不会因隔离不可用自动降级。旧配方提到的环境变量不能替代对当前官方运行时设置的核查。
+出现 `SANDBOX_UNAVAILABLE` 表示主机没有可用的隔离执行后端，应先检查容器与宿主的隔离能力。需要不受限制的执行时，由用户在原生权限设置中显式选择；Expert Workshop 不会因隔离不可用自动降级。旧配方提到的环境变量不能替代对当前官方运行时设置的核查。
 
 个人 Web 是单用户本机运行方式；共享访问同一个 Profile 不提供用户数据隔离。企业功能不等于多租户 Web Host。

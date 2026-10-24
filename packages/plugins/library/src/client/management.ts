@@ -2,7 +2,7 @@ import {fileBase64} from './file-base64.js';
 import type { Context } from '@deepseek-ai/cordis';
 import type { LibraryOriginalRevisionInput, LibraryAssetStatus, LibraryDraft, LibraryNode, LibrarySearchFilters, LibrarySearchHit, LibrarySpace, LibraryTaskReference, LibraryTreeEntry } from 'expert-workshop-contracts/library';
 
-const path = '/api/workdsh-library';
+const path = '/api/expertworkshop-library';
 const invoke = async <T>(endpoint: string, payload: unknown, signal?: AbortSignal): Promise<T> => {
   const timeout = AbortSignal.timeout(60_000);
   const response = await fetch(path, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: signal ? AbortSignal.any([signal, timeout]) : timeout });

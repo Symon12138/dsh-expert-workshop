@@ -13,14 +13,14 @@ const actor = { principalId: 'member.a', organizationId: 'org-a', requestId: 're
 const bytes = text => new TextEncoder().encode(text);
 
 async function withLibrary(work) {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-revision-access-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-revision-access-'));
   const ctx = new Context();
   try {
     await ctx.plugin(Storage);
     await ctx.plugin(JsonStorage, { root: join(root, 'storage') });
     await ctx.plugin(StorageDomain, { backend: 'json' });
     await ctx.plugin(LibraryManager, { root: join(root, 'library') });
-    await work(ctx.workdshLibrary);
+    await work(ctx.expertworkshopLibrary);
   } finally {
     await ctx.fiber.dispose();
     await rm(root, { recursive: true, force: true });

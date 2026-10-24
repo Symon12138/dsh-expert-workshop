@@ -1,6 +1,6 @@
 import type { WorkbenchDevelopmentService } from './development-service.js';
 import { readWorkbenchRequestBody } from './request-body.js';
-export const workbenchDevelopmentPath = '/api/workdsh-workbench-development';
+export const workbenchDevelopmentPath = '/api/expertworkshop-workbench-development';
 const object = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
 const id = (value: unknown): value is string => typeof value === 'string' && !!value.trim() && value.length <= 128;
 const fail = (code: string, message: string, status: number) => Response.json({ ok: false, error: { code, message, details: {} } }, { status });

@@ -19,7 +19,7 @@ export async function prepareWorkbenchImport(input: {
   const check = () => { signal?.throwIfAborted(); input.authorize(); };
   check();
   if (!/^[a-f0-9]{64}$/.test(expected.sha256)) throw new Error('workbench/package-hash-mismatch');
-  const artifact = await inspectWorkbenchPackageArtifact(join(input.installationRoot, '.workdsh-workbench-archives', `${expected.sha256}.tgz`), expected, signal);
+  const artifact = await inspectWorkbenchPackageArtifact(join(input.installationRoot, '.expertworkshop-workbench-archives', `${expected.sha256}.tgz`), expected, signal);
   validateWorkbenchPackageLayout(artifact, input.host);
   if (!input.isCompatible(artifact.manifest.descriptor)) throw new Error('workbench/incompatible-package');
   check();

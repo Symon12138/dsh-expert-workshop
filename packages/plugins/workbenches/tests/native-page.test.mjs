@@ -13,7 +13,7 @@ const descriptor = { id: 'company.quality', title: '质量分析', description: 
 function fixture() {
   const slots = new SlotCore();
   slots.inject = (_name, register) => register();
-  slots.register({ name: 'root', children: { main: { kind: 'keyed', scope: 'root' }, 'sidebar.panellist': { kind: 'list', scope: 'root' }, 'workdsh.workbench.frame': {kind:'single',scope:'root'} } }, () => null);
+  slots.register({ name: 'root', children: { main: { kind: 'keyed', scope: 'root' }, 'sidebar.panellist': { kind: 'list', scope: 'root' }, 'expertworkshop.workbench.frame': {kind:'single',scope:'root'} } }, () => null);
   let activePanelId = null; const listeners = new Set();
   // Explicit navigation fixture. The actual layout service is browser-loaded;
   // this test verifies the owned adapter against real SlotCore, not a live renderer.
@@ -28,10 +28,10 @@ test('business navigation registers only its own main page and leaves native Con
  const Native=()=>null,Header=()=>null;
  slots.register({name:'main',key:'conversation',children:{'conversation.header':{kind:'single',scope:'root'}}},Native);
  slots.register({name:'conversation.header'},Header);
- const mount={descriptor,panelKey:`workdsh-workbench:${descriptor.id}`,signal:new AbortController().signal};
+ const mount={descriptor,panelKey:`expertworkshop-workbench:${descriptor.id}`,signal:new AbortController().signal};
  const release=ports.mountPage(mount,()=>null);
- assert.equal(slots.entriesOfSlot('workdsh.workbench.frame').length,1);
- const seat=`workdsh.workbench.conversation:${mount.panelKey}`;
+ assert.equal(slots.entriesOfSlot('expertworkshop.workbench.frame').length,1);
+ const seat=`expertworkshop.workbench.conversation:${mount.panelKey}`;
  assert.equal(slots.entriesOfSlot(seat).length,0);
  assert.equal(slots.entriesOfSlot('main').find(x=>x.options.key==='conversation').component,Native);
  assert.equal(slots.entriesOfSlot('conversation.header')[0].component,Header);

@@ -15,9 +15,9 @@ export * from './remote/connection-api.js';
 export * from './tools/library-tools.js';
 
 export const name = 'expert-workshop-plugin-library';
-export const inject = ['storageDomain', 'connection', 'tools', 'systemPrompt', 'workdshIdentity'];
+export const inject = ['storageDomain', 'connection', 'tools', 'systemPrompt', 'expertworkshopIdentity'];
 
 export async function apply(ctx: Context, options: LibraryManagerOptions = {}): Promise<void> {
   await ctx.plugin(LibraryManager, options);
-  await ctx.plugin({ name: 'workdsh-library-integration', inject: [...inject, 'workdshLibrary'], apply(integration: Context) { registerLibraryConnection(integration); registerLibraryTools(integration); registerLibraryContextInjection(integration); } });
+  await ctx.plugin({ name: 'expertworkshop-library-integration', inject: [...inject, 'expertworkshopLibrary'], apply(integration: Context) { registerLibraryConnection(integration); registerLibraryTools(integration); registerLibraryContextInjection(integration); } });
 }

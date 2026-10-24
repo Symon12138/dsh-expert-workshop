@@ -22,11 +22,11 @@ async function boot(root){const ctx=new Context();await ctx.plugin(Storage);awai
 function setup(ctx){
   let selected=actor,active=true,launches=0,confirms=0;const owners=new Map();
   const identity={async resolve(){return {...selected};},profile(){return {principalId:selected.principalId,organization:{id:selected.organizationId},resolvedBy:selected.resolvedBy};},membership(){return {state:active?'active':'suspended'};}};
-  const ports={async target(){return target;},async authorizeSession(who,sid){if(owners.get(sid)!==who.principalId)throw Error('workbench/creation-access-denied');},async session(who,row,check){check();const sid=row.sessionId??`session-${row.id}`;if(!row.sessionId)launches++;owners.set(sid,who.principalId);return sid;},async confirm(who,row,requirements,check){check();confirms++;return {title:requirements.title,development:{id:row.id,session:{sessionId:row.sessionId},requirementsRevision:'saved',workbenchId:`workdsh.user-${row.id}`,packageName:`workdsh-workbench-${row.id}`}};}};
+  const ports={async target(){return target;},async authorizeSession(who,sid){if(owners.get(sid)!==who.principalId)throw Error('workbench/creation-access-denied');},async session(who,row,check){check();const sid=row.sessionId??`session-${row.id}`;if(!row.sessionId)launches++;owners.set(sid,who.principalId);return sid;},async confirm(who,row,requirements,check){check();confirms++;return {title:requirements.title,development:{id:row.id,session:{sessionId:row.sessionId},requirementsRevision:'saved',workbenchId:`expertworkshop.user-${row.id}`,packageName:`expertworkshop-workbench-${row.id}`}};}};
   return {service:new WorkbenchCreationService(ctx.storageDomain,identity,ports),ports,identity,owners,setActor(value){selected=value;},setActive(value){active=value;},counts:()=>({launches,confirms})};
 }
 test('one sentence creates only an intake; reopening retains Session and does not request a second opening',async()=>{
-  const root=await mkdtemp(join(tmpdir(),'workdsh-creation-')),ctx=await boot(root),f=setup(ctx);
+  const root=await mkdtemp(join(tmpdir(),'expertworkshop-creation-')),ctx=await boot(root),f=setup(ctx);
   try{
     const first=await f.service.open(id,'整理我的周报');assert.equal(first.needsOpening,true);assert.equal(first.phase,'discussing');assert.equal(first.proposal,undefined);
     const nativeOutput=await f.service.readSession(first.sessionId);
@@ -37,7 +37,7 @@ test('one sentence creates only an intake; reopening retains Session and does no
   }finally{await f.service.close();await ctx.fiber.dispose();await rm(root,{recursive:true,force:true});}
 });
 test('partial summaries remain drafts; concurrent stale proposals cannot overwrite the accepted summary',async()=>{
-  const root=await mkdtemp(join(tmpdir(),'workdsh-creation-summary-')),ctx=await boot(root),f=setup(ctx);
+  const root=await mkdtemp(join(tmpdir(),'expertworkshop-creation-summary-')),ctx=await boot(root),f=setup(ctx);
   try{
     const first=await f.service.open(id,'整理周报');
     const results=await Promise.allSettled([f.service.propose(first.sessionId,first.revision,{title:'周报助手'}),f.service.propose(first.sessionId,first.revision,{title:'晚到覆盖'})]);
@@ -49,7 +49,7 @@ test('partial summaries remain drafts; concurrent stale proposals cannot overwri
   }finally{await f.service.close();await ctx.fiber.dispose();await rm(root,{recursive:true,force:true});}
 });
 test('user confirmation keeps the original Session and confirmed requests reject later model proposals',async()=>{
-  const root=await mkdtemp(join(tmpdir(),'workdsh-creation-confirm-')),ctx=await boot(root),f=setup(ctx);
+  const root=await mkdtemp(join(tmpdir(),'expertworkshop-creation-confirm-')),ctx=await boot(root),f=setup(ctx);
   try{
     const first=await f.service.open(id,'整理周报');const summary=await f.service.propose(first.sessionId,first.revision,complete);
     await assert.rejects(f.service.confirm(id,first.revision,complete),/creation-conflict/);
@@ -59,7 +59,7 @@ test('user confirmation keeps the original Session and confirmed requests reject
   }finally{await f.service.close();await ctx.fiber.dispose();await rm(root,{recursive:true,force:true});}
 });
 test('real official storage restores the idea and summary; another account and suspended member cannot read it',async()=>{
-  const root=await mkdtemp(join(tmpdir(),'workdsh-creation-reopen-'));let ctx=await boot(root),f=setup(ctx);
+  const root=await mkdtemp(join(tmpdir(),'expertworkshop-creation-reopen-'));let ctx=await boot(root),f=setup(ctx);
   try{
     const first=await f.service.open(id,'保留我的想法');await f.service.propose(first.sessionId,first.revision,{title:'持久草稿'});
     await f.service.close();await ctx.fiber.dispose();ctx=await boot(root);f=setup(ctx);

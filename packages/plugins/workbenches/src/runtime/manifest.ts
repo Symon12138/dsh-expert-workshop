@@ -11,7 +11,7 @@ export function parseInstalledWorkbenchManifest(value: unknown, expectedPackageN
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('workbench/invalid-manifest');
   const manifest = value as Record<string, unknown>;
   if (manifest.name !== expectedPackageName) throw new Error('workbench/package-name-mismatch');
-  const namespace = manifest.workdsh;
+  const namespace = manifest.expertworkshop;
   if (namespace === undefined) return undefined;
   if (!namespace || typeof namespace !== 'object' || Array.isArray(namespace)) throw new Error('workbench/invalid-manifest');
   const declaration = (namespace as Record<string, unknown>).workbench;

@@ -8,7 +8,7 @@ const {createWorkbenchImportRecordsClient}=await import(`data:text/javascript;ba
 const scope={developmentId:'dev',packageName:'quality-plugin',workbenchId:'company.quality'};
 const row={id:'existing-op',iterationId:'existing-iteration',developmentId:'dev',kind:'install',state:'unknown',inputHash:'a'.repeat(64),candidate:{packageName:scope.packageName,workbenchId:scope.workbenchId,version:'1.0.0',sha256:'a'.repeat(64)},updatedAt:new Date().toISOString()};
 test('records recreate fixed recovery selection and exclude private data',async()=>{
- const records=await createWorkbenchImportRecordsClient(async(path,options)=>{assert.equal(path,'/api/workdsh-workbench-import-records');assert.deepEqual(JSON.parse(options.body),{developmentId:'dev'});return Response.json({ok:true,value:[{...row,actor:{secret:true},path:'/private'}]});})(scope);
+ const records=await createWorkbenchImportRecordsClient(async(path,options)=>{assert.equal(path,'/api/expertworkshop-workbench-import-records');assert.deepEqual(JSON.parse(options.body),{developmentId:'dev'});return Response.json({ok:true,value:[{...row,actor:{secret:true},path:'/private'}]});})(scope);
  assert.equal(records[0].selection.operationId,'existing-op');assert.equal(records[0].selection.iterationId,'existing-iteration');assert.equal(records[0].actor,undefined);assert.ok(Object.isFrozen(records[0].selection));
 });
 test('foreign, duplicate and incomplete records cannot become recovery commands',async()=>{

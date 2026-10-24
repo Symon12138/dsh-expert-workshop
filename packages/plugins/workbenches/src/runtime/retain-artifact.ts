@@ -11,7 +11,7 @@ export async function retainWorkbenchArtifact(installationRoot:string, source:st
   if (!/^[a-f0-9]{64}$/.test(captured.sha256)) throw new Error('workbench/package-hash-mismatch');
   signal?.throwIfAborted();
   const root=await realpath(installationRoot);
-  const directory=join(root,'.workdsh-workbench-archives');
+  const directory=join(root,'.expertworkshop-workbench-archives');
   await mkdir(directory,{recursive:true,mode:0o700});
   if (await realpath(directory)!==directory) throw new Error('workbench/archive-directory-outside');
   const destination=join(directory,`${captured.sha256}.tgz`);

@@ -33,17 +33,17 @@ export async function ensureQualityAiRunSession(ctx:Context,view:QualityAiRunSes
 /** Native Controller creates the Session; this adapter binds no model or tools. */
 export async function ensureQualityRunSession(ctx:Context,view:RunView,verifyRun:()=>Promise<unknown>,signal?:AbortSignal,workspaceRoot?:string){
  if(!view.recordId.trim()||view.recordId.length>128||!view.runId.trim()||view.runId.length>128||!/^[a-f0-9]{64}$/.test(view.contentHash))throw Error('quality/request/invalid');
- const identity=ctx.get('workdshIdentity') as IdentityService|undefined;
- const access=ctx.get('workdshAccess') as RuntimeBindingService|undefined;
+ const identity=ctx.get('expertworkshopIdentity') as IdentityService|undefined;
+ const access=ctx.get('expertworkshopAccess') as RuntimeBindingService|undefined;
  type Native={create(request:SessionCreateRequest):Promise<SessionCreateValue>;inspect(sessionId:NonNullable<SessionCreateRequest['sessionId']>,signal?:AbortSignal):Promise<{meta:{cwd?:string}}>;};
  type Protected=Native&{create(request:SessionCreateRequest,signal?:AbortSignal):Promise<SessionCreateValue>};
  const native=ctx.get('sessionController') as Native|undefined;
- const protectedSessions=ctx.get('workdshSessionAccess') as Protected|undefined;
+ const protectedSessions=ctx.get('expertworkshopSessionAccess') as Protected|undefined;
  if(!identity||!access||!native)throw Error('quality/service/session-unavailable');
  const actor=await identity.resolve(undefined,signal);
  const authorize=()=>{signal?.throwIfAborted();ctx.fiber.assertActive();const profile=identity.profile();if(profile.principalId!==actor.principalId||profile.organization.id!==actor.organizationId||profile.resolvedBy!==actor.resolvedBy||identity.membership(actor.organizationId,actor.principalId)?.state!=='active')throw Error('quality/service/access-denied');if(profile.organization.kind!=='personal'&&!protectedSessions)throw Error('quality/service/session-unavailable');};
  authorize();await verifyRun();authorize();
- const sessionId=`session-${createHash('sha256').update(JSON.stringify(['workdsh-quality-analysis',actor.organizationId,actor.principalId,view.recordId,view.runId,view.contentHash])).digest('hex').slice(0,32)}`;
+ const sessionId=`session-${createHash('sha256').update(JSON.stringify(['expertworkshop-quality-analysis',actor.organizationId,actor.principalId,view.recordId,view.runId,view.contentHash])).digest('hex').slice(0,32)}`;
  const matches=(owner:ReturnType<RuntimeBindingService['sessionOwner']>)=>owner?.organizationId===actor.organizationId&&owner?.ownerPrincipalId===actor.principalId;
  const prior=access.sessionOwner(sessionId);if(prior&&!matches(prior))throw Error('quality/service/access-denied');
  const ports=qualityWorkspacePorts(ctx),id=sessionId as NonNullable<SessionCreateRequest['sessionId']>;
@@ -85,14 +85,14 @@ export async function ensureQualityRunSession(ctx:Context,view:RunView,verifyRun
 /** Read an existing owned Session only; this path never creates or resumes an Agent. */
 export async function readQualityRunInterpretation(ctx:Context,view:{recordId:string;runId:string;contentHash:string},verifyRun:()=>Promise<unknown>,signal?:AbortSignal){
  const {readQualityInterpretationCandidate}=await import('./interpretation-candidate.js');
- const identity=ctx.get('workdshIdentity') as IdentityService|undefined;
- const access=ctx.get('workdshAccess') as RuntimeBindingService|undefined;
+ const identity=ctx.get('expertworkshopIdentity') as IdentityService|undefined;
+ const access=ctx.get('expertworkshopAccess') as RuntimeBindingService|undefined;
  type Inspector={inspect(sessionId:string,signal?:AbortSignal):Promise<{events:readonly unknown[]}>};
  const native=ctx.get('sessionController') as Inspector|undefined;
- const protectedSessions=ctx.get('workdshSessionAccess') as Inspector|undefined;
+ const protectedSessions=ctx.get('expertworkshopSessionAccess') as Inspector|undefined;
  if(!identity||!access||!native)throw Error('quality/service/session-unavailable');
  const actor=await identity.resolve(undefined,signal);
- const sessionId=`session-${createHash('sha256').update(JSON.stringify(['workdsh-quality-analysis',actor.organizationId,actor.principalId,view.recordId,view.runId,view.contentHash])).digest('hex').slice(0,32)}`;
+ const sessionId=`session-${createHash('sha256').update(JSON.stringify(['expertworkshop-quality-analysis',actor.organizationId,actor.principalId,view.recordId,view.runId,view.contentHash])).digest('hex').slice(0,32)}`;
  const authorize=()=>{signal?.throwIfAborted();ctx.fiber.assertActive();const profile=identity.profile(),owner=access.sessionOwner(sessionId);
   if(profile.principalId!==actor.principalId||profile.organization.id!==actor.organizationId||profile.resolvedBy!==actor.resolvedBy||identity.membership(actor.organizationId,actor.principalId)?.state!=='active'||owner?.organizationId!==actor.organizationId||owner?.ownerPrincipalId!==actor.principalId)throw Error('quality/service/access-denied');
   if(profile.organization.kind!=='personal'&&!protectedSessions)throw Error('quality/service/session-unavailable');

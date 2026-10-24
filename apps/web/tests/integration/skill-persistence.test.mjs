@@ -16,7 +16,7 @@ const exec = promisify(execFile);
 const worker = fileURLToPath(new URL('../helpers/skill-persistence-worker.mjs', import.meta.url));
 
 test('official persistence survives process restart and retires removed skill', { timeout: 30000 }, async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-skill-cold-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-skill-cold-'));
   const skills = join(root, 'skills');
   const id = randomUUID();
   const run = async phase => {
@@ -52,7 +52,7 @@ test('official persistence survives process restart and retires removed skill', 
 });
 
 test('managed import with resources survives a cold process and remains officially invocable', { timeout: 30000 }, async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-skill-import-cold-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-skill-import-cold-'));
   const agentsHome = join(root, 'agents'); const dshHome = join(root, 'dsh'); const incoming = join(root, 'incoming');
   const originalAgentsHome = process.env.DSH_AGENTS_HOME; const originalDshHome = process.env.DSH_HOME;
   const id = randomUUID();
@@ -65,7 +65,7 @@ test('managed import with resources survives a cold process and remains official
     await managerContext.plugin(SkillRegistry);
     await managerContext.plugin(filesystem, { dshHome, agentsHome, watch: false });
     new SkillManager(managerContext);
-    const installed = await managerContext.workdshSkills.installImport({ source: incoming, scope: 'shared-agents' });
+    const installed = await managerContext.expertworkshopSkills.installImport({ source: incoming, scope: 'shared-agents' });
     assert.equal(installed.path, join(agentsHome, 'skills/sample'));
     await managerContext.fiber.dispose();
 

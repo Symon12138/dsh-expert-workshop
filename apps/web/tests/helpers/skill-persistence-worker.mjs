@@ -14,9 +14,9 @@ try {
     for (const plugin of [LocalFileSystem, WorkingDirectory, Sessions, Projections, SystemPrompt, Tools, Llm, Agents, Skills, AgentLoop]) await ctx.plugin(plugin);
     const adapter = new SkillRequestAdapter();
     adapter.callId = `skill-${phase}`;
-    ctx.llm.registerAdapter(['workdsh-test'], adapter);
+    ctx.llm.registerAdapter(['expertworkshop-test'], adapter);
     const options = {
-      agentOptions: { provider: 'workdsh-test', model: 'fixed', cwd: skillRoot },
+      agentOptions: { provider: 'expertworkshop-test', model: 'fixed', cwd: skillRoot },
       setup: async agentCtx => {
         await agentCtx.plugin(filesystem, { includeDefaultRoots: false, customSkillDirs: [skillRoot], watch: false });
         await agentCtx.plugin(skillTool);

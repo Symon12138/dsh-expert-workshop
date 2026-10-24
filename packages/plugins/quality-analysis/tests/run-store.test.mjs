@@ -73,40 +73,40 @@ test('run service resolves Host identity and denies suspended members and switch
  await service.appendHostRun('record1',run(),0);
  const {LibraryManager}=await import(new URL('../../library/dist/index.js',import.meta.url));
  await ctx.plugin(LibraryManager,{root:join(root,'library')});
- const reportClient=createQualityRecordClient(async(path,init)=>handleQualityRecordsRequest(new Request('http://fixture'+path,init),service,undefined,undefined,ctx.workdshLibrary));
+ const reportClient=createQualityRecordClient(async(path,init)=>handleQualityRecordsRequest(new Request('http://fixture'+path,init),service,undefined,undefined,ctx.expertworkshopLibrary));
  const publicReport=await reportClient.saveReport(created.id,'r1',run().contentHash,'公开质量报告');
  assert.deepEqual(await reportClient.saveReport(created.id,'r1',run().contentHash,'公开质量报告'),publicReport);
  assert.equal((await service.history(created.id)).reports.length,1);
- assert.match(new TextDecoder().decode(await ctx.workdshLibrary.readOriginal(actor,publicReport.assetId,publicReport.revisionId)),/公开质量报告/);
+ assert.match(new TextDecoder().decode(await ctx.expertworkshopLibrary.readOriginal(actor,publicReport.assetId,publicReport.revisionId)),/公开质量报告/);
  await assert.rejects(reportClient.saveReport(created.id,'r1','b'.repeat(64),'公开质量报告'),error=>error.status===409);
  const missingReports=await handleQualityRecordsRequest(new Request('http://fixture/api',{method:'POST',body:JSON.stringify({endpoint:'save-report',payload:{recordId:created.id,runId:'r1',contentHash:run().contentHash,title:'公开质量报告'}})}),service);
  assert.equal(missingReports.status,503);
  const malformedClient=createQualityRecordClient(async()=>Response.json({ok:true,value:{...publicReport,runId:'foreign',format:'markdown',detailKind:'markdown'}}));
  await assert.rejects(malformedClient.saveReport(created.id,'r1',run().contentHash,'公开质量报告'));
- const interpretationSource={recordId:created.id,runId:'r1',contentHash:run().contentHash,sessionId:`session-${createHash('sha256').update(JSON.stringify(['workdsh-quality-analysis',actor.organizationId,actor.principalId,created.id,'r1',run().contentHash])).digest('hex').slice(0,32)}`,eventSeq:10,turn:1,text:'核查抽样方式；目前不能推断缺陷原因。'};
+ const interpretationSource={recordId:created.id,runId:'r1',contentHash:run().contentHash,sessionId:`session-${createHash('sha256').update(JSON.stringify(['expertworkshop-quality-analysis',actor.organizationId,actor.principalId,created.id,'r1',run().contentHash])).digest('hex').slice(0,32)}`,eventSeq:10,turn:1,text:'核查抽样方式；目前不能推断缺陷原因。'};
  const interpretation={...interpretationSource,candidateHash:createHash('sha256').update(JSON.stringify(interpretationSource)).digest('hex')};
  const beforeInterpretation=await service.history(created.id);
- const interpretationClient=createQualityRecordClient(async(path,init)=>handleQualityRecordsRequest(new Request('http://fixture'+path,init),service,undefined,undefined,ctx.workdshLibrary,undefined,undefined,async()=>interpretation));
+ const interpretationClient=createQualityRecordClient(async(path,init)=>handleQualityRecordsRequest(new Request('http://fixture'+path,init),service,undefined,undefined,ctx.expertworkshopLibrary,undefined,undefined,async()=>interpretation));
  assert.deepEqual(await interpretationClient.aiCandidate(created.id,'r1',run().contentHash),interpretation);
  const adopted=await interpretationClient.adoptInterpretation(created.id,'r1',run().contentHash,interpretation.candidateHash);
  assert.deepEqual(await interpretationClient.adoptInterpretation(created.id,'r1',run().contentHash,interpretation.candidateHash),adopted);
  assert.deepEqual(await service.history(created.id),beforeInterpretation);
- const interpretationMarkdown=new TextDecoder().decode(await ctx.workdshLibrary.readOriginal(actor,adopted.assetId,adopted.revisionId));assert.match(interpretationMarkdown,/核查抽样方式/);assert.ok(interpretationMarkdown.includes(interpretation.candidateHash));assert.ok(interpretationMarkdown.includes(interpretation.sessionId));
+ const interpretationMarkdown=new TextDecoder().decode(await ctx.expertworkshopLibrary.readOriginal(actor,adopted.assetId,adopted.revisionId));assert.match(interpretationMarkdown,/核查抽样方式/);assert.ok(interpretationMarkdown.includes(interpretation.candidateHash));assert.ok(interpretationMarkdown.includes(interpretation.sessionId));
  await assert.rejects(interpretationClient.adoptInterpretation(created.id,'r1',run().contentHash,'b'.repeat(64)),error=>error.status===409);
- await assert.rejects(service.adoptInterpretation({...interpretation,sessionId:'session-foreign'},ctx.workdshLibrary),/access-denied/);
- await assert.rejects(service.adoptInterpretation({...interpretation,text:'tampered'},ctx.workdshLibrary),/candidate-conflict/);
+ await assert.rejects(service.adoptInterpretation({...interpretation,sessionId:'session-foreign'},ctx.expertworkshopLibrary),/access-denied/);
+ await assert.rejects(service.adoptInterpretation({...interpretation,text:'tampered'},ctx.expertworkshopLibrary),/candidate-conflict/);
  const statisticsReceipt=await reportClient.saveStatistics(created.id,'r1',run().contentHash,'公开统计表','trend');
  assert.deepEqual(await reportClient.saveStatistics(created.id,'r1',run().contentHash,'公开统计表','trend'),statisticsReceipt);
- const statisticsBytes=await ctx.workdshLibrary.readOriginal(actor,statisticsReceipt.assetId,statisticsReceipt.revisionId);
+ const statisticsBytes=await ctx.expertworkshopLibrary.readOriginal(actor,statisticsReceipt.assetId,statisticsReceipt.revisionId);
  assert.match(new TextDecoder().decode(statisticsBytes),/周期起始日期/);
  await assert.rejects(reportClient.saveStatistics(created.id,'r1','b'.repeat(64),'公开统计表','trend'),error=>error.status===409);
- const receipt=await service.saveReport('record1','r1','质量报告',ctx.workdshLibrary);
- assert.deepEqual(await service.saveReport('record1','r1','质量报告',ctx.workdshLibrary),receipt);
+ const receipt=await service.saveReport('record1','r1','质量报告',ctx.expertworkshopLibrary);
+ assert.deepEqual(await service.saveReport('record1','r1','质量报告',ctx.expertworkshopLibrary),receipt);
  assert.equal((await service.history('record1')).reports.length,1);
  const {ProjectManager}=await import(new URL('../../projects/dist/index.js',import.meta.url));
  await ctx.plugin(ProjectManager);
- const project=await ctx.workdshProjects.create(actor,{name:'质量改善项目'});
- const projectClient=createQualityRecordClient(async(path,init)=>handleQualityRecordsRequest(new Request('http://fixture'+path,init),service,undefined,undefined,ctx.workdshLibrary,ctx.workdshProjects));
+ const project=await ctx.expertworkshopProjects.create(actor,{name:'质量改善项目'});
+ const projectClient=createQualityRecordClient(async(path,init)=>handleQualityRecordsRequest(new Request('http://fixture'+path,init),service,undefined,undefined,ctx.expertworkshopLibrary,ctx.expertworkshopProjects));
  const choices=await projectClient.projects();assert.deepEqual(choices,[{id:project.project.id,name:'质量改善项目'}]);
  const publicLink=await projectClient.linkReport(created.id,publicReport.operationId,project.project.id,publicReport);
  assert.equal((await projectClient.linkReport(created.id,publicReport.operationId,project.project.id,publicReport)).id,publicLink.id);
@@ -115,27 +115,27 @@ test('run service resolves Host identity and denies suspended members and switch
  assert.equal((await service.history(created.id)).reports.length,2);
  const wrongLink=createQualityRecordClient(async()=>Response.json({ok:true,value:{...publicLink,projectId:'foreign'}}));await assert.rejects(wrongLink.linkReport(created.id,publicReport.operationId,project.project.id,publicReport));
  // Remove this extra test reference so the existing independent core assertions retain their scope.
- await ctx.workdshProjects.removeAsset(actor,project.project.id,publicLink.id);
- const linked=await service.linkReport('record1',receipt.operationId,project.project.id,ctx.workdshLibrary,ctx.workdshProjects);
+ await ctx.expertworkshopProjects.removeAsset(actor,project.project.id,publicLink.id);
+ const linked=await service.linkReport('record1',receipt.operationId,project.project.id,ctx.expertworkshopLibrary,ctx.expertworkshopProjects);
  assert.equal(linked.assetId,receipt.assetId);
- const again=await service.linkReport('record1',receipt.operationId,project.project.id,ctx.workdshLibrary,ctx.workdshProjects);
- assert.equal(again.id,linked.id);assert.equal((await ctx.workdshProjects.get(actor,project.project.id)).assets.length,1);
+ const again=await service.linkReport('record1',receipt.operationId,project.project.id,ctx.expertworkshopLibrary,ctx.expertworkshopProjects);
+ assert.equal(again.id,linked.id);assert.equal((await ctx.expertworkshopProjects.get(actor,project.project.id)).assets.length,1);
  assert.equal((await service.history('record1')).projectLinks.length,1);
- await ctx.workdshProjects.removeAsset(actor,project.project.id,linked.id);
- const restored=await service.linkReport('record1',receipt.operationId,project.project.id,ctx.workdshLibrary,ctx.workdshProjects);
+ await ctx.expertworkshopProjects.removeAsset(actor,project.project.id,linked.id);
+ const restored=await service.linkReport('record1',receipt.operationId,project.project.id,ctx.expertworkshopLibrary,ctx.expertworkshopProjects);
  assert.notEqual(restored.id,linked.id);assert.equal((await service.history('record1')).projectLinks.length,2);
- await assert.rejects(service.linkReport('record1',receipt.operationId,'missing',ctx.workdshLibrary,ctx.workdshProjects),/not-found/);
+ await assert.rejects(service.linkReport('record1',receipt.operationId,'missing',ctx.expertworkshopLibrary,ctx.expertworkshopProjects),/not-found/);
  assert.equal((await service.history('record1')).reports.length,1);
- await assert.rejects(service.saveReport('record1','missing','质量报告',ctx.workdshLibrary),/run-not-found/);
+ await assert.rejects(service.saveReport('record1','missing','质量报告',ctx.expertworkshopLibrary),/run-not-found/);
  assert.equal((await service.history('record1')).runs.length,1);
  selected={...actor,principalId:'other'};await assert.rejects(service.listSourceViews(created.id),/record-not-found/);await assert.rejects(service.getRecord(created.id),/record-not-found/);await assert.rejects(service.readRunView(created.id,'r1',run().contentHash,false),/record-not-found/);assert.equal((await service.history('record1')).runs.length,0);assert.equal((await service.listRecords()).length,0);
  active=false;await assert.rejects(service.history('record1'),/access-denied/);
  await assert.rejects(service.appendHostRun('record1',run(),0),/access-denied/);
  active=true;selected=actor;assert.equal((await service.history('record1')).runs.length,1);
- const csv=await service.saveStatistics('record1','r1','质量明细','trend',ctx.workdshLibrary);
+ const csv=await service.saveStatistics('record1','r1','质量明细','trend',ctx.expertworkshopLibrary);
  assert.equal(csv.format,'csv');assert.equal(csv.detailKind,'trend');
- assert.deepEqual(await service.saveStatistics('record1','r1','质量明细','trend',ctx.workdshLibrary),csv);
- const csvBytes=await ctx.workdshLibrary.readOriginal(actor,csv.assetId,csv.revisionId);
+ assert.deepEqual(await service.saveStatistics('record1','r1','质量明细','trend',ctx.expertworkshopLibrary),csv);
+ const csvBytes=await ctx.expertworkshopLibrary.readOriginal(actor,csv.assetId,csv.revisionId);
  assert.ok(new TextDecoder().decode(csvBytes).includes('0.01'));
  assert.equal((await service.history('record1')).reports.length,2);
 
@@ -157,13 +157,13 @@ test('real worker analysis saves under initiating actor and stale context cannot
  try{
  const configured=await service.createRecord('已配置分析','configured-record');
  const {LibraryManager}=await import(new URL('../../library/dist/index.js',import.meta.url));await ctx.plugin(LibraryManager,{root:join(root,'library')});
- const file=await ctx.workdshLibrary.importAsset(actor,{name:'inspection.csv',bytes:new TextEncoder().encode('id,date,total,bad,unit,type\n001,2026-10-10,100,1,piece,initial'),operationId:'csv-input'});
+ const file=await ctx.expertworkshopLibrary.importAsset(actor,{name:'inspection.csv',bytes:new TextEncoder().encode('id,date,total,bad,unit,type\n001,2026-10-10,100,1,piece,initial'),operationId:'csv-input'});
  const importPayload={recordId:configured.id,reference:{assetId:file.asset.id,revisionId:file.revision.id},format:'csv',tableKind:'inspections',headerRow:1,expectedGeneration:0};
  const importRequest=payload=>new Request('http://fixture/api',{method:'POST',body:JSON.stringify({endpoint:'import-library',payload})});
  assert.equal((await handleQualityRecordsRequest(importRequest(importPayload),service,executor)).status,503);
- const importedResponse=await handleQualityRecordsRequest(importRequest(importPayload),service,executor,{library:ctx.workdshLibrary,csv});assert.equal(importedResponse.status,200);const admitted=(await importedResponse.json()).value;assert.equal(admitted.status,'ready');assert.equal(admitted.inspectionRows,1);assert.deepEqual(admitted.inspectionHeaders,['id','date','total','bad','unit','type']);
- assert.equal((await handleQualityRecordsRequest(importRequest({...importPayload,principalId:'other'}),service,executor,{library:ctx.workdshLibrary,csv})).status,400);
- assert.equal((await handleQualityRecordsRequest(importRequest({...importPayload,reference:{...importPayload.reference,revisionId:'missing'}}),service,executor,{library:ctx.workdshLibrary,csv})).status,403);
+ const importedResponse=await handleQualityRecordsRequest(importRequest(importPayload),service,executor,{library:ctx.expertworkshopLibrary,csv});assert.equal(importedResponse.status,200);const admitted=(await importedResponse.json()).value;assert.equal(admitted.status,'ready');assert.equal(admitted.inspectionRows,1);assert.deepEqual(admitted.inspectionHeaders,['id','date','total','bad','unit','type']);
+ assert.equal((await handleQualityRecordsRequest(importRequest({...importPayload,principalId:'other'}),service,executor,{library:ctx.expertworkshopLibrary,csv})).status,400);
+ assert.equal((await handleQualityRecordsRequest(importRequest({...importPayload,reference:{...importPayload.reference,revisionId:'missing'}}),service,executor,{library:ctx.expertworkshopLibrary,csv})).status,403);
  const boundConfiguration={inspectionsMapping:reference.content.sources.inspections.mapping,rules:reference.content.rules,filter:{trendGranularity:'month'}};
  const rpc=(endpoint,payload,worker=executor)=>handleQualityRecordsRequest(new Request('http://fixture/api',{method:'POST',body:JSON.stringify({endpoint,payload})}),service,worker);
  const configuredClient=createQualityRecordClient(async(path,init)=>handleQualityRecordsRequest(new Request('http://fixture'+path,init),service,executor));
@@ -226,13 +226,13 @@ test('real worker analysis saves under initiating actor and stale context cannot
  const saved=await service.analyzeAndSave('record',request,0,executor,()=>{});
  assert.equal(saved.status,'saved');assert.equal((await service.history('record')).runs.length,1);
  const {ProjectManager}=await import(new URL('../../projects/dist/index.js',import.meta.url));await ctx.plugin(ProjectManager);
- const project=await ctx.workdshProjects.create(actor,{name:'分析项目'});
- const selection={projectId:project.project.id,projects:ctx.workdshProjects};
+ const project=await ctx.expertworkshopProjects.create(actor,{name:'分析项目'});
+ const selection={projectId:project.project.id,projects:ctx.expertworkshopProjects};
  const projectRun=await service.analyzeAndSave('project-record',{...request,runId:'project-run'},0,executor,()=>{},undefined,selection);
  assert.equal(projectRun.run.content.projectContext.configRevisionId,project.config.id);
- await ctx.workdshProjects.updateConfig(actor,project.project.id,{instruction:'新的项目指令',capabilities:[]},project.config.id);
+ await ctx.expertworkshopProjects.updateConfig(actor,project.project.id,{instruction:'新的项目指令',capabilities:[]},project.config.id);
  assert.equal((await service.history('project-record')).runs[0].content.projectContext.configRevisionId,project.config.id);
- await ctx.workdshProjects.archive(actor,project.project.id);
+ await ctx.expertworkshopProjects.archive(actor,project.project.id);
  await assert.rejects(service.analyzeAndSave('project-record',{...request,runId:'archived'},1,executor,()=>{},undefined,selection),/projects\/not-found/);
 
  const changedIdentityExecutor={async execute(input,signal){const result=await executor.execute(input,signal);selected={...actor,principalId:'other'};return result;}};
@@ -277,7 +277,7 @@ test('record browser client round-trips real handler and keeps retry identity wh
  const root=await mkdtemp(join(tmpdir(),'quality-client-'));const ctx=await boot(root);let active=true;
  const identity={async resolve(){return {...actor};},profile(){return {principalId:actor.principalId,organization:{id:actor.organizationId},resolvedBy:actor.resolvedBy};},membership(){return {state:active?'active':'suspended'};}};
  const service=new QualityAnalysisRunService(ctx.storageDomain,identity);
- const transport=async(path,init)=>{assert.equal(path,'/api/workdsh-quality-records');assert.equal(init.credentials,'same-origin');return handleQualityRecordsRequest(new Request('http://fixture'+path,init),service);};
+ const transport=async(path,init)=>{assert.equal(path,'/api/expertworkshop-quality-records');assert.equal(init.credentials,'same-origin');return handleQualityRecordsRequest(new Request('http://fixture'+path,init),service);};
  const client=createQualityRecordClient(transport);
  try{
   const first=await client.create(' 首轮分析 ','client-create');assert.equal(first.title,'首轮分析');assert.ok(Object.isFrozen(first));
@@ -294,12 +294,12 @@ test('record browser client round-trips real handler and keeps retry identity wh
 
 test('quality Host composition registers streaming route and disposes storage service with its owner',async()=>{
  const root=await mkdtemp(join(tmpdir(),'quality-host-'));const ctx=await boot(root);let route,service,plugin;
- ctx.provide('workdshIdentity',{async resolve(){return {...actor};},profile(){return {principalId:actor.principalId,organization:{id:actor.organizationId},resolvedBy:actor.resolvedBy};},membership(){return {state:'active'};}});
+ ctx.provide('expertworkshopIdentity',{async resolve(){return {...actor};},profile(){return {principalId:actor.principalId,organization:{id:actor.organizationId},resolvedBy:actor.resolvedBy};},membership(){return {state:'active'};}});
  // This observes official Cordis lifecycle, not connection admission or an installed Profile.
  ctx.provide('connection',{fetch:{register(value){route=value;return()=>{route=undefined;};}}});
  try{
   plugin=await ctx.plugin({name:'quality-host-probe',apply(child){service=mountQualityRecordsHost(child);}});
-  assert.equal(route.path,'/api/workdsh-quality-records');assert.equal(route.requestBody,'streaming');assert.deepEqual(route.methods,['POST']);
+  assert.equal(route.path,'/api/expertworkshop-quality-records');assert.equal(route.requestBody,'streaming');assert.deepEqual(route.methods,['POST']);
   const client=createQualityRecordClient(async(path,init)=>route.fetch(new Request('http://fixture'+path,init)));
   const created=await client.create('宿主记录','host-create');assert.equal((await client.list())[0].id,created.id);
   assert.equal((await client.get(created.id)).generation,0);
@@ -394,7 +394,7 @@ test('service adopts only persisted reverified expert sources with expert proven
   await assert.rejects(service.adoptInterpretation(candidate,library,undefined,{association,reverify:async()=>{}}),/access-denied/);assert.equal(imports,0);
   await service.rememberExpertAssociation(association,async()=>{});let checks=0;
   const expertPorts={list:(_view,signal)=>service.listExpertAssociations(record.id,first.runId,first.contentHash,signal),read:async saved=>({association:saved,candidate})};
-  const rpc=(endpoint,payload)=>handleQualityRecordsRequest(new Request('http://fixture/api/workdsh-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})}),service,undefined,undefined,library,undefined,undefined,undefined,expertPorts);
+  const rpc=(endpoint,payload)=>handleQualityRecordsRequest(new Request('http://fixture/api/expertworkshop-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})}),service,undefined,undefined,library,undefined,undefined,undefined,expertPorts);
   const source={recordId:record.id,runId:first.runId,contentHash:first.contentHash};
   const expertClient=createQualityRecordClient(async(path,init)=>handleQualityRecordsRequest(new Request('http://fixture'+path,init),service,undefined,undefined,library,undefined,undefined,undefined,expertPorts));
   assert.deepEqual(await expertClient.expertSources(record.id,first.runId,first.contentHash),[association]);
@@ -421,11 +421,11 @@ test('service adopts only persisted reverified expert sources with expert proven
   const identity={resolve:async()=>actor,profile:()=>({principalId:actor.principalId,organization:{id:actor.organizationId,kind:'personal'},resolvedBy:actor.resolvedBy}),membership:()=>({state:active?'active':'revoked'})};
   const service=new QualityAnalysisRunService(ctx.storageDomain,identity);
   const experts={list:async()=>({items:[{id:'expert-1',name:'质量核查专家',canUse:true,publishedRevisionRef:{revisionId:'revision-1'}},{id:'hidden',name:'无权专家',canUse:false,publishedRevisionRef:{revisionId:'revision-2'}}]}),prepareExecution:async(a,id,revision,workspace,model,draft)=>{assert.equal(a.principalId,actor.principalId);assert.equal(workspace,undefined);assert.equal(model,undefined);prepares++;assert.ok(draft.includes('不修改统计'));return {executionPlanId:'plan-1',expertRevisionRef:{expertId:id,revisionId:'revision-1'},expiresAt:'2026-10-11T00:10:00Z',missing:[]};},createExecution:async(a,planId,operation)=>{assert.equal(planId,'plan-1');if(!seenOperation){nativeCreates++;seenOperation=operation.operationId;binding={sessionId:'session-'+ 'e'.repeat(32),owner:{organizationId:actor.organizationId,ownerPrincipalId:actor.principalId},expertRevisionRef:{expertId:'expert-1',revisionId:'revision-1'},compositionDigest:'b'.repeat(64),presetRevisionRef:'preset-1',creationOperationId:seenOperation};}else assert.equal(operation.operationId,seenOperation);return {sessionId:binding.sessionId,binding:structuredClone(binding),handoffId:'handoff'};},verifyBinding:async()=>structuredClone(binding)};
-  const nativeCtx={get:name=>({workdshIdentity:identity,workdshExperts:experts,workdshAccess:{sessionOwner:()=>binding?.owner}}[name]),fiber:{assertActive(){}}};
+  const nativeCtx={get:name=>({expertworkshopIdentity:identity,expertworkshopExperts:experts,expertworkshopAccess:{sessionOwner:()=>binding?.owner}}[name]),fiber:{assertActive(){}}};
   try{
    const record=await service.createRecord('专家任务','create-record');const first=run();await service.appendHostRun(record.id,first,0);const source={recordId:record.id,runId:first.runId,contentHash:first.contentHash};
    const tasks=createQualityExpertTasks(nativeCtx,service);assert.deepEqual(await tasks.list(source),[{id:'expert-1',name:'质量核查专家',revisionId:'revision-1'}]);const plan=await tasks.prepare(source,'expert-1');assert.equal(prepares,1);assert.equal(nativeCreates,0);
-   const rpc=(endpoint,payload)=>handleQualityRecordsRequest(new Request('http://fixture/api/workdsh-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})}),service,undefined,undefined,undefined,undefined,undefined,undefined,{...tasks,available:tasks.list,list:async()=>[],read:async()=>{throw Error('unused')}});
+   const rpc=(endpoint,payload)=>handleQualityRecordsRequest(new Request('http://fixture/api/expertworkshop-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})}),service,undefined,undefined,undefined,undefined,undefined,undefined,{...tasks,available:tasks.list,list:async()=>[],read:async()=>{throw Error('unused')}});
    assert.equal((await rpc('create-expert-task',{...source,executionPlanId:'unrelated-plan'})).status,404);
    assert.equal((await rpc('prepare-expert-task',{...source,expertId:'expert-1',operationId:'page-controlled'})).status,400);
    const ready=await rpc('available-experts',source);assert.equal(ready.status,200);assert.equal((await ready.json()).value.length,1);

@@ -31,8 +31,8 @@ export async function mountWorkbenchRegistrationHost<Page>(ctx:Context, isCompat
     await bootstrapInstalledWorkbenchArchives(directory,archives,()=>ctx.fiber.assertActive());
     const verifier=createWorkbenchInstallationVerifier(directory,async(name,version)=>archives.resolve(name,version),isCompatible);
     const registration=new HostWorkbenchRegistration<Page>(loader,new InstalledWorkbenchManifestReader(directory),verifier);
-    ctx.effect(()=>()=>{registration.close();return archives.close();},'workdsh.workbench.registration.close');
-    const identity = ctx.get('workdshIdentity') as IdentityService | undefined;
+    ctx.effect(()=>()=>{registration.close();return archives.close();},'expertworkshop.workbench.registration.close');
+    const identity = ctx.get('expertworkshopIdentity') as IdentityService | undefined;
     const connection = ctx.get('connection') as HostConnectionHandle | undefined;
     if (identity && connection) ctx.effect(() => connection.fetch.register({ path: workbenchRegistrationPath, methods: ['POST'], requestBody: 'streaming',
       fetch: request => handleWorkbenchRegistrationRequest(request, registration, async signal => {
@@ -43,9 +43,9 @@ export async function mountWorkbenchRegistrationHost<Page>(ctx:Context, isCompat
           if (profile.principalId !== actor.principalId || profile.organization.id !== actor.organizationId || profile.resolvedBy !== actor.resolvedBy ||
               identity.membership(actor.organizationId, actor.principalId)?.state !== 'active') throw new Error('workbench/development-access-denied');
         };
-      }) }), 'workdsh.workbench.registration.rpc');
-    ctx.provide('workdshWorkbenchInstallationArchives',archives);
-    ctx.provide('workdshWorkbenchRegistration',registration);
+      }) }), 'expertworkshop.workbench.registration.rpc');
+    ctx.provide('expertworkshopWorkbenchInstallationArchives',archives);
+    ctx.provide('expertworkshopWorkbenchRegistration',registration);
     return Object.freeze({registration,archives,installationId,directory});
   } catch(cause) {await archives.close();throw cause;}
 }

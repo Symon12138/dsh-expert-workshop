@@ -23,7 +23,7 @@ export interface CreationPorts {
 const rowSchema=z.object({id:z.string(),revision:z.string(),idea:z.string(),target:z.object({hostId:z.string(),installationId:z.string(),profileId:z.string(),harnessVersion:z.string()}),phase:z.enum(['discussing','confirmed']),sessionId:z.string().optional(),proposal:z.record(z.string(),z.string()).optional(),requirementsRevision:z.string().optional(),createdAt:z.string()});
 function spec(actor:ActorContext){
   const key=createHash('sha256').update(JSON.stringify([actor.organizationId,actor.principalId])).digest('hex').slice(0,40);
-  return defineDomain({name:`workdsh_creation_${key}`,version:1,global:{schema:z.object({organizationId:z.string(),principalId:z.string(),rows:z.array(rowSchema)}),initial:{organizationId:actor.organizationId,principalId:actor.principalId,rows:[]}},tables:{}});
+  return defineDomain({name:`expertworkshop_creation_${key}`,version:1,global:{schema:z.object({organizationId:z.string(),principalId:z.string(),rows:z.array(rowSchema)}),initial:{organizationId:actor.organizationId,principalId:actor.principalId,rows:[]}},tables:{}});
 }
 export function parseCreationProposal(value:unknown):CreationProposal {
   if(!value||typeof value!=='object'||Array.isArray(value))throw Error('workbench/invalid-creation-proposal');

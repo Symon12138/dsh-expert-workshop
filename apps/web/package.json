@@ -1,9 +1,9 @@
 {
-  "name": "workdsh",
+  "name": "expertworkshop",
   "version": "3.0.0-alpha.1",
   "private": true,
   "type": "module",
-  "description": "WorkDSH planning and plugin workspace",
+  "description": "Expert Workshop planning and plugin workspace",
   "packageManager": "pnpm@10.34.5",
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
@@ -14,8 +14,8 @@
     "check:acceptance": "node scripts/check-acceptance.mjs",
     "check:env": "node scripts/check-environment.mjs",
     "test:planning": "node --test tests/planning/*.test.mjs",
-    "build": "corepack pnpm --filter workdsh-tabular build && corepack pnpm --filter workdsh-contracts build && corepack pnpm --filter workdsh-provider-browser-session build && corepack pnpm --filter workdsh-provider-identity-local build && corepack pnpm --filter workdsh-plugin-audit build && corepack pnpm --filter workdsh-plugin-access build && corepack pnpm --filter workdsh-plugin-skills build && corepack pnpm --filter workdsh-plugin-experts build && corepack pnpm --filter workdsh-plugin-connectors build && corepack pnpm --filter workdsh-plugin-office build && corepack pnpm --filter workdsh-plugin-library build && corepack pnpm --filter workdsh-plugin-projects build && corepack pnpm --filter workdsh-bundle build && corepack pnpm --filter workdsh-plugin-activity build && corepack pnpm --filter workdsh-plugin-workbenches build && corepack pnpm --filter workdsh-plugin-quality-analysis build",
-    "typecheck": "corepack pnpm --filter workdsh-tabular typecheck && corepack pnpm --filter workdsh-provider-browser-session typecheck && corepack pnpm --filter workdsh-contracts typecheck && corepack pnpm --filter workdsh-provider-identity-local typecheck && corepack pnpm --filter workdsh-plugin-audit typecheck && corepack pnpm --filter workdsh-plugin-access typecheck && corepack pnpm --filter workdsh-plugin-skills typecheck && corepack pnpm --filter workdsh-plugin-experts typecheck && corepack pnpm --filter workdsh-plugin-connectors typecheck && corepack pnpm --filter workdsh-plugin-office typecheck && corepack pnpm --filter workdsh-plugin-library typecheck && corepack pnpm --filter workdsh-plugin-projects typecheck && corepack pnpm --filter workdsh-bundle typecheck && corepack pnpm --filter workdsh-plugin-activity typecheck && corepack pnpm --filter workdsh-plugin-workbenches typecheck && corepack pnpm --filter workdsh-plugin-quality-analysis typecheck",
+    "build": "corepack pnpm --filter expertworkshop-tabular build && corepack pnpm --filter expertworkshop-contracts build && corepack pnpm --filter expertworkshop-provider-browser-session build && corepack pnpm --filter expertworkshop-provider-identity-local build && corepack pnpm --filter expertworkshop-plugin-audit build && corepack pnpm --filter expertworkshop-plugin-access build && corepack pnpm --filter expertworkshop-plugin-skills build && corepack pnpm --filter expertworkshop-plugin-experts build && corepack pnpm --filter expertworkshop-plugin-connectors build && corepack pnpm --filter expertworkshop-plugin-office build && corepack pnpm --filter expertworkshop-plugin-library build && corepack pnpm --filter expertworkshop-plugin-projects build && corepack pnpm --filter expertworkshop-bundle build && corepack pnpm --filter expertworkshop-plugin-activity build && corepack pnpm --filter expertworkshop-plugin-workbenches build && corepack pnpm --filter expertworkshop-plugin-quality-analysis build",
+    "typecheck": "corepack pnpm --filter expertworkshop-tabular typecheck && corepack pnpm --filter expertworkshop-provider-browser-session typecheck && corepack pnpm --filter expertworkshop-contracts typecheck && corepack pnpm --filter expertworkshop-provider-identity-local typecheck && corepack pnpm --filter expertworkshop-plugin-audit typecheck && corepack pnpm --filter expertworkshop-plugin-access typecheck && corepack pnpm --filter expertworkshop-plugin-skills typecheck && corepack pnpm --filter expertworkshop-plugin-experts typecheck && corepack pnpm --filter expertworkshop-plugin-connectors typecheck && corepack pnpm --filter expertworkshop-plugin-office typecheck && corepack pnpm --filter expertworkshop-plugin-library typecheck && corepack pnpm --filter expertworkshop-plugin-projects typecheck && corepack pnpm --filter expertworkshop-bundle typecheck && corepack pnpm --filter expertworkshop-plugin-activity typecheck && corepack pnpm --filter expertworkshop-plugin-workbenches typecheck && corepack pnpm --filter expertworkshop-plugin-quality-analysis typecheck",
     "probe:install": "node scripts/check-environment.mjs && node scripts/probe-install.mjs",
     "probe:activity": "node scripts/probe-activity.mjs",
     "test:activity": "node --test ../../packages/plugins/activity/tests/*.test.mjs",
@@ -51,11 +51,11 @@
     "probe:connectors": "node scripts/probe-connectors.mjs",
     "probe:headless": "node scripts/probe-headless-interface.mjs",
     "probe:subagent:activation-limit": "node scripts/probe-subagent-activation-limit.mjs",
-    "test:library": "corepack pnpm --filter workdsh-plugin-library test",
+    "test:library": "corepack pnpm --filter expertworkshop-plugin-library test",
     "probe:library": "node scripts/probe-library-release.mjs",
-    "test:projects": "corepack pnpm --filter workdsh-plugin-projects test",
-    "test:runtime-isolated": "corepack pnpm --filter workdsh-provider-runtime-isolated test",
-    "test:tabular": "corepack pnpm --filter workdsh-tabular test",
+    "test:projects": "corepack pnpm --filter expertworkshop-plugin-projects test",
+    "test:runtime-isolated": "corepack pnpm --filter expertworkshop-provider-runtime-isolated test",
+    "test:tabular": "corepack pnpm --filter expertworkshop-tabular test",
     "test:office:save": "node --test ../../packages/plugins/office/tests/*.test.mjs",
     "test:workbenches": "node --test ../../packages/plugins/workbenches/tests/*.test.mjs",
     "test:quality-analysis": "node --test ../../packages/plugins/quality-analysis/tests/*.test.mjs"

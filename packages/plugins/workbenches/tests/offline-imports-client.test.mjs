@@ -4,7 +4,7 @@ const built=await build({entryPoints:[fileURLToPath(new URL('../src/client/offli
 const {createWorkbenchOfflineImportsClient}=await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
 const row={importId:'import:11111111-1111-4111-8111-111111111111',packageName:'quality-plugin',workbenchId:'company.quality',createdAt:'2026-10-10T00:00:00Z'};
 test('offline discovery requests current Host member references without identities or private paths',async()=>{
- const result=await createWorkbenchOfflineImportsClient(async(path,options)=>{assert.equal(path,'/api/workdsh-workbench-offline-imports');assert.equal(options.body,'{}');assert.equal(options.credentials,'same-origin');return Response.json({ok:true,value:[{...row,path:'/private',principalId:'private'}]});})();
+ const result=await createWorkbenchOfflineImportsClient(async(path,options)=>{assert.equal(path,'/api/expertworkshop-workbench-offline-imports');assert.equal(options.body,'{}');assert.equal(options.credentials,'same-origin');return Response.json({ok:true,value:[{...row,path:'/private',principalId:'private'}]});})();
  assert.deepEqual(result,[row]);assert.ok(Object.isFrozen(result));assert.ok(Object.isFrozen(result[0]));
 });
 test('offline discovery rejects duplicates, invalid identity, failed requests and cancellation',async()=>{

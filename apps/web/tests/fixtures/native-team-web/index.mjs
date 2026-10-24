@@ -2,7 +2,7 @@
 // below; this fixture substitutes model I/O and exposes local test orchestration.
 import { LlmAdapter, createMessage } from '@deepseek-ai/dsh-llm';
 import assert from 'node:assert/strict';
-export const inject = ['connection', 'llm', 'agents', 'agentTeams', 'sessionController', 'sessionPersistence', 'workdshSessionAccess', 'workdshExperts', 'workdshIdentity'];
+export const inject = ['connection', 'llm', 'agents', 'agentTeams', 'sessionController', 'sessionPersistence', 'expertworkshopSessionAccess', 'expertworkshopExperts', 'expertworkshopIdentity'];
 const blocks = text => [{ type: 'text', text }];
 const delay = (milliseconds, signal) => new Promise((resolve, reject) => {
   const timer = setTimeout(done, milliseconds);
@@ -62,21 +62,21 @@ export function apply(ctx) {
       let value;
       if (input.action === 'create') {
         stage = 'identity';
-        const actor = await ctx.workdshIdentity.resolve({}, request.signal);
+        const actor = await ctx.expertworkshopIdentity.resolve({}, request.signal);
         stage = 'draft';
-        const draft = await ctx.workdshExperts.createDraft(actor, { ...definition('lead'), team: { members: ['analyst', 'reviewer'].map(key => ({ key, definition: definition(key) })), workflows: [{ id: 'report', title: '测试报告', trigger: '核对测试数据', deliverable: '测试结论', stages: [{ id: 'draft', worker: 'analyst', reviewer: 'reviewer', dependsOn: [] }] }] } }, { operationId: 'web-team-create' });
+        const draft = await ctx.expertworkshopExperts.createDraft(actor, { ...definition('lead'), team: { members: ['analyst', 'reviewer'].map(key => ({ key, definition: definition(key) })), workflows: [{ id: 'report', title: '测试报告', trigger: '核对测试数据', deliverable: '测试结论', stages: [{ id: 'draft', worker: 'analyst', reviewer: 'reviewer', dependsOn: [] }] }] } }, { operationId: 'web-team-create' });
         stage = 'validate';
-        const validation = await ctx.workdshExperts.validate(actor, draft.expertId, draft.revision);
+        const validation = await ctx.expertworkshopExperts.validate(actor, draft.expertId, draft.revision);
         assert.ok(validation.publishable, JSON.stringify(validation.issues));
-        const confirmation = await ctx.workdshExperts.requestPublishConfirmation(actor, draft.expertId, draft.revision);
-        const proof = await ctx.workdshExperts.confirmPublish(actor, confirmation.confirmationToken);
-        await ctx.workdshExperts.publish(actor, draft.expertId, draft.revision, validation.dependencyLockDigest, proof, { operationId: 'web-team-publish' });
+        const confirmation = await ctx.expertworkshopExperts.requestPublishConfirmation(actor, draft.expertId, draft.revision);
+        const proof = await ctx.expertworkshopExperts.confirmPublish(actor, confirmation.confirmationToken);
+        await ctx.expertworkshopExperts.publish(actor, draft.expertId, draft.revision, validation.dependencyLockDigest, proof, { operationId: 'web-team-publish' });
         stage = 'prepare-execution';
-        const plan = await ctx.workdshExperts.prepareExecution(actor, draft.expertId, undefined, input.cwd, undefined, undefined, request.signal, input.workspaceId);
+        const plan = await ctx.expertworkshopExperts.prepareExecution(actor, draft.expertId, undefined, input.cwd, undefined, undefined, request.signal, input.workspaceId);
         stage = 'create-execution';
-        const execution = await ctx.workdshExperts.createExecution(actor, plan.executionPlanId, { operationId: 'web-team-execution' });
+        const execution = await ctx.expertworkshopExperts.createExecution(actor, plan.executionPlanId, { operationId: 'web-team-execution' });
         await ctx.sessionController.selectModel({ sessionId: execution.sessionId, provider: 'native-team-fixture', model: 'fixture' });
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(execution.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(execution.sessionId, request.signal);
         assert.ok(agent);
         agent.followup(createMessage({ role: 'user', source: { kind: 'user' }, content: blocks('WEB_SPAWN_ANALYST：用官方 Team 处理本次隔离验证。') }));
         stage = 'settle-lead';
@@ -94,12 +94,12 @@ export function apply(ctx) {
         await ctx.agentTeams.createTask(agent, { subject: '复核测试结论', description: '依赖前一个任务', blockedBy: [draftTask.id] });
         value = { sessionId: agent.id, expertId: draft.expertId, view: teamView(agent), requests };
       } else if (input.action === 'view') {
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent); value = teamView(agent);
       } else if (input.action === 'begin-long-task') {
         stage = 'resolve-resumed-team';
         const before = (await history(input.memberId)).events.filter(e => e.type === 'turn/end').length;
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         stage = 'assign-long-task';
         const created = await ctx.agentTeams.createTask(agent, { subject: '长任务与重连验收', description: '运行中刷新浏览器后，成员与任务归属必须保持可见。', writeScopes: ['fixture/long-report.md'] });
@@ -117,7 +117,7 @@ export function apply(ctx) {
       } else if (input.action === 'begin-interrupt') {
         stage = 'resolve-interrupt-team';
         const before = (await history(input.memberId)).events.filter(e => e.type === 'turn/end').length;
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         const member = ctx.agentTeams.listMembers(agent).find(row => row.id === input.memberId && row.name === input.memberName);
         assert.ok(member);
@@ -130,7 +130,7 @@ export function apply(ctx) {
         value = { memberId: input.memberId, before, task };
       } else if (input.action === 'interrupt-member') {
         stage = 'interrupt-live-member';
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         ctx.agentTeams.interrupt(agent, input.memberName);
         stage = 'wait-member-interruption';
@@ -144,7 +144,7 @@ export function apply(ctx) {
       } else if (input.action === 'resume-interrupted') {
         stage = 'resume-interrupted-member';
         const before = (await history(input.memberId)).events.filter(e => e.type === 'turn/end').length;
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         const member = ctx.agentTeams.listMembers(agent).find(row => row.id === input.memberId && row.name === input.memberName);
         assert.ok(member);
@@ -153,14 +153,14 @@ export function apply(ctx) {
         value = { memberId: input.memberId, before };
       } else if (input.action === 'complete-task') {
         stage = 'complete-member-task';
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         const task = ctx.agentTeams.getTask(agent, input.taskId);
         assert.equal(task.ownerName, input.memberName, 'Lead may sign off only the expected member-owned task');
         value = await ctx.agentTeams.updateTask(agent, { taskId: task.id, expectedRevision: task.revision, action: 'complete' });
       } else if (input.action === 'begin-handoff') {
         stage = 'resolve-handoff-team';
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         const members = ctx.agentTeams.listMembers(agent);
         assert.ok(members.some(member => member.id === input.fromMemberId && member.name === input.fromMemberName));
@@ -176,7 +176,7 @@ export function apply(ctx) {
         value = { before, delivery: delivered.status, task };
       } else if (input.action === 'begin-failure') {
         stage = 'resolve-failure-team';
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         const member = ctx.agentTeams.listMembers(agent).find(row => row.id === input.memberId && row.name === input.memberName);
         assert.ok(member);
@@ -193,13 +193,13 @@ export function apply(ctx) {
         await waitFor(async () => (await history(input.memberId)).events.filter(e => e.type === 'turn/end').length > input.before);
         const latestEnd = (await history(input.memberId)).events.filter(e => e.type === 'turn/end').at(-1);
         assert.notEqual(latestEnd.data.reason.kind, 'completed');
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         value = { memberId: input.memberId, reason: latestEnd.data.reason.kind, view: teamView(agent) };
       } else if (input.action === 'recover-failure') {
         stage = 'resolve-failed-team-after-restart';
         const before = (await history(input.memberId)).events.filter(e => e.type === 'turn/end').length;
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         const member = ctx.agentTeams.listMembers(agent).find(row => row.id === input.memberId && row.name === input.memberName);
         assert.ok(member);
@@ -209,12 +209,12 @@ export function apply(ctx) {
         value = { memberId: input.memberId, before };
       } else if (input.action === 'begin-real-model') {
         stage = 'prepare-real-model-execution';
-        const actor = await ctx.workdshIdentity.resolve({}, request.signal);
-        const plan = await ctx.workdshExperts.prepareExecution(actor, input.expertId, undefined, input.cwd, undefined, undefined, request.signal, input.workspaceId);
-        const execution = await ctx.workdshExperts.createExecution(actor, plan.executionPlanId, { operationId: 'web-team-real-execution' });
+        const actor = await ctx.expertworkshopIdentity.resolve({}, request.signal);
+        const plan = await ctx.expertworkshopExperts.prepareExecution(actor, input.expertId, undefined, input.cwd, undefined, undefined, request.signal, input.workspaceId);
+        const execution = await ctx.expertworkshopExperts.createExecution(actor, plan.executionPlanId, { operationId: 'web-team-real-execution' });
         await ctx.sessionController.selectModel({ sessionId: execution.sessionId, provider: 'deepseek-official', model: 'deepseek-flash' });
         stage = 'resolve-real-model-team';
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(execution.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(execution.sessionId, request.signal);
         assert.ok(agent);
         stage = 'spawn-real-model-members';
         for (const name of ['analyst', 'reviewer']) {
@@ -247,7 +247,7 @@ export function apply(ctx) {
         };
       } else if (input.action === 'real-model-status') {
         stage = 'read-real-model-team';
-        const { agent } = await ctx.workdshSessionAccess.resolveAgent(input.sessionId, request.signal);
+        const { agent } = await ctx.expertworkshopSessionAccess.resolveAgent(input.sessionId, request.signal);
         assert.ok(agent);
         const view = teamView(agent);
         const leadHistory = await history(agent.id);

@@ -11,7 +11,7 @@ const value={package:receipt,descriptor,compatible:true};
 test('first-import preview sends bytes without caller-supplied package identity and drops private fields',async()=>{
  const file=new Blob(['archive']);
  const result=await createWorkbenchPackagePreviewClient(async(path,options)=>{
-  assert.equal(path,'/api/workdsh-workbench-package-preview');
+  assert.equal(path,'/api/expertworkshop-workbench-package-preview');
   assert.equal(options.body,file);assert.equal(options.credentials,'same-origin');
   assert.deepEqual(options.headers,{'content-type':'application/octet-stream'});
   return Response.json({ok:true,value:{...value,path:'/private',package:{...receipt,path:'/private'}}});

@@ -13,7 +13,7 @@ export function createWorkbenchImportRecordsClient(transport: typeof fetch = fet
     const captured = { ...scope };
     const lifetime = AbortSignal.any([AbortSignal.timeout(30_000), ...(signal ? [signal] : [])]);
     lifetime.throwIfAborted();
-    const response = await transport('/api/workdsh-workbench-import-records', { method: 'POST', credentials: 'same-origin',
+    const response = await transport('/api/expertworkshop-workbench-import-records', { method: 'POST', credentials: 'same-origin',
       headers: { 'content-type': 'application/json' }, body: JSON.stringify({ developmentId: captured.developmentId }), signal: lifetime });
     const result = await response.json(); lifetime.throwIfAborted();
     if (!response.ok || result?.ok !== true || !Array.isArray(result.value)) throw new Error('workbench/records-unavailable');

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const { build } = createRequire(new URL('../../../../apps/web/package.json', import.meta.url))('esbuild');
 const built = await build({ entryPoints: [fileURLToPath(new URL('../src/runtime/registration-rpc.ts', import.meta.url))], bundle: true, platform: 'node', format: 'esm', write: false });
 const { handleWorkbenchRegistrationRequest: handle } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
-const request = payload => new Request('http://localhost/api/workdsh-workbench-registration',{method:'POST',body:JSON.stringify({endpoint:'client-authority',payload})});
+const request = payload => new Request('http://localhost/api/expertworkshop-workbench-registration',{method:'POST',body:JSON.stringify({endpoint:'client-authority',payload})});
 test('registration facts reject identity/path claims and recheck access after installation lookup',async()=>{
  let calls=0,active=true;
  const resolve=async()=>()=>{if(!active)throw new Error('workbench/development-access-denied');};

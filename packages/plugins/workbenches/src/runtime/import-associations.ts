@@ -8,7 +8,7 @@ const record = z.object({ id: text, workbenchId: text, packageName: z.string().m
 const state = z.object({organizationId:text, principalId:text, entries:z.array(record)});
 function spec(actor:ActorContext) {
   const key=createHash('sha256').update(JSON.stringify([actor.organizationId,actor.principalId])).digest('hex').slice(0,40);
-  return defineDomain({name:`workdsh_import_associations_${key}`,version:1,global:{schema:state,initial:{organizationId:actor.organizationId,principalId:actor.principalId,entries:[]}},tables:{}});
+  return defineDomain({name:`expertworkshop_import_associations_${key}`,version:1,global:{schema:state,initial:{organizationId:actor.organizationId,principalId:actor.principalId,entries:[]}},tables:{}});
 }
 /** Host-only ownership reference for offline imports. It is neither a fabricated
  * authoring requirement nor evidence that a package has been installed.

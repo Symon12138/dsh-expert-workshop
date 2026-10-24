@@ -1,14 +1,14 @@
 # Contributing
 
-Thank you for wanting to contribute to WorkDSH. This is a community project — whether you are a regular user, a plugin author, or a developer, there is a way to contribute that fits you.
+Thank you for wanting to contribute to Expert Workshop. This is a community project — whether you are a regular user, a plugin author, or a developer, there is a way to contribute that fits you.
 
 ## Regular users: use, report, and spread the word
 
-- Report problems or odd behavior in an [issue](https://github.com/techflag/workdsh/issues): include your operating system (macOS / Windows), application version, and reproduction steps.
+- Report problems or odd behavior in an [issue](https://github.com/techflag/expertworkshop/issues): include your operating system (macOS / Windows), application version, and reproduction steps.
 - Feature ideas and improvement suggestions are welcome as issues too.
 - Join the [community channels](README.md#community-and-acknowledgements) (WeChat group, QQ group, Discord) and help other users.
 - Write tutorials or experience posts, or help improve and translate the documentation.
-- Suggest ecosystem projects for an [issue](https://github.com/techflag/workdsh/issues).
+- Suggest ecosystem projects for an [issue](https://github.com/techflag/expertworkshop/issues).
 
 ## Plugin authors: extend the ecosystem
 
@@ -32,20 +32,20 @@ corepack yarn dev     # launch the application when a graphical session is avail
 ### Repository boundaries (please read before starting)
 
 - Official dependencies use the published version and archive digests locked in `upstream.json`; builds never clone or compile official source.
-- Desktop code lives in `apps/desktop/`, and WorkDSH feature packages live in `apps/web/`. The former uses the root Yarn workspace; the latter retains its own pnpm workspace.
+- Desktop code lives in `apps/desktop/`, and Expert Workshop feature packages live in `apps/web/`. The former uses the root Yarn workspace; the latter retains its own pnpm workspace.
 - Builds, typechecks, unit tests, and smoke checks must stay headless-safe.
 
 ### Commits and pull requests
 
 - Use conventional commit messages (for example `fix(desktop): ...`, `docs: ...`).
 - Run `yarn check` and keep it green before committing.
-- After changing packaged dependencies or the WorkDSH Profile, verify the actual installed versions, license files, and `apps/desktop/THIRD_PARTY_NOTICES.md`. Do not reuse a dependency inventory from an older release.
+- After changing packaged dependencies or the Expert Workshop Profile, verify the actual installed versions, license files, and `apps/desktop/THIRD_PARTY_NOTICES.md`. Do not reuse a dependency inventory from an older release.
 - Documentation changes should stay bilingual and update the `README.i18n.yaml` hash record.
 - Describe the change, its motivation, and how it was verified in the PR; merge after CI passes.
 
 ## Join the technical team
 
-If you would like to help maintain WorkDSH, open a [GitHub issue](https://github.com/techflag/workdsh/issues) to suggest an area where you can contribute.
+If you would like to help maintain Expert Workshop, open a [GitHub issue](https://github.com/techflag/expertworkshop/issues) to suggest an area where you can contribute.
 
 ## Code of conduct
 

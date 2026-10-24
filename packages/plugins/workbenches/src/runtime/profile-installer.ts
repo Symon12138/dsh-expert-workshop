@@ -30,7 +30,7 @@ export async function createProfileWorkbenchInstaller(ctx: Context, authorize: (
     check();
     const path = await realpath(retainedPath);
     if (await realpath(captured.dir) !== directory || path !== retainedPath ||
-        dirname(path) !== join(directory, '.workdsh-workbench-archives') || !/^[a-f0-9]{64}\.tgz$/.test(basename(path)))
+        dirname(path) !== join(directory, '.expertworkshop-workbench-archives') || !/^[a-f0-9]{64}\.tgz$/.test(basename(path)))
       throw new Error('workbench/archive-path-outside');
     check();
     // Share the official manager's lock so the final baseline check and package

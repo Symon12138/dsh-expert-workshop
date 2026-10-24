@@ -6,7 +6,7 @@ export interface AcceptanceBinding{developmentId:string;requirementsRevision:str
 export interface AcceptanceFacts{binding?:AcceptanceBinding;ready:boolean;criteria?:string}
 export const acceptanceBindingSchema=z.object({developmentId:z.string().min(1).max(128),requirementsRevision:z.string().min(1).max(128),packageName:z.string().min(1).max(214),version:z.string().min(1).max(128),sha256:z.string().regex(/^[a-f0-9]{64}$/),hostId:z.string().min(1).max(128),profileId:z.string().min(1).max(128),installationId:z.string().min(1).max(128)}).strict();
 const receipt=acceptanceBindingSchema.extend({acceptedAt:z.string(),principalId:z.string(),organizationId:z.string()});
-function spec(actor:ActorContext){return defineDomain({name:'workdsh_acceptance_'+createHash('sha256').update(JSON.stringify([actor.organizationId,actor.principalId])).digest('hex').slice(0,40),version:1,global:{schema:z.object({receipts:z.array(receipt).max(1000)}),initial:{receipts:[] as z.infer<typeof receipt>[]}},tables:{}});}
+function spec(actor:ActorContext){return defineDomain({name:'expertworkshop_acceptance_'+createHash('sha256').update(JSON.stringify([actor.organizationId,actor.principalId])).digest('hex').slice(0,40),version:1,global:{schema:z.object({receipts:z.array(receipt).max(1000)}),initial:{receipts:[] as z.infer<typeof receipt>[]}},tables:{}});}
 const same=(a:AcceptanceBinding,b:AcceptanceBinding)=>Object.keys(a).length===Object.keys(b).length&&(Object.keys(a) as (keyof AcceptanceBinding)[]).every(key=>a[key]===b[key]);
 /** Explicit user acceptance of an exact installed revision; never inferred from model text. */
 export class WorkbenchAcceptanceService{

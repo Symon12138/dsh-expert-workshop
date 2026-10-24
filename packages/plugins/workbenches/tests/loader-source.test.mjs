@@ -16,7 +16,7 @@ const harnessRequire = createRequire(require.resolve('@deepseek-ai/dsh/package.j
 const { default: Loader } = await import(pathToFileURL(harnessRequire.resolve('@deepseek-ai/cordis-plugin-loader')).href);
 
 test('official Loader locates actual package caller and rejects disposed contexts', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-workbench-loader-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-workbench-loader-'));
   const ctx = new Context();
   try {
     const directory = join(root, 'node_modules', 'quality-probe');

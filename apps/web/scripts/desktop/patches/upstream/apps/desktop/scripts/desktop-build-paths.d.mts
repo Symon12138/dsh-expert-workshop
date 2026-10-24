@@ -13,7 +13,7 @@ export interface DesktopTargetBuildPaths {
   readonly packedVendor: string
   readonly packedLandlock: string
   // EXPERTWORKSHOP TEST PATCH: local Expert Workshop profile tarball directory.
-  readonly packedWorkdsh: string
+  readonly packedExpertworkshop: string
   readonly downloads: string
 }
 

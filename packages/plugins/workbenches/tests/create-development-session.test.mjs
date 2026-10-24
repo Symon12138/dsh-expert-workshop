@@ -10,8 +10,8 @@ const development = { id: 'dev-1', owner: { ownerPrincipalId: 'member', organiza
 test('lost native creation receipt retries the same Session identity and binds its owner', async () => {
   const ids = []; let owner, lost = true;
   const services = {
-    workdshIdentity: { profile: () => ({ principalId: 'member', resolvedBy: 'fixture', organization: { id: 'org', kind: 'personal' } }), membership: () => ({ state: 'active' }) },
-    workdshAccess: { sessionOwner: () => owner, bindSession: async () => owner = development.owner },
+    expertworkshopIdentity: { profile: () => ({ principalId: 'member', resolvedBy: 'fixture', organization: { id: 'org', kind: 'personal' } }), membership: () => ({ state: 'active' }) },
+    expertworkshopAccess: { sessionOwner: () => owner, bindSession: async () => owner = development.owner },
     sessionController: { create: async request => { assert.equal(request.workspaceId, 'workspace'); assert.equal(request.agentPreset, 'cordis'); assert.equal('cwd' in request, false); ids.push(request.sessionId); if (lost) { lost = false; throw new Error('lost-response'); } return { sessionId: request.sessionId, agentPreset: 'cordis' }; } },
   };
   const ctx = { get: name => services[name], fiber: { assertActive() {} }, workspaceController: { create: async () => ({ workspace: { workspaceId: 'workspace' }, created: false }) } };
@@ -25,8 +25,8 @@ test('missing or different Creator receipt is rejected without binding a false d
   for (const agentPreset of [undefined, 'standard']) {
     let binds = 0;
     const services = {
-      workdshIdentity: { profile: () => ({ principalId: 'member', resolvedBy: 'fixture', organization: { id: 'org', kind: 'personal' } }), membership: () => ({ state: 'active' }) },
-      workdshAccess: { sessionOwner: () => undefined, bindSession: async () => { binds++; return development.owner; } },
+      expertworkshopIdentity: { profile: () => ({ principalId: 'member', resolvedBy: 'fixture', organization: { id: 'org', kind: 'personal' } }), membership: () => ({ state: 'active' }) },
+      expertworkshopAccess: { sessionOwner: () => undefined, bindSession: async () => { binds++; return development.owner; } },
       sessionController: { create: async request => ({ sessionId: request.sessionId, agentPreset }) },
     };
     const ctx = { get: name => services[name], fiber: { assertActive() {} }, workspaceController: { create: async () => ({ workspace: { workspaceId: 'workspace' }, created: false }) } };
@@ -38,10 +38,10 @@ test('missing or different Creator receipt is rejected without binding a false d
 test('enterprise creation uses its protected owner service and the explicit Creator request', async () => {
   let protectedCalls = 0;
   const services = {
-    workdshIdentity: { profile: () => ({ principalId: 'member', resolvedBy: 'fixture', organization: { id: 'org', kind: 'enterprise' } }), membership: () => ({ state: 'active' }) },
-    workdshAccess: { sessionOwner: () => development.owner },
+    expertworkshopIdentity: { profile: () => ({ principalId: 'member', resolvedBy: 'fixture', organization: { id: 'org', kind: 'enterprise' } }), membership: () => ({ state: 'active' }) },
+    expertworkshopAccess: { sessionOwner: () => development.owner },
     sessionController: { create: async () => { throw new Error('must-use-protected-service'); } },
-    workdshSessionAccess: { create: async request => { protectedCalls++; assert.equal(request.agentPreset, 'cordis'); return { sessionId: request.sessionId, agentPreset: 'cordis' }; } },
+    expertworkshopSessionAccess: { create: async request => { protectedCalls++; assert.equal(request.agentPreset, 'cordis'); return { sessionId: request.sessionId, agentPreset: 'cordis' }; } },
   };
   const ctx = { get: name => services[name], fiber: { assertActive() {} }, workspaceController: { create: async () => ({ workspace: { workspaceId: 'workspace' }, created: false }) } };
   const result = await create(ctx, actor, development, '质量分析');
@@ -51,8 +51,8 @@ test('enterprise creation uses its protected owner service and the explicit Crea
 test('existing associated session keeps its identity and is never recreated or silently switched', async () => {
   const session = { hostId: 'host', sessionId: 'existing' };
   const services = {
-    workdshIdentity: { profile: () => ({ principalId: 'member', resolvedBy: 'fixture', organization: { id: 'org', kind: 'personal' } }), membership: () => ({ state: 'active' }) },
-    workdshAccess: {}, sessionController: { create: async () => { throw new Error('must-not-create'); } },
+    expertworkshopIdentity: { profile: () => ({ principalId: 'member', resolvedBy: 'fixture', organization: { id: 'org', kind: 'personal' } }), membership: () => ({ state: 'active' }) },
+    expertworkshopAccess: {}, sessionController: { create: async () => { throw new Error('must-not-create'); } },
   };
   assert.equal(await create({ get: name => services[name], fiber: { assertActive() {} } }, actor, { ...development, session }, '质量分析'), session);
 });

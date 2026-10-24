@@ -38,5 +38,5 @@ test('manager shows unconfirmed discussions and uninstalled developments togethe
  const html=renderToStaticMarkup(React.createElement(WorkbenchDevelopmentOverview,{creations:[{id:'idea',idea:'合同到期提醒',phase:'discussing',createdAt:'2026-10-14T08:00:00Z'}],developments:[{title:'制作中的合同台账',development:{id:'dev',state:'developing',updatedAt:'2026-10-14T09:00:00Z'}}],onAll(){},onContinue(){},onDiscuss(){}}));
  assert.match(html,/合同到期提醒/);assert.match(html,/制作中的合同台账/);assert.match(html,/继续讨论/);assert.match(html,/查看进度/);
  assert.ok(html.indexOf('制作中的合同台账')<html.indexOf('合同到期提醒'));
- assert.doesNotMatch(html,/workdsh.user-/);
+ assert.doesNotMatch(html,/expertworkshop.user-/);
 });

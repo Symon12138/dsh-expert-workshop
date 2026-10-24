@@ -11,7 +11,7 @@ import type { VerifyWorkbenchDevelopmentSource } from './development-service.js'
 import { prepareWorkbenchDevelopmentSource } from './prepare-development-source.js';
 
 async function saveDevelopmentRuntime(directory:string,installationAnchor:string,authorize:()=>void){
- const target=join(directory,'.workdsh-runtime.json'),temporary=target+'.tmp-'+randomUUID();
+ const target=join(directory,'.expertworkshop-runtime.json'),temporary=target+'.tmp-'+randomUUID();
  authorize();
  try{const entry=await lstat(target);if(!entry.isFile()||entry.isSymbolicLink())throw Error('workbench/source-directory-outside');}
  catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
@@ -26,7 +26,7 @@ async function saveDevelopmentRuntime(directory:string,installationAnchor:string
  * the Agent must implement and validate executable plugin entries. */
 export function createProfileWorkbenchDevelopmentSourceVerifier(ctx: Context): VerifyWorkbenchDevelopmentSource {
   const profile = ctx.get('profileContext') as ProfileContext | undefined;
-  const identity = ctx.get('workdshIdentity') as IdentityService | undefined;
+  const identity = ctx.get('expertworkshopIdentity') as IdentityService | undefined;
   if (!profile || !identity) throw new Error('workbench/host-services-unavailable');
   const captured = { name: profile.name, dir: profile.dir, home: profile.home, installAnchor: profile.installAnchor };
   return async (actor, development, signal) => {
@@ -54,10 +54,10 @@ export function createProfileWorkbenchDevelopmentSourceVerifier(ctx: Context): V
     } catch(cause) { throw new Error('workbench/sdk-package-unavailable',{cause}); }
     authorize();
     if(sdkManifest.name!=='expert-workshop-plugin-workbenches'||typeof sdkManifest.version!=='string')throw Error('workbench/sdk-package-unavailable');
-    const root = join(profileDirectory, 'workdsh-workbench-sources');
+    const root = join(profileDirectory, 'expertworkshop-workbench-sources');
     await mkdir(root, { recursive: true, mode: 0o700 });
     if (await realpath(root) !== root) throw new Error('workbench/source-directory-outside');
-    const requirements=ctx.get('workdshWorkbenchRequirements') as Pick<WorkbenchRequirementsService,'history'>|undefined;
+    const requirements=ctx.get('expertworkshopWorkbenchRequirements') as Pick<WorkbenchRequirementsService,'history'>|undefined;
     if(!requirements)throw new Error('workbench/host-services-unavailable');
     const saved=(await requirements.history(development.id,signal)).find(item=>item.id===development.requirementsRevision);
     authorize();
@@ -74,7 +74,7 @@ export function createProfileWorkbenchDevelopmentSourceVerifier(ctx: Context): V
     // Platform metadata is separate from developer source and excluded from the
     // starter package's files allowlist. pnpm may rebuild node_modules freely.
     await saveDevelopmentRuntime(prepared.directory,installationAnchor,authorize);
-    const checkpoint=await checkpointWorkbenchSource(prepared.directory,join(profileDirectory,'workdsh-workbench-source-checkpoints',basename(prepared.directory)),authorize,signal);
+    const checkpoint=await checkpointWorkbenchSource(prepared.directory,join(profileDirectory,'expertworkshop-workbench-source-checkpoints',basename(prepared.directory)),authorize,signal);
     authorize();
     return Object.freeze({ hostId: development.target.hostId, directory: prepared.directory,
       revision: `source-sha256:${checkpoint.sha256}` });

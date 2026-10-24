@@ -16,9 +16,9 @@ import {createQualityRecordClient,QualityRecordRequestError} from './client/reco
 import {createQualityIdentityScopeOwner} from './client/identity-scope.js';
 import type {QualityAiContext} from './client/ai-context.js';
 import {qualityNativeDraftState} from './client/native-draft-state.js';
-export const name='workdsh-quality-analysis-client';
-export const inject=['workdshWorkbenchClientRegistration','layout','workdshLibraryPreview','sessions','conversation','uiWorkspace','sidebarRight','workspaces','slots'];
-const descriptor:WorkbenchDescriptor={id:'workdsh.quality-analysis',title:'质量分析',description:'检验数据、缺陷分析和可追溯报告',protocolVersion:'1.0',layout:'full-page',hostCompatibility:{sdk:'^1.0.0',harness:'0.2.1-rc.2'},capabilities:[]};
+export const name='expertworkshop-quality-analysis-client';
+export const inject=['expertworkshopWorkbenchClientRegistration','layout','expertworkshopLibraryPreview','sessions','conversation','uiWorkspace','sidebarRight','workspaces','slots'];
+const descriptor:WorkbenchDescriptor={id:'expertworkshop.quality-analysis',title:'质量分析',description:'检验数据、缺陷分析和可追溯报告',protocolVersion:'1.0',layout:'full-page',hostCompatibility:{sdk:'^1.0.0',harness:'0.2.1-rc.2'},capabilities:[]};
 type ConversationBinding={sessionId:string;recordId:string;originRunId?:string;originContentHash?:string};
 const closeStyles=`.wd-quality-native-companion{position:relative}.wd-quality-companion-close{position:absolute;right:10px;top:7px;z-index:2;display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:6px;background:var(--dsw-alias-bg-base,#fff);color:var(--dsw-alias-label-secondary,#657185);cursor:pointer;font:inherit}.wd-quality-companion-close:hover{background:var(--dsw-alias-bg-layer-1,#f2f3f5)}.wd-quality-companion-close:focus-visible{outline:2px solid var(--dsw-alias-brand-primary,#3d73ff);outline-offset:2px}`;
 const frameStyles=`.wd-quality-native-frame{height:100%;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);overflow:hidden;width:100%}.wd-quality-native-frame.has-companion{grid-template-columns:minmax(0,1fr) minmax(360px,42%)}.wd-quality-business-column{min-width:0;min-height:0;overflow:auto}.wd-quality-native-companion{height:100%;min-height:0;min-width:0;overflow:hidden;border-left:1px solid var(--dsw-alias-border-l2,#dce2e9);display:flex;flex-direction:column;background:var(--dsw-alias-bg-base,#fff)}.wd-quality-companion-return{display:none}.wd-quality-native-companion[hidden],.wd-quality-native-session[hidden],.wd-quality-native-file[hidden]{display:none}.wd-quality-native-session,.wd-quality-native-file{flex:1;display:flex;flex-direction:column;height:100%;min-height:0;min-width:0;overflow:hidden}.wd-quality-native-file>header{flex:0 0 auto;display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--dsw-alias-border-l2,#dce2e9)}.wd-quality-native-file>header strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wd-quality-native-file>header button{font:inherit;padding:6px 10px;border-radius:6px;border:1px solid var(--dsw-alias-border-l2,#dce2e9);background:var(--dsw-alias-bg-layer-1,#fff);color:inherit}.wd-quality-native-feedback{margin:0;padding:10px 16px;font-size:13px;color:var(--dsw-alias-label-secondary,#657185)}.wd-quality-ai-result-notice{padding:12px 16px;margin-bottom:16px;border:1px solid var(--dsw-alias-border-l2,#dce2e9);border-radius:8px}.wd-quality-ai-result-notice button{margin-left:12px}@media(max-width:850px){.wd-quality-native-frame.has-companion{grid-template-columns:minmax(0,1fr)}.wd-quality-native-frame.has-companion>.wd-quality-business-column{display:none}.wd-quality-native-companion{border-left:0}.wd-quality-companion-return{display:flex;padding:8px 12px;flex:0 0 auto}.wd-quality-companion-return button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer}}`;
@@ -32,7 +32,7 @@ function QualityPage({native,nativeFiles,navigation}:{native:Context;nativeFiles
   return()=>{owner.dispose();window.removeEventListener('focus',check);document.removeEventListener('visibilitychange',visible);};
  },[attempt]);
  const management=useMemo(()=>createLibraryClient(native),[native]);
- const previewRegistry=native.get('workdshLibraryPreview') as LibraryOriginalPreviewRegistry;
+ const previewRegistry=native.get('expertworkshopLibraryPreview') as LibraryOriginalPreviewRegistry;
  const [binding,setBinding]=useState<ConversationBinding>(),[draftRequest,setDraftRequest]=useState<NativeWorkbenchConversationDraft>(),[aiContext,setAiContext]=useState<QualityAiContext>();
  const [originalRevisionSaved,setOriginalRevisionSaved]=useState<import('expert-workshop-contracts/library').LibraryTreeEntry>();
  const [rightMode,setRightMode]=useState<'conversation'|'file'>(),[source,setSource]=useState<LibraryOriginalSurfaceProps['source']>(),[sourceBusy,setSourceBusy]=useState(false),[sourceNotice,setSourceNotice]=useState<string>(),[nativeError,setNativeError]=useState<string>(),[nativeNotice,setNativeNotice]=useState<string>();
@@ -114,7 +114,7 @@ function QualityPage({native,nativeFiles,navigation}:{native:Context;nativeFiles
      setNativeNotice(purpose==='focus'?(inputState==='busy'?'AI 正在处理当前任务，所选记录尚未交给 AI。请等待完成后再核查。':'已有输入已保留，所选记录尚未交给 AI。请处理当前输入后再核查。'):(inputState==='busy'?'当前对话暂不能接收新请求，已有输入已保留。':'已有输入已保留，请先完成当前对话。'));return;
     }
    }}
-   library={{management,previewRegistry,originalRevisionSaved,openLibrary:()=>{if(!sourceBusyRef.current)native.layout.selectPanel('workdsh-library' as MainPanelId);},openOriginal:async(next,signal)=>{signal?.throwIfAborted();if(sourceBusyRef.current)throw Error('quality/source-saving');await nativeFiles.open({assetId:next.assetId,revisionId:next.revisionId,sessionId:binding?.sessionId,returnPanel:{id:'workdsh-workbench:workdsh.quality-analysis',label:'返回质量分析'}},signal);}}}/></div>
+   library={{management,previewRegistry,originalRevisionSaved,openLibrary:()=>{if(!sourceBusyRef.current)native.layout.selectPanel('expertworkshop-library' as MainPanelId);},openOriginal:async(next,signal)=>{signal?.throwIfAborted();if(sourceBusyRef.current)throw Error('quality/source-saving');await nativeFiles.open({assetId:next.assetId,revisionId:next.revisionId,sessionId:binding?.sessionId,returnPanel:{id:'expertworkshop-workbench:expertworkshop.quality-analysis',label:'返回质量分析'}},signal);}}}/></div>
    {binding&&<NativeWorkbenchConversation onClose={closeCompanion} active={rightMode==='conversation'} native={native} sessionId={binding.sessionId} identityScopeKey={scope} draftRequest={draftRequest} onDraftReady={id=>finishDraft(id)} onDraftError={(id,error)=>finishDraft(id,error)} onToolSettled={event=>void refreshFromTool(event)} onError={()=>setNativeError('原生会话暂时无法打开，请稍后重试。')}/>}
   <aside className="wd-quality-native-companion" aria-label="工作台协作区" hidden={rightMode!=='file'}><div className="wd-quality-companion-return"><button disabled={sourceBusy} onClick={closeCompanion}>返回分析</button></div>
    {rightMode==='conversation'&&<button type="button" className="wd-quality-companion-close" aria-label="收起右侧对话" title="收起对话，保留会话" disabled={sourceBusy} onClick={closeCompanion}><span aria-hidden="true">×</span></button>}
@@ -123,7 +123,7 @@ function QualityPage({native,nativeFiles,navigation}:{native:Context;nativeFiles
  </div>}</>;
 }
 export async function apply(ctx:Context){
- const registration=ctx.get('workdshWorkbenchClientRegistration') as ClientWorkbenchRegistration<React.ComponentType>;
+ const registration=ctx.get('expertworkshopWorkbenchClientRegistration') as ClientWorkbenchRegistration<React.ComponentType>;
  const navigation:{scope?:string;value?:QualityNavigation}={};
  const nativeFiles=createLibraryNativeFileClient(ctx);
  await registration.registerManaged(ctx,descriptor,()=> <QualityPage native={ctx} nativeFiles={nativeFiles} navigation={navigation}/>);

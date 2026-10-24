@@ -13,10 +13,10 @@ import type { HostWorkbenchRegistration } from './host-registration.js';
 export async function mountWorkbenchActivationHost(ctx: Context, directory: string, archives: WorkbenchInstallationArchives, development: WorkbenchDevelopmentService, isCompatible: (descriptor: WorkbenchDescriptor) => boolean,
   verifyOfflineAssociation?: (actor:ActorContext,id:string,expected:{packageName:string;workbenchId:string},signal?:AbortSignal)=>Promise<boolean>) {
   const connection = ctx.get('connection') as HostConnectionHandle | undefined;
-  const identity = ctx.get('workdshIdentity') as IdentityService | undefined;
+  const identity = ctx.get('expertworkshopIdentity') as IdentityService | undefined;
   if (!connection || !identity) throw new Error('workbench/host-services-unavailable');
   const resolveTarget = await createProfileWorkbenchTarget(ctx);
-  ctx.effect(() => connection.fetch.register({ path: '/api/workdsh-workbench-activation', methods: ['POST'], requestBody: 'streaming',
+  ctx.effect(() => connection.fetch.register({ path: '/api/expertworkshop-workbench-activation', methods: ['POST'], requestBody: 'streaming',
     fetch: async request => {
       try {
         const value = await readWorkbenchRequestBody(request) as Record<string, unknown>;
@@ -42,7 +42,7 @@ export async function mountWorkbenchActivationHost(ctx: Context, directory: stri
           enabled: value.enabled, expected: { packageName: value.packageName as string, version: value.version as string,
             workbenchId: value.workbenchId as string, sha256: value.sha256 as string } }, request.signal);
         await resolveTarget(actor, request.signal); access.authorize();
-        const registration = ctx.get('workdshWorkbenchRegistration') as HostWorkbenchRegistration<string> | undefined;
+        const registration = ctx.get('expertworkshopWorkbenchRegistration') as HostWorkbenchRegistration<string> | undefined;
         if (!registration) throw new Error('workbench/host-services-unavailable');
         const observed = confirmWorkbenchRuntimeSelection(result, value.enabled, value.sha256 as string, registration.list());
         return Response.json({ ok: true, value: observed });
@@ -50,5 +50,5 @@ export async function mountWorkbenchActivationHost(ctx: Context, directory: stri
         const code = cause instanceof Error && /^workbench\/[a-z-]+$/.test(cause.message) ? cause.message : 'workbench/activation-unconfirmed';
         return Response.json({ ok: false, error: { code } }, { status: request.signal.aborted ? 408 : ['workbench/development-access-denied', 'workbench/development-owner-mismatch'].includes(code) ? 403 : 409 });
       }
-    } }), 'workdsh.workbench.activation.rpc');
+    } }), 'expertworkshop.workbench.activation.rpc');
 }

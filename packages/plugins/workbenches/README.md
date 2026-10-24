@@ -12,10 +12,10 @@ Host 骨架已经完成以下注册，不必重新研究 Loader、registry 或�
 
 ```js
 import manifest from './package.json';
-export const inject = ['workdshWorkbenchRegistration'];
+export const inject = ['expertworkshopWorkbenchRegistration'];
 export async function apply(ctx) {
-  await ctx.get('workdshWorkbenchRegistration').registerManaged(
-    ctx, manifest.workdsh.workbench, manifest.name + '-page');
+  await ctx.get('expertworkshopWorkbenchRegistration').registerManaged(
+    ctx, manifest.expertworkshop.workbench, manifest.name + '-page');
 }
 ```
 
@@ -25,7 +25,7 @@ export async function apply(ctx) {
 import React, {useState} from 'react';
 import {WorkbenchButton} from 'expert-workshop-plugin-workbenches/client';
 import manifest from './package.json';
-export const inject = ['workdshWorkbenchClientRegistration'];
+export const inject = ['expertworkshopWorkbenchClientRegistration'];
 function Page({workbench}) {
   const [count, setCount] = useState(0);
   // workbench.descriptor 是已核验声明；workbench.signal 在插件退出时取消。
@@ -34,8 +34,8 @@ function Page({workbench}) {
   </main>;
 }
 export async function apply(ctx) {
-  await ctx.get('workdshWorkbenchClientRegistration').registerManaged(
-    ctx, manifest.workdsh.workbench, Page);
+  await ctx.get('expertworkshopWorkbenchClientRegistration').registerManaged(
+    ctx, manifest.expertworkshop.workbench, Page);
 }
 ```
 
@@ -59,7 +59,7 @@ Host 入口 `src/index.ts` 在官方 Profile、Loader、Storage Domain、身份�
 
 继续开发进入时由平台重新核对当前身份、运行环境、最新需求修订、源码及原生会话关联；核对失败保留开发记录并给出对应提示，不根据旧会话中的“已完成”判断当前状态，不自动接受其他环境的目录。页面展示本轮范围和完成标准。开始或继续开发时再次核对，通过同一规范化生成器准备指令并交给原生会话提交；确认需求时留下的同一份未发送草稿可直接续交，不额外拼接前言造成自身草稿冲突。核对、提交和 AI 执行是不同事实。重试不得覆盖已有草稿、重复创建应用或扩大权限。平台服务核对不代表模型已响应，也不代表插件已安装或页面已验收。
 
-新开发会话明确使用官方 Creator（`cordis`）预设，核对创建回执与打开后的实际预设。开发草稿显式调用官方 `cordis-plugin-development` 和 Expert Workshop `workdsh-workbench-dev` 技能，带入已保存需求、插件身份和已验证源码目录；规范正文仅维护在技能 Markdown 中。开发仍由完整原生会话、工具、模型选择及授权执行。已有开发会话不被重建或静默切换；若未使用 Creator，保留需求和源码并明确提示，不能把普通模式当作开发能力已就绪。
+新开发会话明确使用官方 Creator（`cordis`）预设，核对创建回执与打开后的实际预设。开发草稿显式调用官方 `cordis-plugin-development` 和 Expert Workshop `expertworkshop-workbench-dev` 技能，带入已保存需求、插件身份和已验证源码目录；规范正文仅维护在技能 Markdown 中。开发仍由完整原生会话、工具、模型选择及授权执行。已有开发会话不被重建或静默切换；若未使用 Creator，保留需求和源码并明确提示，不能把普通模式当作开发能力已就绪。
 
 Expert Workshop 开发技能要求先明确一件工作的业务对象、状态、用户动作、AI 分工和成果落点，再安排模块与页面。当前用户要求决定本轮交付阶段：产品定义、效果预览或开发候选；暂停打包期间不因构建成功自动继续打包安装。阶段说明是 Agent 工作要求，不是新增的 Host 状态门禁，真实操作仍沿用宿主已有授权及确认流程。
 
@@ -77,7 +77,7 @@ Expert Workshop 开发技能要求先明确一件工作的业务对象、状态�
 
 工作台管理页的组件运行状态来自原生插件管理器公开的 `listBundles()` 与 `listPlugins()`，通过 bundle row 的 `entryId` 精确关联；不读取私有 Fiber，不按模块名猜测归属。加载失败、正在加载、组件活动但业务未注册和无法确认分别展示，活动组件不等于工作台页面可用。已关联开发记录的失败工作台可在工作台内继续开发，也可从管理页导入修复版本；刷新只重新核对，不执行代码修复或自动安装。安装字节核验与版本匹配的业务注册仍是独立事实。原生清单缺失、重复或版本不匹配时不宣称加载成功。此项代码检查通过不代表已安装版本或真实页面已经验收。
 
-每个包通过 `workdsh.workbench` 声明一个工作台，包名与描述符身份必须与开发记录一致。Host/Client 导出、Cordis 补丁和内核依赖必须满足实际安装校验。更新保留插件身份、配置与业务数据；候选试用和正式更新分开，涉及数据结构变化需要迁移与恢复验证。
+每个包通过 `expertworkshop.workbench` 声明一个工作台，包名与描述符身份必须与开发记录一致。Host/Client 导出、Cordis 补丁和内核依赖必须满足实际安装校验。更新保留插件身份、配置与业务数据；候选试用和正式更新分开，涉及数据结构变化需要迁移与恢复验证。
 
 项目、资料库、技能、专家和连接器由各自领域服务管理。项目关联是可选的数据归属：安装工作台不自动创建项目，多个工作台可以处理同一项目的不同业务。通过公开领域接口读取与保存成果，所有操作继续检查当前身份和权限。企业凭据留在宿主，不写入浏览器、提示词或插件包。Excel、Word 的通用打开与编辑复用系统 Office，工作台提供业务校验、分析及成果入口。
 
@@ -91,13 +91,13 @@ Expert Workshop 开发技能要求先明确一件工作的业务对象、状态�
 
 ## 公开注册类型
 
-Host 从包根 `import type {HostWorkbenchRegistration, WorkbenchDescriptor} from "expert-workshop-plugin-workbenches"`；Client 从公开入口 `import type {ClientWorkbenchRegistration} from "expert-workshop-plugin-workbenches/client"`。业务插件分别取 `workdshWorkbenchRegistration` 与 `workdshWorkbenchClientRegistration`，使用 `registerManaged(ctx, descriptor, page)`。Host page 为页面标识，Client page 为页面组件，声明必须与安装包 manifest 一致。类型导出不提供安装权限，也不代替实际宿主授权检查。质量插件已采用公开 Client 注册类型，可作为当前集成参考。
+Host 从包根 `import type {HostWorkbenchRegistration, WorkbenchDescriptor} from "expert-workshop-plugin-workbenches"`；Client 从公开入口 `import type {ClientWorkbenchRegistration} from "expert-workshop-plugin-workbenches/client"`。业务插件分别取 `expertworkshopWorkbenchRegistration` 与 `expertworkshopWorkbenchClientRegistration`，使用 `registerManaged(ctx, descriptor, page)`。Host page 为页面标识，Client page 为页面组件，声明必须与安装包 manifest 一致。类型导出不提供安装权限，也不代替实际宿主授权检查。质量插件已采用公开 Client 注册类型，可作为当前集成参考。
 
 宿主升级后，托管注册遇到已核验安装内容但内核兼容声明不匹配的旧包，会保留可释放的拒绝记录，让原生插件图继续加载；不会注册 Host 业务入口或挂载 Client 页面，也不会更改用户的插件启用选择。管理页显示“版本不兼容”，可沿原有开发记录修复后安装兼容版本。`registerManaged` 返回不代表应用已可用，仍需分别核对兼容性、实时注册和实际页面。未托管的 `register` 继续抛出兼容错误；伪造声明、安装字节变更、调用者失效及其他错误同样拒绝，不被此恢复逻辑吞掉。
 
 ## 开发源码检查点
 
-首次源码准备生成可构建骨架，后续保持开发者文件。绑定源码前保存本机内容检查点，开发记录的 source.revision 使用 source-sha256 内容指纹。检查点存放在同一 Profile 的 workdsh-workbench-source-checkpoints/归属目录/指纹目录；不接受页面传入目的目录。保留源码和包声明，排除 node_modules、.git、dist；单文件 16MiB、总量 64MiB、最多 2000 文件，超限或包含链接时拒绝准备并保留原源码。
+首次源码准备生成可构建骨架，后续保持开发者文件。绑定源码前保存本机内容检查点，开发记录的 source.revision 使用 source-sha256 内容指纹。检查点存放在同一 Profile 的 expertworkshop-workbench-source-checkpoints/归属目录/指纹目录；不接受页面传入目的目录。保留源码和包声明，排除 node_modules、.git、dist；单文件 16MiB、总量 64MiB、最多 2000 文件，超限或包含链接时拒绝准备并保留原源码。
 
 “我的开发”可查看源码恢复点，并逐份点击“校验文件”。目录摘要默认未校验；校验会读取所有清单文件并核对大小及 SHA256，成功仅代表当次读取通过。关闭面板或切换记录会取消请求。公开接口只接收开发记录编号及内容指纹，源码目录由 Host 按当前身份派生。
 
@@ -123,7 +123,7 @@ Expert Workshop 注册服务是本平台扩展，不属于官方预生成的 Ser
 
 用户需先打开应用并按本轮完成标准试用，主动勾选并确认后才保存验收。记录绑定组织、账号、需求修订、包名、版本、SHA256 和本机安装实例；新需求或新包不继承旧确认。Host 再次核对需求与安装注册事实后写入原生 Storage Domain。验收是用户的试用确认，不是平台自动证明所有业务场景。发现问题通过已有修改意见流程保存需求修订并沿用原生开发会话，不重新创建应用。
 
-新接口 `/api/workdsh-workbench-acceptance` 仅供当前账号页面读取或显式提交确认，不向模型提供自动验收工具。公开接口目录查询边界不影响该身份校验。
+新接口 `/api/expertworkshop-workbench-acceptance` 仅供当前账号页面读取或显式提交确认，不向模型提供自动验收工具。公开接口目录查询边界不影响该身份校验。
 
 工作台列表与顶部“更多”复用官方 `@deepseek-ai/dsh-client-ui-primitives` 的 `Menu`，由原生渲染器共享该模块，启用 portal 定位、窗口边界约束、滚动跟随和键盘关闭；不复制官方组件。停用应用的“启用”直接显示在列表中。菜单只保留版本、常用、查看制作进度和停用等辅助操作。
 
@@ -139,7 +139,7 @@ Expert Workshop 注册服务是本平台扩展，不属于官方预生成的 Ser
 
 ## 新建业务包的固定构建边界
 
-平台生成的骨架使用项目内 `.workdsh-pnpm-store`，避免继承全局缓存的旧权限；源码恢复点同时排除该目录与旧版 `.workdsh-npm-cache`。构建时将 React、React DOM 与 `expert-workshop-plugin-workbenches/client` 留给宿主提供，不把平台重复打入业务包。通过统一交付入口执行构建、启动检查与 pnpm 打包，不能用 macOS 系统 tar 临时拼包。安装前读取开发上下文，确认同一最终 tgz 的版本、SHA256 与兼容检查通过。检查失败保留具体错误，不能把被拒归档笼统称为候选不存在。
+平台生成的骨架使用项目内 `.expertworkshop-pnpm-store`，避免继承全局缓存的旧权限；源码恢复点同时排除该目录与旧版 `.expertworkshop-npm-cache`。构建时将 React、React DOM 与 `expert-workshop-plugin-workbenches/client` 留给宿主提供，不把平台重复打入业务包。通过统一交付入口执行构建、启动检查与 pnpm 打包，不能用 macOS 系统 tar 临时拼包。安装前读取开发上下文，确认同一最终 tgz 的版本、SHA256 与兼容检查通过。检查失败保留具体错误，不能把被拒归档笼统称为候选不存在。
 
 
 ### 共用安装前启动检查
@@ -148,7 +148,7 @@ Expert Workshop 注册服务是本平台扩展，不属于官方预生成的 Ser
 
 检查在子进程中加载真实 Host 构建产物、解析声明运行依赖，使用官方 `ctx.plugin`，等待全部当前子组件生命周期，并检查依赖挂起和清理错误。15 秒超时会停止检查。子进程清空模型密钥等继承环境，使用临时 Home；临时目录与子进程不等于 OS 沙箱，执行权限仍由官方工具沙箱控制。
 
-默认只提供工作台注册的测试适配器，并在回执中明确列出。业务包需要其他服务时，必须通过 `package.json` 的 `workdsh.startupFixture` 指定工程内测试模块，导出 `setup(ctx,{home})`，仅加载公开实际依赖并使用临时存储及合成身份；未提供依赖的组件会失败，不会被伪造为通过。测试夹具不证明真实账号、路由、安装登记和页面可用。
+默认只提供工作台注册的测试适配器，并在回执中明确列出。业务包需要其他服务时，必须通过 `package.json` 的 `expertworkshop.startupFixture` 指定工程内测试模块，导出 `setup(ctx,{home})`，仅加载公开实际依赖并使用临时存储及合成身份；未提供依赖的组件会失败，不会被伪造为通过。测试夹具不证明真实账号、路由、安装登记和页面可用。
 
 回执包含包版本、实际 Host 文件 SHA256、检查范围与测试适配器。这个开发自检结果不能充当安装权限或生产启动凭证；平台继续独立核验安装字节、启用状态、Host/Client 注册和用户试用。
 

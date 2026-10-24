@@ -19,7 +19,7 @@ const actor={principalId:'member.a',organizationId:'org',requestId:'probe',resol
 async function boot(root){const ctx=new Context();await ctx.plugin(Storage);await ctx.plugin(Json,{root});await ctx.plugin(Domain,{backend:'json'});return ctx;}
 function setup(ctx){let selected=actor,active=true;const identity={async resolve(){return {...selected};},profile(){return {principalId:selected.principalId,organization:{id:selected.organizationId},resolvedBy:selected.resolvedBy};},membership(){return {state:active?'active':'suspended'};}};return {service:new WorkbenchShortcutsService(ctx.storageDomain,identity,id=>id.startsWith('app.')),setActor(value){selected=value;},setActive(value){active=value;}};}
 test('native storage retains shortcuts after restart, isolates accounts and rejects inactive membership',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-shortcuts-'));let ctx=await boot(root),f=setup(ctx);
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-shortcuts-'));let ctx=await boot(root),f=setup(ctx);
  try{
   await Promise.all([f.service.invoke('app.a',true),f.service.invoke('app.b',true)]);assert.deepEqual((await f.service.invoke()).ids,['app.a','app.b']);
   await f.service.close();await ctx.fiber.dispose();ctx=await boot(root);f=setup(ctx);
@@ -30,7 +30,7 @@ test('native storage retains shortcuts after restart, isolates accounts and reje
  }finally{await f.service.close();await ctx.fiber.dispose();await rm(root,{recursive:true,force:true});}
 });
 test('unknown applications cannot be pinned, duplicate pins are idempotent and limits do not erase saved entries',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-shortcuts-limit-')),ctx=await boot(root),f=setup(ctx);
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-shortcuts-limit-')),ctx=await boot(root),f=setup(ctx);
  try{
   await assert.rejects(f.service.invoke('unknown',true),/shortcut-unavailable/);
   await f.service.invoke('app.a',true);await f.service.invoke('app.a',true);assert.equal((await f.service.invoke()).ids.length,1);

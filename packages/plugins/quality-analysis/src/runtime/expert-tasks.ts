@@ -10,8 +10,8 @@ type Source={recordId:string;runId:string;contentHash:string};
  * selection, publishing, credential access or automatic prompt submission. */
 export function createQualityExpertTasks(ctx:Context,service:QualityAnalysisRunService){
  async function authority(signal?:AbortSignal){
-  const identity=ctx.get('workdshIdentity') as IdentityService|undefined;
-  const experts=ctx.get('workdshExperts') as ExpertsService|undefined;
+  const identity=ctx.get('expertworkshopIdentity') as IdentityService|undefined;
+  const experts=ctx.get('expertworkshopExperts') as ExpertsService|undefined;
   if(!identity||!experts)throw Error('quality/service/expert-unavailable');
   const actor=await identity.resolve(undefined,signal);
   const check=()=>{signal?.throwIfAborted();ctx.fiber.assertActive();const profile=identity.profile();

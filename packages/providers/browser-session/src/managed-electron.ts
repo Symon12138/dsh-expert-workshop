@@ -57,8 +57,8 @@ export function electronWorkerArguments(port: number, profileDir: string, applic
   if (applicationPath !== undefined && !isAbsolute(applicationPath)) throw new Error('Electron application path must be absolute');
   return [
     ...(applicationPath === undefined ? [] : [applicationPath]),
-    `--workdsh-browser-worker-port=${port}`,
-    `--workdsh-browser-worker-profile=${profileDir}`,
+    `--expertworkshop-browser-worker-port=${port}`,
+    `--expertworkshop-browser-worker-profile=${profileDir}`,
   ];
 }
 
@@ -66,7 +66,7 @@ export function electronWorkerArguments(port: number, profileDir: string, applic
 export async function launchManagedElectron(executable: string, signal?: AbortSignal, applicationPath?: string): Promise<ManagedChromium> {
   if (!executable.trim()) throw new Error('Desktop Electron executable is required');
   signal?.throwIfAborted();
-  const profileDir = await mkdtemp(join(tmpdir(), 'workdsh-electron-browser-'));
+  const profileDir = await mkdtemp(join(tmpdir(), 'expertworkshop-electron-browser-'));
   let child: ChildProcess | undefined;
   let browser: Browser | undefined;
   try {

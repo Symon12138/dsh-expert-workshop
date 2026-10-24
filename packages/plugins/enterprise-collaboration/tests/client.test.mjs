@@ -73,7 +73,7 @@ async function instance(member, memberToken) {
   let route;
   ctx.provide('connection', { fetch: { register(handler) { route = handler; return () => { route = undefined; }; } } });
   ctx.provide('systemPrompt', { tools() {}, section() {}, getSectionOrder() { return 0; } });
-  ctx.provide('workdshIdentity', { async resolve() { return { principalId: member, organizationId: 'org' }; } });
+  ctx.provide('expertworkshopIdentity', { async resolve() { return { principalId: member, organizationId: 'org' }; } });
   await ctx.plugin(Tools);
   const fiber = await ctx.plugin(enterpriseMemberCollaboration(adminUrl, async () => `Bearer ${memberToken}`));
   async function call(name, args = {}, callId = randomUUID()) {
@@ -99,10 +99,10 @@ test('handoff plugin waits for enterprise identity instead of exposing unusable 
     await ctx.plugin(Tools);
     const fiber = ctx.plugin(Plugin, { adminUrl, memberAuthorization: async () => `Bearer ${[...tokens.keys()][0]}` });
     assert.equal(fiber.state, 0, 'missing required identity keeps Fiber PENDING');
-    assert.equal(ctx.tools.get('workdsh_collaboration_send'), undefined);
-    ctx.provide('workdshIdentity', { async resolve() { return { principalId: a, organizationId: 'org' }; } });
+    assert.equal(ctx.tools.get('expertworkshop_collaboration_send'), undefined);
+    ctx.provide('expertworkshopIdentity', { async resolve() { return { principalId: a, organizationId: 'org' }; } });
     await settle(() => fiber.state === 2);
-    assert.ok(ctx.tools.get('workdsh_collaboration_send'), 'tool appears after dependency activates');
+    assert.ok(ctx.tools.get('expertworkshop_collaboration_send'), 'tool appears after dependency activates');
   } finally {
     await ctx.fiber.dispose();
   }
@@ -113,14 +113,14 @@ test('invalid collaboration service origin leaves Fiber FAILED with no registere
   try {
     ctx.provide('connection', { fetch: { register() { return () => {}; } } });
     ctx.provide('systemPrompt', { tools() {}, section() {}, getSectionOrder() { return 0; } });
-    ctx.provide('workdshIdentity', { async resolve() { return { principalId: a, organizationId: 'org' }; } });
+    ctx.provide('expertworkshopIdentity', { async resolve() { return { principalId: a, organizationId: 'org' }; } });
     await ctx.plugin(Tools);
     const fiber = ctx.plugin(Plugin, {
       adminUrl: 'http://example.com', memberAuthorization: async () => `Bearer ${[...tokens.keys()][0]}`,
     });
     await settle(() => fiber.state === 3);
     assert.match(fiber._error.message, /requires HTTPS except on loopback/);
-    assert.equal(ctx.tools.get('workdsh_collaboration_send'), undefined);
+    assert.equal(ctx.tools.get('expertworkshop_collaboration_send'), undefined);
   } finally {
     await ctx.fiber.dispose();
   }
@@ -132,54 +132,54 @@ test('two isolated official tool registries hand off to a real member inbox and 
   try {
     for (const ctx of [first.ctx, second.ctx]) {
       const names = ctx.tools.schemas({ id: 'session' }).map(t => t.name);
-      for (const name of ['workdsh_collaboration_colleagues', 'workdsh_collaboration_send', 'workdsh_collaboration_inbox',
-        'workdsh_collaboration_sent', 'workdsh_collaboration_complete', 'workdsh_collaboration_thread',
-        'workdsh_collaboration_reply']) assert.ok(names.includes(name), name);
+      for (const name of ['expertworkshop_collaboration_colleagues', 'expertworkshop_collaboration_send', 'expertworkshop_collaboration_inbox',
+        'expertworkshop_collaboration_sent', 'expertworkshop_collaboration_complete', 'expertworkshop_collaboration_thread',
+        'expertworkshop_collaboration_reply']) assert.ok(names.includes(name), name);
     }
-    const people = await first.call('workdsh_collaboration_colleagues');
+    const people = await first.call('expertworkshop_collaboration_colleagues');
     assert.equal(JSON.parse(people.value.data_json)[0].id, b);
     assert.equal(JSON.parse(people.value.data_json)[0].email, 'b@example.test');
-    const uiList = await first.route(new Request(`${adminUrl}/api/workdsh-collaboration`, {
+    const uiList = await first.route(new Request(`${adminUrl}/api/expertworkshop-collaboration`, {
       method: 'POST', body: JSON.stringify({ endpoint: 'colleagues' }),
     }));
     assert.equal((await uiList.json()).value[0].id, b);
-    const sent = await first.call('workdsh_collaboration_send', { recipient_id: b, summary: '请复核这份分析' }, 'same-call');
+    const sent = await first.call('expertworkshop_collaboration_send', { recipient_id: b, summary: '请复核这份分析' }, 'same-call');
     assert.equal(sent.isError, false);
     const id = JSON.parse(sent.value.data_json).id;
-    await first.call('workdsh_collaboration_send', { recipient_id: b, summary: '请复核这份分析' }, 'same-call');
+    await first.call('expertworkshop_collaboration_send', { recipient_id: b, summary: '请复核这份分析' }, 'same-call');
     assert.equal(handoffs.length, 1, 'replayed call must not duplicate handoff');
-    const inbox = await second.call('workdsh_collaboration_inbox');
+    const inbox = await second.call('expertworkshop_collaboration_inbox');
     assert.equal(JSON.parse(inbox.value.data_json)[0].id, id);
     assert.equal(JSON.parse(inbox.value.data_json)[0].needsReply, true);
-    const asked = await second.call('workdsh_collaboration_reply', {
+    const asked = await second.call('expertworkshop_collaboration_reply', {
       handoff_id: id, content: '请补充计算依据',
     }, 'reply-question');
     assert.equal(JSON.parse(asked.value.data_json).authorId, b);
-    assert.equal(JSON.parse((await first.call('workdsh_collaboration_sent')).value.data_json)[0].needsReply, true);
-    assert.equal(JSON.parse((await second.call('workdsh_collaboration_inbox')).value.data_json)[0].needsReply, false);
-    await second.call('workdsh_collaboration_reply', { handoff_id: id, content: '请补充计算依据' }, 'reply-question');
+    assert.equal(JSON.parse((await first.call('expertworkshop_collaboration_sent')).value.data_json)[0].needsReply, true);
+    assert.equal(JSON.parse((await second.call('expertworkshop_collaboration_inbox')).value.data_json)[0].needsReply, false);
+    await second.call('expertworkshop_collaboration_reply', { handoff_id: id, content: '请补充计算依据' }, 'reply-question');
     assert.equal(messages.filter(item => item.handoffId === id).length, 1);
-    const thread = await first.call('workdsh_collaboration_thread', { handoff_id: id });
+    const thread = await first.call('expertworkshop_collaboration_thread', { handoff_id: id });
     assert.equal(JSON.parse(thread.value.data_json)[0].content, '请补充计算依据');
-    const answered = await first.route(new Request(`${adminUrl}/api/workdsh-collaboration`, {
+    const answered = await first.route(new Request(`${adminUrl}/api/expertworkshop-collaboration`, {
       method: 'POST', body: JSON.stringify({ endpoint: 'reply', handoffId: id,
         content: '8 × 120 = 960', requestKey: 'ui-answer' }),
     }));
     assert.equal((await answered.json()).value.content, '8 × 120 = 960');
-    assert.equal(JSON.parse((await second.call('workdsh_collaboration_thread', { handoff_id: id })).value.data_json).length, 2);
-    assert.equal(JSON.parse((await second.call('workdsh_collaboration_inbox')).value.data_json)[0].needsReply, true);
-    const completed = await second.call('workdsh_collaboration_complete', { handoff_id: id, resolution: '已核对，需改两处' });
+    assert.equal(JSON.parse((await second.call('expertworkshop_collaboration_thread', { handoff_id: id })).value.data_json).length, 2);
+    assert.equal(JSON.parse((await second.call('expertworkshop_collaboration_inbox')).value.data_json)[0].needsReply, true);
+    const completed = await second.call('expertworkshop_collaboration_complete', { handoff_id: id, resolution: '已核对，需改两处' });
     assert.equal(JSON.parse(completed.value.data_json).status, 'DONE');
-    const reply = await first.call('workdsh_collaboration_sent');
+    const reply = await first.call('expertworkshop_collaboration_sent');
     assert.equal(JSON.parse(reply.value.data_json)[0].resolution, '已核对，需改两处');
     revoked = true;
-    const denied = await first.call('workdsh_collaboration_sent');
+    const denied = await first.call('expertworkshop_collaboration_sent');
     assert.equal(denied.isError, true);
-    assert.equal((await second.call('workdsh_collaboration_inbox')).isError, false);
+    assert.equal((await second.call('expertworkshop_collaboration_inbox')).isError, false);
   } finally {
     revoked = false;
     await first.fiber.dispose(); await second.fiber.dispose();
-    assert.equal(first.ctx.tools.get('workdsh_collaboration_send'), undefined);
+    assert.equal(first.ctx.tools.get('expertworkshop_collaboration_send'), undefined);
     await first.ctx.fiber.dispose(); await second.ctx.fiber.dispose();
   }
 });
@@ -187,10 +187,10 @@ test('two isolated official tool registries hand off to a real member inbox and 
 test('a mismatched DSH principal cannot call the member service', async () => {
   const ctx = new Context();
   ctx.provide('systemPrompt', { tools() {}, section() {}, getSectionOrder() { return 0; } });
-  ctx.provide('workdshIdentity', { async resolve() { return { principalId: b, organizationId: 'org' }; } });
+  ctx.provide('expertworkshopIdentity', { async resolve() { return { principalId: b, organizationId: 'org' }; } });
   await ctx.plugin(Tools);
   const fiber = await ctx.plugin(Plugin, { adminUrl, memberAuthorization: async () => `Bearer ${[...tokens.keys()][0]}` });
-  const result = await ctx.tools.execute({ name: 'workdsh_collaboration_colleagues', arguments: {}, callId: 'mismatch',
+  const result = await ctx.tools.execute({ name: 'expertworkshop_collaboration_colleagues', arguments: {}, callId: 'mismatch',
     agent: { id: 'session-mismatch' }, signal: new AbortController().signal });
   assert.equal(result.isError, true);
   await fiber.dispose(); await ctx.fiber.dispose();
@@ -201,7 +201,7 @@ test('an incompatible collaboration contract prevents writes before creating a h
   const count = handoffs.length;
   try {
     collaborationContractVersion = 2;
-    const result = await first.call('workdsh_collaboration_send', {
+    const result = await first.call('expertworkshop_collaboration_send', {
       recipient_id: b, summary: '不能写入不兼容的服务',
     });
     assert.equal(result.isError, true);

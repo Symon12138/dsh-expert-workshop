@@ -54,7 +54,7 @@ export const libraryStateSchema = z.object({
 export type LibraryState = z.infer<typeof libraryStateSchema>;
 
 export const libraryDomainSpec = defineDomain({
-  name: 'workdsh_library',
+  name: 'expertworkshop_library',
   version: 1,
   layout: 'per-record',
   tables: { states: domainTable<string, LibraryState>(libraryStateSchema) },

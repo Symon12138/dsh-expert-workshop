@@ -44,11 +44,11 @@ export async function registerQualityWorkspace(ports:QualityWorkspacePorts,path:
 export async function createQualityWorkspace(ports:QualityWorkspacePorts,actor:ActorContext,recordId:string,
  authorize:()=>void,workspaceRoot?:string){
  authorize();
- const configured=workspaceRoot??process.env.DSH_HOME??join(homedir(),'.workdsh');
+ const configured=workspaceRoot??process.env.DSH_HOME??join(homedir(),'.expertworkshop');
  if(!isAbsolute(configured))throw Error('quality/service/workspace-conflict');
  await mkdir(configured,{recursive:true,mode:0o700});authorize();
  const root=await realpath(configured);authorize();
- const scope=join(root,'workdsh-quality-analysis');
+ const scope=join(root,'expertworkshop-quality-analysis');
  await mkdir(scope,{recursive:true,mode:0o700});authorize();
  if(await realpath(scope)!==scope)throw Error('quality/service/workspace-conflict');authorize();
  const key=createHash('sha256').update(JSON.stringify([actor.organizationId,actor.principalId,recordId])).digest('hex');

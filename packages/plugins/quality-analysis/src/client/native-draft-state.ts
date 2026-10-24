@@ -7,7 +7,7 @@ export interface QualityNativeDraftGuard{readonly signal:AbortSignal;allowInitia
  * temporary reference neither mounts another composer nor modifies its text. */
 export async function qualityNativeDraftState(native:NativeWorkbenchConversationContext,sessionId:string,signal:AbortSignal,operation?:(guard:QualityNativeDraftGuard)=>Promise<void>):Promise<'empty'|'draft'|'busy'>{
  signal.throwIfAborted();
- const reference=native.sessions.retain(sessionId as SessionReference['sessionId'],{source:'workdshWorkbenchConversation',signal});
+ const reference=native.sessions.retain(sessionId as SessionReference['sessionId'],{source:'expertworkshopWorkbenchConversation',signal});
  try{
   const binding=await reference.ready;signal.throwIfAborted();
   if(String(binding.sessionId)!==sessionId)throw Error('quality/native-session-mismatch');

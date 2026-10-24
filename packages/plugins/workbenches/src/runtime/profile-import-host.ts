@@ -26,7 +26,7 @@ import type { WorkbenchDevelopmentService } from './development-service.js';
  * Uses the registration owner's archives and one journal per member/development. */
 export async function mountProfileWorkbenchImportHost(ctx: Context, development: WorkbenchDevelopmentService,
   isCompatible: (descriptor: WorkbenchDescriptor) => boolean, cordisVersion: string, archives: WorkbenchInstallationArchives) {
-  const identity = ctx.get('workdshIdentity') as IdentityService;
+  const identity = ctx.get('expertworkshopIdentity') as IdentityService;
   const storage = ctx.get('storageDomain') as DomainFacility;
   const profile = ctx.get('profileContext') as ProfileContext;
   if (!identity || !storage || !archives || !profile) throw new Error('workbench/host-services-unavailable');
@@ -130,7 +130,7 @@ export async function mountProfileWorkbenchImportHost(ctx: Context, development:
       const journal = await pending; authorize();
       const install = await createProfileWorkbenchInstaller(ctx, authorize); authorize();
       const adapter = createWorkbenchImportOperationAdapter({ installationRoot: directory,
-        archivePath: request.recover ? join(directory, '.workdsh-workbench-archives', `${request.expected.sha256}.tgz`) : request.archivePath ?? '',
+        archivePath: request.recover ? join(directory, '.expertworkshop-workbench-archives', `${request.expected.sha256}.tgz`) : request.archivePath ?? '',
         expected: request.expected, target, host: { harnessVersion: target.harnessVersion, cordisVersion },
         archives, install, authorize, isCompatible, checkInstalledBaseline: checkDevelopmentBaseline });
       const runner = new WorkbenchOperationRunner(journal, adapter, operation => {
@@ -145,9 +145,9 @@ export async function mountProfileWorkbenchImportHost(ctx: Context, development:
       return runner.execute({ ...request.intent, candidate: request.expected }, actor, signal);
     },
   };
-  ctx.effect(() => () => { closed = true; return Promise.allSettled([...journals.values(), ...associations.values()].map(async pending => (await pending).close())); }, 'workdsh.workbench.import.close');
+  ctx.effect(() => () => { closed = true; return Promise.allSettled([...journals.values(), ...associations.values()].map(async pending => (await pending).close())); }, 'expertworkshop.workbench.import.close');
   const connection = ctx.get('connection') as HostConnectionHandle | undefined;
-  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/workdsh-workbench-source-candidates', methods: ['POST'], requestBody: 'streaming',
+  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/expertworkshop-workbench-source-candidates', methods: ['POST'], requestBody: 'streaming',
     fetch: async request => {
       try {
         const input = await readWorkbenchRequestBody(request) as Record<string, unknown>;
@@ -179,8 +179,8 @@ export async function mountProfileWorkbenchImportHost(ctx: Context, development:
         const code = cause instanceof Error && /^workbench\/[a-z-]+$/.test(cause.message) ? cause.message : 'workbench/package-preview-failed';
         return Response.json({ ok: false, error: { code } }, { status: request.signal.aborted ? 408 : 409 });
       }
-    } }), 'workdsh.workbench.source.candidates.rpc');
-  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/workdsh-workbench-offline-imports', methods: ['POST'], requestBody: 'streaming',
+    } }), 'expertworkshop.workbench.source.candidates.rpc');
+  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/expertworkshop-workbench-offline-imports', methods: ['POST'], requestBody: 'streaming',
     fetch: async request => {
       try {
         const input = await readWorkbenchRequestBody(request);
@@ -196,8 +196,8 @@ export async function mountProfileWorkbenchImportHost(ctx: Context, development:
         const rows=store.list().filter(row=>JSON.stringify(row.target)===JSON.stringify(target)).map(row=>({importId:`import:${row.id}`,packageName:row.packageName,workbenchId:row.workbenchId,createdAt:row.createdAt}));
         await resolveTarget(actor,request.signal);authorize();return Response.json({ok:true,value:rows});
       } catch {return Response.json({ok:false,error:{code:'workbench/records-unavailable'}},{status:request.signal.aborted?408:403});}
-    } }), 'workdsh.workbench.offline.list.rpc');
-  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/workdsh-workbench-offline-prepare', methods: ['POST'], requestBody: 'streaming',
+    } }), 'expertworkshop.workbench.offline.list.rpc');
+  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/expertworkshop-workbench-offline-prepare', methods: ['POST'], requestBody: 'streaming',
     fetch: async request => {
       try {
         const value = await readWorkbenchRequestBody(request) as Record<string, unknown>;
@@ -226,8 +226,8 @@ export async function mountProfileWorkbenchImportHost(ctx: Context, development:
         const code = cause instanceof Error && /^workbench\/[a-z-]+$/.test(cause.message) ? cause.message : 'workbench/import-prepare-failed';
         return Response.json({ok:false,error:{code}},{status:request.signal.aborted ? 408 : code === 'workbench/development-access-denied' ? 403 : 409});
       }
-    } }), 'workdsh.workbench.offline.prepare.rpc');
-  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/workdsh-workbench-package-preview', methods: ['POST'], requestBody: 'streaming',
+    } }), 'expertworkshop.workbench.offline.prepare.rpc');
+  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/expertworkshop-workbench-package-preview', methods: ['POST'], requestBody: 'streaming',
     fetch: async request => {
       try {
         if (request.headers.get('content-type') !== 'application/octet-stream' || !request.body) return Response.json({ ok: false, error: { code: 'workbench/invalid-request' } }, { status: 400 });
@@ -247,8 +247,8 @@ export async function mountProfileWorkbenchImportHost(ctx: Context, development:
         const code = cause instanceof Error && /^workbench\/[a-z-]+$/.test(cause.message) ? cause.message : 'workbench/package-preview-failed';
         return Response.json({ ok: false, error: { code } }, { status: request.signal.aborted ? 408 : code === 'workbench/package-archive-size-limit' ? 413 : code === 'workbench/development-access-denied' ? 403 : 422 });
       }
-    } }), 'workdsh.workbench.package.preview.rpc');
-  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/workdsh-workbench-import-records', methods: ['POST'], requestBody: 'streaming',
+    } }), 'expertworkshop.workbench.package.preview.rpc');
+  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/expertworkshop-workbench-import-records', methods: ['POST'], requestBody: 'streaming',
     fetch: async request => {
       try {
         const value = await readWorkbenchRequestBody(request) as Record<string, unknown>;
@@ -257,8 +257,8 @@ export async function mountProfileWorkbenchImportHost(ctx: Context, development:
         const records = await service.list(value.developmentId, request.signal);
         request.signal.throwIfAborted(); return Response.json({ ok: true, value: records });
       } catch { return Response.json({ ok: false, error: { code: 'workbench/records-unavailable' } }, { status: request.signal.aborted ? 408 : 403 }); }
-    } }), 'workdsh.workbench.import.records.rpc');
-  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/workdsh-workbench-import-prepare', methods: ['POST'], requestBody: 'streaming',
+    } }), 'expertworkshop.workbench.import.records.rpc');
+  if (connection) ctx.effect(() => connection.fetch.register({ path: '/api/expertworkshop-workbench-import-prepare', methods: ['POST'], requestBody: 'streaming',
     fetch: async request => {
       try {
         const value = await readWorkbenchRequestBody(request) as Record<string, unknown>;
@@ -287,19 +287,19 @@ export async function mountProfileWorkbenchImportHost(ctx: Context, development:
         const code = cause instanceof Error && /^workbench\/[a-z-]+$/.test(cause.message) ? cause.message : 'workbench/import-prepare-failed';
         return Response.json({ ok: false, error: { code } }, { status: request.signal.aborted ? 408 : ['workbench/development-access-denied', 'workbench/development-owner-mismatch'].includes(code) ? 403 : 409 });
       }
-    } }), 'workdsh.workbench.import.prepare.rpc');
+    } }), 'expertworkshop.workbench.import.prepare.rpc');
   if (connection) ctx.effect(() => connection.fetch.register({ path: workbenchImportPath, methods: ['POST'], requestBody: 'streaming',
     fetch: request => handleWorkbenchImportRequest(request, async (input: WorkbenchImportRequest, signal) => {
       const actor = await identity.resolve(undefined, signal); assertActorContext(actor);
       const target = await resolveTarget(actor, signal);
       const expected = { packageName: input.packageName, version: input.version, workbenchId: input.workbenchId, sha256: input.sha256 };
       const operation = await service.run({ developmentId: input.developmentId, expected,
-        archivePath: join(directory, '.workdsh-workbench-archives', `${input.sha256}.tgz`), recover: input.recover,
+        archivePath: join(directory, '.expertworkshop-workbench-archives', `${input.sha256}.tgz`), recover: input.recover,
         intent: { id: input.operationId, iterationId: input.iterationId, kind: input.kind, inputHash: input.sha256, target, expectedInstalledHash: input.expectedInstalledHash } }, signal);
       return { id: operation.id, developmentId: operation.developmentId, iterationId: operation.iterationId,
         state: operation.state, kind: operation.kind, inputHash: operation.inputHash, revision: operation.revision,
         receipt: operation.receipt, errorCode: operation.errorCode };
-    }) }), 'workdsh.workbench.import.rpc');
+    }) }), 'expertworkshop.workbench.import.rpc');
   if (connection) ctx.effect(() => connection.fetch.register({ path: workbenchUploadPath, methods: ['POST'], requestBody: 'streaming',
     fetch: request => handleWorkbenchUploadRequest(request, directory, async (metadata, signal) => {
       const actor = await identity.resolve(undefined, signal); assertActorContext(actor);
@@ -317,7 +317,7 @@ export async function mountProfileWorkbenchImportHost(ctx: Context, development:
       if (!entries.some(row => row.development.id === metadata.developmentId && row.development.packageName === metadata.packageName && row.development.workbenchId === metadata.workbenchId))
         throw new Error('workbench/development-owner-mismatch');
       return authorize;
-    }) }), 'workdsh.workbench.upload.rpc');
-  ctx.provide('workdshWorkbenchImport', service);
+    }) }), 'expertworkshop.workbench.upload.rpc');
+  ctx.provide('expertworkshopWorkbenchImport', service);
   return service;
 }

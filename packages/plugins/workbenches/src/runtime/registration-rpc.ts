@@ -1,6 +1,6 @@
 import { readWorkbenchRequestBody } from './request-body.js';
 import type { HostWorkbenchRegistration } from './host-registration.js';
-export const workbenchRegistrationPath = '/api/workdsh-workbench-registration';
+export const workbenchRegistrationPath = '/api/expertworkshop-workbench-registration';
 const fail = (code: string, status: number) => Response.json({ ok: false, error: { code, message: '无法确认工作台安装状态，请刷新并核对。' } }, { status });
 export async function handleWorkbenchRegistrationRequest(request: Request,
   registration: Pick<HostWorkbenchRegistration<unknown>, 'clientAuthority'>,

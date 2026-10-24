@@ -12,11 +12,11 @@ const {confirmCreationDevelopment,WorkbenchCreationService,WorkbenchRequirements
 const load=name=>import(pathToFileURL(runtime.resolve(name)).href);
 const {Context}=await load('@deepseek-ai/cordis');const {default:Storage}=await load('@deepseek-ai/dsh-storage');const Json=await load('@deepseek-ai/dsh-storage-json');const Domain=await load('@deepseek-ai/dsh-storage-domain');
 test('confirmation resumes after saved requirements and project preparation failure without duplicate records or Session',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-confirm-resume-')),ctx=new Context();
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-confirm-resume-')),ctx=new Context();
  await ctx.plugin(Storage);await ctx.plugin(Json,{root});await ctx.plugin(Domain,{backend:'json'});
  const actor={principalId:'local-user',organizationId:'local-personal',requestId:'test',resolvedBy:'trusted-fixture'};
  const identity={resolve:async()=>actor,profile:()=>({principalId:actor.principalId,organization:{id:actor.organizationId},resolvedBy:actor.resolvedBy}),membership:()=>({state:'active'})};
- const target={hostId:'host',installationId:'installation',profileId:'workdsh',harnessVersion:'0.2.1-rc.1'};
+ const target={hostId:'host',installationId:'installation',profileId:'expertworkshop',harnessVersion:'0.2.1-rc.1'};
  const requirements=new WorkbenchRequirementsService(ctx.storageDomain,identity);
  const development=new WorkbenchDevelopmentService(ctx.storageDomain,identity,requirements,async()=>target);
  let sdkAvailable=false,sourceChecks=0,sessionChecks=0,sessionsCreated=0;

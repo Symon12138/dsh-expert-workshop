@@ -51,7 +51,7 @@ async function bootStorage(root) {
 }
 
 async function fixture() {
-  const home = await realpath(await mkdtemp(join(tmpdir(), 'workdsh-native-installation-')));
+  const home = await realpath(await mkdtemp(join(tmpdir(), 'expertworkshop-native-installation-')));
   const directory = join(home, 'profile'), storageRoot = join(home, 'storage');
   await mkdir(directory);
   await writeFile(join(directory, 'package.json'), JSON.stringify({ name: 'isolated-native-receipt', version: '0.0.0', private: true, dsh: { bundles: [] } }));
@@ -65,13 +65,13 @@ async function fixture() {
   let source, api, archives, storageContext;
   const services = {
     profileContext: profile,
-    workdshIdentity: {
+    expertworkshopIdentity: {
       resolve: async () => ({ ...actor }),
       profile: () => ({ principalId: actor.principalId, resolvedBy: actor.resolvedBy,
         organization: { id: actor.organizationId, kind: 'personal' } }),
       membership: () => ({ state: flags.active ? 'active' : 'revoked' }),
     },
-    workdshAccess: { sessionOwner: () => flags.owner ? { ownerPrincipalId: actor.principalId, organizationId: actor.organizationId } : undefined },
+    expertworkshopAccess: { sessionOwner: () => flags.owner ? { ownerPrincipalId: actor.principalId, organizationId: actor.organizationId } : undefined },
     sessionController: { inspect: async id => {
       assert.equal(id, 'native-session-1');
       flags.inspections++;
@@ -82,7 +82,7 @@ async function fixture() {
   };
   const ctx = {
     get: key => {
-      if (/^(?:pluginManager|bundleManager|workdshWorkbenchImport)$/.test(key)) {
+      if (/^(?:pluginManager|bundleManager|expertworkshopWorkbenchImport)$/.test(key)) {
         flags.sideEffects++;
         throw new Error('verification-must-not-install-or-enable');
       }
@@ -94,15 +94,15 @@ async function fixture() {
   const target = await (await createProfileWorkbenchTarget(ctx))(actor);
   const developmentId = 'native-development-1';
   const key = createHash('sha256').update(JSON.stringify([actor.organizationId, actor.principalId, target.hostId, developmentId])).digest('hex');
-  source = join(directory, 'workdsh-workbench-sources', key);
+  source = join(directory, 'expertworkshop-workbench-sources', key);
   await mkdir(source, { recursive: true });
-  const descriptor = { id: 'workdsh.native-receipt-test', title: '原生安装核验探针', description: '', protocolVersion: '1.0', layout: 'full-page',
+  const descriptor = { id: 'expertworkshop.native-receipt-test', title: '原生安装核验探针', description: '', protocolVersion: '1.0', layout: 'full-page',
     hostCompatibility: { sdk: '^1.0.0', harness: target.harnessVersion }, capabilities: [] };
-  const packageName = 'workdsh-native-receipt-test', version = '0.1.0';
+  const packageName = 'expertworkshop-native-receipt-test', version = '0.1.0';
   await writeFile(join(source, 'package.json'), JSON.stringify({ name: packageName, version, type: 'module',
     files: ['index.js', 'index.d.ts', 'client.js', 'client.d.ts', 'cordis.patch.yml'],
     exports: { '.': { default: './index.js', types: './index.d.ts' }, './client': { default: './client.js', types: './client.d.ts' } },
-    dsh: { bundle: { patch: './cordis.patch.yml' }, client: { platform: 'web' } }, workdsh: { workbench: descriptor } }));
+    dsh: { bundle: { patch: './cordis.patch.yml' }, client: { platform: 'web' } }, expertworkshop: { workbench: descriptor } }));
   await Promise.all(['index.js', 'client.js'].map(name => writeFile(join(source, name), 'throw new Error("fixture-entry-must-not-run");\n')));
   await Promise.all(['index.d.ts', 'client.d.ts'].map(name => writeFile(join(source, name), 'export {};\n')));
   await writeFile(join(source, 'cordis.patch.yml'), '- insert: []\n');
@@ -135,9 +135,9 @@ async function fixture() {
   return {
     directory, source, packageName, version, artifact, developmentId, target, flags,
     get api() { return api; }, get archives() { return archives; },
-    request: fields => routes.get('/api/workdsh-workbench-native-installation').fetch(new Request('http://localhost/api/workdsh-workbench-native-installation',
+    request: fields => routes.get('/api/expertworkshop-workbench-native-installation').fetch(new Request('http://localhost/api/expertworkshop-workbench-native-installation',
       { method: 'POST', body: JSON.stringify(fields) })),
-    timingRequest:fields=>routes.get('/api/workdsh-workbench-timing').fetch(new Request('http://localhost/api/workdsh-workbench-timing',{method:'POST',body:JSON.stringify(fields)})),
+    timingRequest:fields=>routes.get('/api/expertworkshop-workbench-timing').fetch(new Request('http://localhost/api/expertworkshop-workbench-timing',{method:'POST',body:JSON.stringify(fields)})),
     fields: () => ({ developmentId, expectedRevision: 'development-1', version, sha256: artifact.receipt.sha256 }),
     reset() { flags.active = true; flags.owner = true; flags.bound = true; flags.revision = 'development-1'; flags.requirement = 'requirements-1';
       flags.listReads = 0; flags.inspections = 0; flags.onList = undefined; flags.onInspect = undefined; },

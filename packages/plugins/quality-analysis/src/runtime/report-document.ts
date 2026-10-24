@@ -17,7 +17,7 @@ export const qualityReportDocumentOperationSchema=z.object({operationId:id,reque
 export type QualityReportDocumentOperation=z.infer<typeof qualityReportDocumentOperationSchema>;
 const metadataSchema=z.object({schemaVersion:z.literal(1),reportId:id,recordId:scopeId,runId:scopeId,contentHash:hash,fields:qualityReportFieldsSchema}).strict();
 export interface QualityReportDocumentIdentity {readonly reportId:string;readonly recordId:string;readonly runId:string;readonly contentHash:string;}
-const prefix='<!-- workdsh-quality-report-document:1 ',suffix=' -->';
+const prefix='<!-- expertworkshop-quality-report-document:1 ',suffix=' -->';
 export const qualityReportBytesHash=(bytes:Uint8Array|string)=>createHash('sha256').update(bytes).digest('hex');
 const heading=(value:string)=>value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/[\\`*_{}\[\]()#!|]/g,'\\$&');
 
@@ -32,7 +32,7 @@ export function encodeQualityReportDocument(identity:QualityReportDocumentIdenti
   const statistics=run.content.statistics.summary,conformingRate=statistics.inspectedQuantity===0?'不可计算（分母为零）':(statistics.conformingQuantity/statistics.inspectedQuantity*100).toFixed(2)+'%';
   const markdown=[marker,`# ${heading(fields.title)}`,'','报告中的分析、结论和建议由用户加工；下方统计依据固定于原分析运行。','',
     '## 分析',fields.analysis,'','## 结论',fields.conclusion,'','## 建议',fields.recommendations,'',
-    '<!-- workdsh-quality-report-fixed-statistics -->',`固定统计：检验数量 ${statistics.inspectedQuantity}；不合格数量 ${statistics.nonconformingQuantity}；合格率 ${conformingRate}。`,'',renderQualityMarkdownReport(run,'固定统计依据')].join('\n');
+    '<!-- expertworkshop-quality-report-fixed-statistics -->',`固定统计：检验数量 ${statistics.inspectedQuantity}；不合格数量 ${statistics.nonconformingQuantity}；合格率 ${conformingRate}。`,'',renderQualityMarkdownReport(run,'固定统计依据')].join('\n');
   if(Buffer.byteLength(markdown,'utf8')>QUALITY_REPORT_DOCUMENT_BYTE_LIMIT)throw Error('quality/report-document/byte-budget-exceeded');
   return markdown;
 }

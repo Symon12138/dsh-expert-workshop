@@ -77,14 +77,14 @@ const identity = {
 async function boot(root, fs = {}) {
   const ctx = new Context();
   ctx.provide("fs", fs);
-  ctx.provide("workdshIdentity", identity);
+  ctx.provide("expertworkshopIdentity", identity);
   await ctx.plugin(Storage);
   await ctx.plugin(JsonStorage, { root });
   await ctx.plugin(StorageDomain, { backend: "json" });
   await ctx.plugin(AuditJournal);
   await ctx.plugin(AccessManager);
   for (const p of ["a", "b", "c"])
-    await ctx.workdshAccess.bindSession(actor(p), {
+    await ctx.expertworkshopAccess.bindSession(actor(p), {
       sessionId: "session-" + p,
       workspaceId: "workspace",
     });
@@ -102,7 +102,7 @@ async function boot(root, fs = {}) {
   });
   await ctx.plugin(Tools);
   const toolFiber = await ctx.plugin(toolPlugin);
-  return { ctx, fiber, toolFiber, sections, s: ctx.workdshOfficeContent };
+  return { ctx, fiber, toolFiber, sections, s: ctx.expertworkshopOfficeContent };
 }
 const block = (text) => ({ type: "paragraph", runs: [{ text, marks: [] }] });
 const create = async (s) =>
@@ -301,9 +301,9 @@ test("Office native tools, atomic batches, replay before CAS, leases, ownership 
     );
     await h.s.edit(actor(), change(restored, "after-restart", "恢复后继续"));
     const old = h.s;
-    assert.ok(h.sections.has("workdsh:office-authoring"));
+    assert.ok(h.sections.has("expertworkshop:office-authoring"));
     await h.fiber.dispose();
-    assert.equal(h.sections.has("workdsh:office-authoring"), false, "Office disposal removes its writing guide");
+    assert.equal(h.sections.has("expertworkshop:office-authoring"), false, "Office disposal removes its writing guide");
     assert.equal(
       h.ctx.tools.get("content_read"),
       undefined,
@@ -431,17 +431,17 @@ test("Office Host unload revokes tools and writing guide, and reinstall preserve
     const before = await h.s.read(actor(), initial.documentId);
     const names = ["content_open", "content_read", "content_capabilities", "content_edit", "content_present", "content_export"];
     for (const name of names) assert.ok(h.ctx.tools.get(name));
-    assert.ok(h.sections.has("workdsh:office-authoring"));
+    assert.ok(h.sections.has("expertworkshop:office-authoring"));
     await h.toolFiber.dispose();
     for (const name of names) assert.equal(h.ctx.tools.get(name), undefined);
-    assert.equal(h.sections.has("workdsh:office-authoring"), false);
+    assert.equal(h.sections.has("expertworkshop:office-authoring"), false);
     await h.fiber.dispose();
-    assert.equal(h.ctx.workdshOfficeContent, undefined);
+    assert.equal(h.ctx.expertworkshopOfficeContent, undefined);
     const restoredFiber = await h.ctx.plugin(ContentService);
     try {
       await h.ctx.plugin(toolPlugin);
       for (const name of names) assert.ok(h.ctx.tools.get(name));
-      const after = await h.ctx.workdshOfficeContent.read(actor(), initial.documentId);
+      const after = await h.ctx.expertworkshopOfficeContent.read(actor(), initial.documentId);
       assert.deepEqual(after.state, before.state);
       assert.equal(after.revision, before.revision);
     } finally {await restoredFiber.dispose();}
@@ -526,7 +526,7 @@ test("AI image references copy across authorized documents and reject changed or
     await assert.rejects(h.s.editForAgent(actor(), {...input, operationId: "unauthorized-source", operations: [{...input.operations[0], blocks: [{...image, image: {...image.image, src: foreignRef}, clientRef: "forbidden"}]}]}), {code: "FORBIDDEN"});
     assert.equal((await h.s.read(actor(), doc.documentId)).revision, receipt.revision);
     const workspaceActor = {...actor(), sessionId: "session-a-other-workspace"};
-    await h.ctx.workdshAccess.bindSession(workspaceActor, {sessionId: workspaceActor.sessionId, workspaceId: "other-workspace"});
+    await h.ctx.expertworkshopAccess.bindSession(workspaceActor, {sessionId: workspaceActor.sessionId, workspaceId: "other-workspace"});
     const workspaceDoc = await h.s.open(workspaceActor, {source: "new", title: "另工作区来源", operationId: "workspace-source"});
     await h.s.edit(workspaceActor, {documentId: workspaceDoc.documentId, baseRevision: workspaceDoc.revision, operationId: "workspace-seed", operations: [{op: "document.insertBlocks", afterBlockId: null, blocks: [{...image, clientRef: "workspace-image"}]}]});
     const workspaceRef = Object.values(h.s.projectForAgent(await h.s.read(workspaceActor, workspaceDoc.documentId)).state.blocks).find(b => b.type === "image").image.src;
@@ -764,7 +764,7 @@ test("Large template browser saves are accepted only for authorized PPT document
   const template=await createPresentation("标准模板");
   const JSZip=(await import(officeRequire.resolve("jszip"))).default;
   const zip=await JSZip.loadAsync(Buffer.from(template.bytes,"base64"));
-  zip.file("customXml/workdsh-padding.bin",Buffer.alloc(2*1024*1024,7));
+  zip.file("customXml/expertworkshop-padding.bin",Buffer.alloc(2*1024*1024,7));
   const bytes=(await zip.generateAsync({type:"nodebuffer",compression:"STORE"})).toString("base64");
   const first=await h.s.open(actor(),{source:"pptx",kind:"presentation",title:"大模板",operationId:"large-template",bytes});
   let endpoint;
@@ -772,7 +772,7 @@ test("Large template browser saves are accepted only for authorized PPT document
   await h.ctx.plugin(await import(new URL("connection.js",artifacts)));
   const envelope={sessionId:"session-a",request:{endpoint:"edit",input:{documentId:first.documentId,baseRevision:0,operationId:"large-browser-save",operations:[{op:"presentation.replaceDeck",deck:first.state.deck}]}}};
   const body=JSON.stringify(envelope);assert.ok(Buffer.byteLength(body)>1500000);
-  const send=async(text)=> (await endpoint.fetch(new Request("http://local/api/workdsh-office",{method:"POST",body:text}))).json();
+  const send=async(text)=> (await endpoint.fetch(new Request("http://local/api/expertworkshop-office",{method:"POST",body:text}))).json();
   const saved=await send(body);assert.equal(saved.ok,true);assert.equal(saved.value.revision,1);
   assert.deepEqual(await send(body),saved);
   const forbidden=await send(JSON.stringify({...envelope,sessionId:"session-b"}));assert.equal(forbidden.error.code,"FORBIDDEN");

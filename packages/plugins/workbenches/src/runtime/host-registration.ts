@@ -113,7 +113,7 @@ export class HostWorkbenchRegistration<Page> {
       };
       this.disposers.add(dispose);
     }
-    try { return caller.effect(() => dispose, 'workdsh.workbench.registration'); }
+    try { return caller.effect(() => dispose, 'expertworkshop.workbench.registration'); }
     catch (cause) { dispose(); throw cause; }
   }
 }

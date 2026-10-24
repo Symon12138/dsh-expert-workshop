@@ -33,7 +33,7 @@ test('evidence decoder rejects another basis, unrelated record, invalid origin a
  for(const wrong of [{...receipt,recordId:'other'},{...receipt,runId:'other'},{...receipt,contentHash:'b'.repeat(64)},{...receipt,selection:{kind:'inspection',inspectionId:'c'}},{...receipt,total:2},{...receipt,nextOffset:1},{...receipt,rows:[]},{...receipt,rows:[{...receipt.rows[0],sourceRow:0}]},{...receipt,rows:[{...receipt.rows[0],inspection:row('c','2026-10-10')}]},{...receipt,rows:[{...receipt.rows[0],inspection:{...receipt.rows[0].inspection,nonconformingQuantity:101}}]}])assert.throws(()=>parse(wrong,expected),/invalid-page/);
 });
 test('Client sends bounded focus requests and validates the same view and selected focus receipt',async()=>{
- let submitted;const client=createQualityRecordClient(async(path,init)=>{assert.equal(path,'/api/workdsh-quality-records');submitted=JSON.parse(init.body);return Response.json({ok:true,value:receipt});});
+ let submitted;const client=createQualityRecordClient(async(path,init)=>{assert.equal(path,'/api/expertworkshop-quality-records');submitted=JSON.parse(init.body);return Response.json({ok:true,value:receipt});});
  assert.equal((await client.focusInspections(basis.recordId,basis.runId,basis.contentHash,selection,0)).rows[0].inspection.inspectionId,'b');
  assert.deepEqual(submitted,{endpoint:'focus-inspections',payload:{...basis,selection,offset:0}});
  const context={...basis,sessionId:'session',originRunId:'original',originContentHash:'b'.repeat(64),revision:4,selectedFocus:selection};

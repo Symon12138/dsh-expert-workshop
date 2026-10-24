@@ -1,4 +1,4 @@
-import { extractTabularText } from 'workdsh-tabular';
+import { extractTabularText } from 'expertworkshop-tabular';
 import JSZip from 'jszip';
 import type { LibraryAssetKind } from 'expert-workshop-contracts/library';
 

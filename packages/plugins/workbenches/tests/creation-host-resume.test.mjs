@@ -13,7 +13,7 @@ const {mountWorkbenchCreationHost,createProfileWorkbenchTarget,WorkbenchRequirem
 const load=name=>import(pathToFileURL(runtime.resolve(name)).href);
 const {Context}=await load('@deepseek-ai/cordis');const {default:Storage}=await load('@deepseek-ai/dsh-storage');const Json=await load('@deepseek-ai/dsh-storage-json');const Domain=await load('@deepseek-ai/dsh-storage-domain');
 for(const existingBehavior of ['mint-new-id','reject-existing'])test(`the mounted Host reopens a started Session (${existingBehavior}) after partial confirmation without creating another Session`,async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-host-creation-resume-')),profileDir=join(root,'profile');await mkdir(profileDir);await writeFile(join(profileDir,'package.json'),'{}');
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-host-creation-resume-')),profileDir=join(root,'profile');await mkdir(profileDir);await writeFile(join(profileDir,'package.json'),'{}');
  const owners=new Map(),sessions=new Map(),workspaces=new Map();let creates=0,boot;
  const actor={principalId:'member',organizationId:'personal',requestId:'fixture',resolvedBy:'fixture'};
  const identity={resolve:async()=>actor,profile:()=>({principalId:actor.principalId,organization:{id:actor.organizationId,kind:'personal'},resolvedBy:actor.resolvedBy}),membership:()=>({state:'active'})};
@@ -25,9 +25,9 @@ for(const existingBehavior of ['mint-new-id','reject-existing'])test(`the mounte
  };
  async function start(){
   const storageCtx=new Context();await storageCtx.plugin(Storage);await storageCtx.plugin(Json,{root:join(root,'storage')});await storageCtx.plugin(Domain,{backend:'json'});
-  const services={profileContext:{name:'test',dir:profileDir,home:root},workdshIdentity:identity,workdshAccess:access,storageDomain:storageCtx.storageDomain,sessionController:native,connection:{fetch:{register:()=>()=>{}}}};
+  const services={profileContext:{name:'test',dir:profileDir,home:root},expertworkshopIdentity:identity,expertworkshopAccess:access,storageDomain:storageCtx.storageDomain,sessionController:native,connection:{fetch:{register:()=>()=>{}}}};
   const ctx={get:key=>services[key],fiber:{assertActive(){}},effect:()=>{},tools:{register(){}},sessionController:native,workspaceController:{create:async({path})=>{let entry=[...workspaces].find(([,cwd])=>cwd===path);const created=!entry;if(!entry){entry=[`workspace-${workspaces.size}`,path];workspaces.set(...entry);}return {workspace:{workspaceId:entry[0]},created};},rename:async()=>{}}};
-  const requirements=new WorkbenchRequirementsService(storageCtx.storageDomain,identity),development=new WorkbenchDevelopmentService(storageCtx.storageDomain,identity,requirements,await createProfileWorkbenchTarget(ctx));services.workdshWorkbenchRequirements=requirements;
+  const requirements=new WorkbenchRequirementsService(storageCtx.storageDomain,identity),development=new WorkbenchDevelopmentService(storageCtx.storageDomain,identity,requirements,await createProfileWorkbenchTarget(ctx));services.expertworkshopWorkbenchRequirements=requirements;
   const service=await mountWorkbenchCreationHost(ctx,{requirements,development});
   return {service,requirements,development,close:async()=>{await service.close();await development.close();await requirements.close();await storageCtx.fiber.dispose();}};
  }

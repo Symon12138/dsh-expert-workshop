@@ -26,13 +26,13 @@ export async function mountNativeWorkbenchInstallationHost(ctx: Context, directo
   development: WorkbenchDevelopmentService, requirements: WorkbenchRequirementsService,
   archives: WorkbenchInstallationArchives, isCompatible: (descriptor: WorkbenchDescriptor) => boolean,
   cordisVersion: string) {
-  const identity = ctx.get('workdshIdentity') as IdentityService;
+  const identity = ctx.get('expertworkshopIdentity') as IdentityService;
   const profile = ctx.get('profileContext') as ProfileContext;
   const connection = ctx.get('connection') as HostConnectionHandle;
   const resolveTarget = await createProfileWorkbenchTarget(ctx);
   const atomic = await import(pathToFileURL(createRequire(profile.installAnchor).resolve('@deepseek-ai/dsh-atomic-write')).href);
   let closed = false;
-  ctx.effect(() => () => { closed = true; }, 'workdsh.workbench.native-installation.close');
+  ctx.effect(() => () => { closed = true; }, 'expertworkshop.workbench.native-installation.close');
   async function scope(developmentId: string | undefined, sessionId: string | undefined, signal?: AbortSignal) {
     const actor = await identity.resolve(sessionId ? { sessionId } : undefined, signal); assertActorContext(actor);
     const check = () => {
@@ -49,7 +49,7 @@ export async function mountNativeWorkbenchInstallationHost(ctx: Context, directo
     const baseline = structuredClone(matches[0]!.development);
     if (!baseline.source || JSON.stringify(baseline.target) !== JSON.stringify(target)) throw new Error('workbench/installation-target-changed');
     const key = createHash('sha256').update(JSON.stringify([actor.organizationId, actor.principalId, target.hostId, baseline.id])).digest('hex');
-    if (baseline.source.directory !== join(directory, 'workdsh-workbench-sources', key) || baseline.source.hostId !== target.hostId)
+    if (baseline.source.directory !== join(directory, 'expertworkshop-workbench-sources', key) || baseline.source.hostId !== target.hostId)
       throw new Error('workbench/source-identity-mismatch');
     const guard = async () => {
       check(); await resolveTarget(actor, signal); check();
@@ -96,7 +96,7 @@ export async function mountNativeWorkbenchInstallationHost(ctx: Context, directo
     // Same public lock as the native installer: never record a mixed package generation.
     await atomic.withFileLock(join(directory, 'package.json'), async () => {
       await guard();
-      try { await archives.retainVerified({ ...expected, path: join(directory, '.workdsh-workbench-archives', `${expected.sha256}.tgz`) }, check, signal); }
+      try { await archives.retainVerified({ ...expected, path: join(directory, '.expertworkshop-workbench-archives', `${expected.sha256}.tgz`) }, check, signal); }
       catch(cause){if(cause&&typeof cause==='object'&&'code' in cause&&cause.code==='ENOENT')throw Error('workbench/installed-file-missing');throw cause;}
       await guard();
     }, { waitMs: 10_000 });
@@ -117,7 +117,7 @@ export async function mountNativeWorkbenchInstallationHost(ctx: Context, directo
     verifyNativeInstallation: (sessionId: string, input: { version: string; sha256: string }, signal?: AbortSignal) =>
       verify(undefined, sessionId, input, undefined, signal),
   };
-  ctx.effect(() => connection.fetch.register({ path: '/api/workdsh-workbench-native-installation', methods: ['POST'], requestBody: 'streaming',
+  ctx.effect(() => connection.fetch.register({ path: '/api/expertworkshop-workbench-native-installation', methods: ['POST'], requestBody: 'streaming',
     fetch: async request => {
       try {
         const value = await readWorkbenchRequestBody(request) as Record<string, unknown>;
@@ -130,6 +130,6 @@ export async function mountNativeWorkbenchInstallationHost(ctx: Context, directo
         const code = cause instanceof Error && /^workbench\/[a-z-]+$/.test(cause.message) ? cause.message : 'workbench/native-installation-unconfirmed';
         return Response.json({ ok: false, error: { code } }, { status: request.signal.aborted ? 408 : code === 'workbench/invalid-request' ? 400 : ['workbench/development-owner-mismatch', 'workbench/development-access-denied'].includes(code) ? 403 : 409 });
       }
-    } }), 'workdsh.workbench.native-installation.rpc');
+    } }), 'expertworkshop.workbench.native-installation.rpc');
   return api;
 }

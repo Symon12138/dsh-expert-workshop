@@ -11,7 +11,7 @@ import {isDeepStrictEqual} from 'node:util';
 // context. It supplies host peers, never missing business dependencies or a
 // replacement resolver for the candidate's executable JavaScript.
 async function hostPeerRequire(directory){
- let text;try{text=await readFile(join(directory,'.workdsh-runtime.json'),'utf8');}
+ let text;try{text=await readFile(join(directory,'.expertworkshop-runtime.json'),'utf8');}
  catch(error){if(error.code==='ENOENT')return undefined;throw Error('workbench/startup-invalid-runtime-anchor');}
  try{
   const record=JSON.parse(text);
@@ -25,7 +25,7 @@ async function hostPeerRequire(directory){
  * Test providers are explicitly reported and cannot certify production startup. */
 export async function checkWorkbenchStartup(directory,{timeoutMs=15000,signal}={}){
  signal?.throwIfAborted();
- const source=await realpath(directory),home=await mkdtemp(join(tmpdir(),'workdsh-startup-'));
+ const source=await realpath(directory),home=await mkdtemp(join(tmpdir(),'expertworkshop-startup-'));
  try{
   return await new Promise((accept,reject)=>{
    const env={PATH:process.env.PATH??'',HOME:home,USERPROFILE:home,TMPDIR:home,TEMP:home,TMP:home,DSH_HOME:home,DSH_AGENTS_HOME:join(home,'agents')};
@@ -45,7 +45,7 @@ export async function checkWorkbenchStartup(directory,{timeoutMs=15000,signal}={
  }finally{await rm(home,{recursive:true,force:true});}
 }
 async function worker(directory,home){
- let ctx,stage='dependencies';const providers=['workdshWorkbenchRegistration (test adapter)'];
+ let ctx,stage='dependencies';const providers=['expertworkshopWorkbenchRegistration (test adapter)'];
  try{
   const pkg=JSON.parse(await readFile(join(directory,'package.json'),'utf8')),require=createRequire(join(directory,'package.json'));
   const hostRequire=await hostPeerRequire(directory),hostPeers=new Set(['@deepseek-ai/cordis','expert-workshop-plugin-workbenches']);
@@ -81,12 +81,12 @@ async function worker(directory,home){
   if(cordisVersion!=='4.0.5')throw Error('workbench/startup-unsupported-cordis');
   const {Context}=await import(pathToFileURL(cordisRequire.resolve('@deepseek-ai/cordis')).href);
   ctx=new Context();let registered=false;
-  ctx.provide('workdshWorkbenchRegistration',{async registerManaged(caller,declaration,page){
-   if(!isDeepStrictEqual(declaration,pkg.workdsh?.workbench)||typeof page!=='string'||!page)throw Error('workbench/startup-registration-mismatch');
+  ctx.provide('expertworkshopWorkbenchRegistration',{async registerManaged(caller,declaration,page){
+   if(!isDeepStrictEqual(declaration,pkg.expertworkshop?.workbench)||typeof page!=='string'||!page)throw Error('workbench/startup-registration-mismatch');
    registered=true;return caller.effect(()=>()=>{},'startup.registration-test-adapter');
   }});
   stage='fixtures';
-  const fixture=pkg.workdsh?.startupFixture;
+  const fixture=pkg.expertworkshop?.startupFixture;
   if(fixture!==undefined){
    if(typeof fixture!=='string'||!fixture.startsWith('./'))throw Error('workbench/startup-invalid-fixture');
    const path=await realpath(resolve(directory,fixture)),delta=relative(directory,path);

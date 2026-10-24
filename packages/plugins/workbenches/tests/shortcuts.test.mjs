@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 const {build}=createRequire(new URL('../../../../apps/web/package.json',import.meta.url))('esbuild');
 const built=await build({entryPoints:[fileURLToPath(new URL('../src/client/shortcuts.ts',import.meta.url))],bundle:true,platform:'node',format:'esm',write:false});
 const {createWorkbenchShortcuts,switcherSections}=await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
-const mount=id=>({descriptor:{id,title:id,description:'业务应用'},panelKey:`workdsh-workbench:${id}`,signal:new AbortController().signal});
+const mount=id=>({descriptor:{id,title:id,description:'业务应用'},panelKey:`expertworkshop-workbench:${id}`,signal:new AbortController().signal});
 test('switcher lists verified page lifetimes, filters unavailable preferences and retains stable application identity',async()=>{
  let ids=['app.a','app.uninstalled'];
  const controller=createWorkbenchShortcuts(async(_path,request)=>{const input=JSON.parse(request.body);if(input.id)ids=input.pinned?[...ids,input.id]:ids.filter(id=>id!==input.id);return Response.json({ok:true,value:{organizationId:'org',principalId:'user',ids}});});

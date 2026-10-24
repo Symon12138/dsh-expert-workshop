@@ -12,7 +12,7 @@ const entrySchema = z.object({ packageName:z.string().min(1).max(214), version:z
 const stateSchema = z.object({ installationId:z.string(), installationRoot:z.string(), entries:z.array(entrySchema) });
 function specification(installationId:string, installationRoot:string) {
   const key=createHash('sha256').update(installationId).digest('hex').slice(0,40);
-  return defineDomain({name:`workdsh_install_archives_${key}`,version:1,global:{schema:stateSchema,
+  return defineDomain({name:`expertworkshop_install_archives_${key}`,version:1,global:{schema:stateSchema,
     initial:{installationId,installationRoot,entries:[]}},tables:{}});
 }
 type ArchiveDomain=Domain<ReturnType<typeof specification>>;

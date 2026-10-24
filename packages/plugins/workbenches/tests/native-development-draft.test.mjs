@@ -23,7 +23,7 @@ function fixture({ draft = '', ready = Promise.resolve(), onOpen = () => {}, pre
 }
 test('native handoff retains correct generation, opens conversation and releases after draft insertion', async () => {
   const f = fixture(); await handoff(f.ctx, 'session-1', '创建质量工作台');
-  assert.deepEqual(f.calls, [['retain', 'session-1', 'workdshWorkbenchDraft'], ['draft', '创建质量工作台'], ['open', 'session-1'], ['panel', null], ['release']]);
+  assert.deepEqual(f.calls, [['retain', 'session-1', 'expertworkshopWorkbenchDraft'], ['draft', '创建质量工作台'], ['open', 'session-1'], ['panel', null], ['release']]);
 });
 
 test('existing non-Creator conversation stays on the original page with no draft change', async () => {
@@ -31,7 +31,7 @@ test('existing non-Creator conversation stays on the original page with no draft
     const f = fixture({ preset, draft: '保留我的输入' });
     await assert.rejects(handoff(f.ctx, 'session-1', '开发需求'), /development-creator-required/);
     assert.equal(f.draft(), '保留我的输入');
-    assert.deepEqual(f.calls, [['retain', 'session-1', 'workdshWorkbenchDraft'], ['release']]);
+    assert.deepEqual(f.calls, [['retain', 'session-1', 'expertworkshopWorkbenchDraft'], ['release']]);
   }
 });
 test('ready rejection, occupied draft and cancellation release without changing input', async () => {
@@ -41,7 +41,7 @@ test('ready rejection, occupied draft and cancellation release without changing 
   const occupied = fixture({ draft: '用户输入' });
   await assert.rejects(handoff(occupied.ctx, 'session-1', '需求'), /draft-not-empty/);
   assert.equal(occupied.draft(), '用户输入');
-  assert.deepEqual(occupied.calls, [['retain', 'session-1', 'workdshWorkbenchDraft'], ['release']]);
+  assert.deepEqual(occupied.calls, [['retain', 'session-1', 'expertworkshopWorkbenchDraft'], ['release']]);
   const controller = new AbortController();
   const cancelled = fixture({ ready: Promise.resolve().then(() => controller.abort()) });
   await assert.rejects(handoff(cancelled.ctx, 'session-1', '需求', controller.signal), { name: 'AbortError' });
@@ -54,10 +54,10 @@ test('navigation-triggered editor cancellation preserves the written native draf
   await handoff(f.ctx, 'session-1', '需求', controller.signal);
   assert.equal(controller.signal.aborted, true);
   assert.equal(f.draft(), '需求');
-  assert.deepEqual(f.calls, [['retain', 'session-1', 'workdshWorkbenchDraft'], ['draft', '需求'], ['open', 'session-1'], ['panel', null], ['release']]);
+  assert.deepEqual(f.calls, [['retain', 'session-1', 'expertworkshopWorkbenchDraft'], ['draft', '需求'], ['open', 'session-1'], ['panel', null], ['release']]);
 });
 test('retry with the same native draft navigates without writing again', async () => {
   const f = fixture({ draft: '需求' });
   await handoff(f.ctx, 'session-1', '需求');
-  assert.deepEqual(f.calls, [['retain', 'session-1', 'workdshWorkbenchDraft'], ['open', 'session-1'], ['panel', null], ['release']]);
+  assert.deepEqual(f.calls, [['retain', 'session-1', 'expertworkshopWorkbenchDraft'], ['open', 'session-1'], ['panel', null], ['release']]);
 });

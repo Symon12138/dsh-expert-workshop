@@ -12,7 +12,7 @@ export function encodeOperationInput(input){
  * Host path, model path or direct Host filesystem write is used here. */
 export async function stageOperationInput(dispatch,parse,python,encoded){
  if(Buffer.byteLength(encoded)<=32768)return {argument:Buffer.from(encoded).toString('base64'),cleanup:null};
- const prefix='.workdsh-compute-input-'+randomUUID()+'-';
+ const prefix='.expertworkshop-compute-input-'+randomUUID()+'-';
  const create=`import json,os,tempfile;print(json.dumps({'directory':tempfile.mkdtemp(prefix=${JSON.stringify(prefix)},dir=os.getcwd())}))`;
  const result=parse(await dispatch('bash',{command:`${quote(python)} -I -c ${quote(create)}`,description:'准备当前工作区的专业计算临时输入',timeoutMs:10000},'input-create'),'INPUT');
  if(typeof result?.directory!=='string'||!isAbsolute(result.directory)||!basename(result.directory).startsWith(prefix))throw Error('HOST_COMPUTE_INPUT_INVALID_OUTPUT');
@@ -23,6 +23,6 @@ export async function stageOperationInput(dispatch,parse,python,encoded){
  return {argument:`--payload-file ${quote(path)} ${quote(createHash('sha256').update(encoded).digest('hex'))}`,cleanup};
 }
 export function cleanupOperationInputCommand(python,cleanup){
- const script="import os,pathlib,sys;p=pathlib.Path(sys.argv[1]);d=p.parent;assert p.name=='payload.json' and d.name.startswith('.workdsh-compute-input-') and not d.is_symlink();p.unlink(missing_ok=True);d.rmdir()";
+ const script="import os,pathlib,sys;p=pathlib.Path(sys.argv[1]);d=p.parent;assert p.name=='payload.json' and d.name.startswith('.expertworkshop-compute-input-') and not d.is_symlink();p.unlink(missing_ok=True);d.rmdir()";
  return `${quote(python)} -I -c ${quote(script)} ${quote(cleanup.path)}`;
 }

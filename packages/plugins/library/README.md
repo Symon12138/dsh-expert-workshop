@@ -39,7 +39,7 @@
 
 ## 表格资料
 
-CSV/XLSX 可上传、按类型检索并引用到任务；原始文件按字节保留。Host 转换在构建时复用共享 `workdsh-tabular` 的 CSV 解码/解析；表格提取模块与 PapaParse 随 Library 构建，运行时复用 ExcelJS，无需安装或激活 Office 插件即可导入和检索。CSV 支持 UTF-8、GB18030、UTF-16，以及逗号、分号和制表符；XLSX 提取工作表名称和单元格已有值，公式不重新计算，图表、图片和格式不进入检索文本。检索文本最多 1500 行/120 列/24000 单元格，XLSX 最多 20 个工作表；截取会显示警告，完整原件仍可下载。
+CSV/XLSX 可上传、按类型检索并引用到任务；原始文件按字节保留。Host 转换在构建时复用共享 `expertworkshop-tabular` 的 CSV 解码/解析；表格提取模块与 PapaParse 随 Library 构建，运行时复用 ExcelJS，无需安装或激活 Office 插件即可导入和检索。CSV 支持 UTF-8、GB18030、UTF-16，以及逗号、分号和制表符；XLSX 提取工作表名称和单元格已有值，公式不重新计算，图表、图片和格式不进入检索文本。检索文本最多 1500 行/120 列/24000 单元格，XLSX 最多 20 个工作表；截取会显示警告，完整原件仍可下载。
 
 原件预览通过公开可选注册表复用 Office：CSV 为只读表格，XLSX 使用现有隔离编辑器；普通预览导出副本，提供公开保存回调的业务工作台可明确保存为新修订，不覆盖旧原件。未启用 Office 预览时显示检索文本。个人与企业 Desktop、Web 复用相同导入和预览实现，实际资料授权保持不变。
 
@@ -54,7 +54,7 @@ CSV/XLSX 可上传、按类型检索并引用到任务；原始文件按字节�
 
 右侧文件沿用唯一 Library/Office 预览注册表。CSV 只读；XLSX 的显式保存通过 Library 的 `saveOriginalRevision` 校验固定基准修订、操作幂等及字节摘要，新版本待工作台回读并明确采用。保存中阻止官方 Tab 关闭和返回按钮，已访问正文保持挂载以保留切 Tab 时的编辑状态；插件卸载与导航更新取消旧请求，取消/通信失败须核对资料库保存结果，不能宣称未保存或重试为另一份文件。
 
-工作台从公开 Library Client 读取 `readOriginal(assetId, revisionId, signal)`，将固定版本的字节交给 `workdshLibraryPreview.mount`。`LibraryOriginalPreviewInput.onSaveOriginal(bytes, signal)` 是可选能力：目前系统 Office 的 XLSX 编辑器支持它，CSV、DOCX 与 PPTX 不因此获得保存能力。未提供回调时 XLSX 仍导出副本。工作台应检查预览注册表 `canOpen`，保持缺少 Office 时的资料库入口。
+工作台从公开 Library Client 读取 `readOriginal(assetId, revisionId, signal)`，将固定版本的字节交给 `expertworkshopLibraryPreview.mount`。`LibraryOriginalPreviewInput.onSaveOriginal(bytes, signal)` 是可选能力：目前系统 Office 的 XLSX 编辑器支持它，CSV、DOCX 与 PPTX 不因此获得保存能力。未提供回调时 XLSX 仍导出副本。工作台应检查预览注册表 `canOpen`，保持缺少 Office 时的资料库入口。
 
 回调调用公开 Client `saveOriginalRevision({assetId, expectedRevisionId, operationId, bytes}, signal)`，返回 `LibraryTreeEntry`。Host 在当前身份与权限下保存不可变原件、转换结果和新修订；不接受客户端 token 或外部 URL。当前 Host 上原资产已有更新时拒绝旧基础保存。同一操作编号和同一输入可重试得到原保存回执，输入改变则不能复用操作编号。回执可能指向已经不是最新的历史修订，不要用资产当前版本字段替代回执里的 `revision.id`。
 

@@ -13,7 +13,7 @@ import { ConnectorManager } from '../../../../packages/plugins/connectors/dist/i
 import { connectorProcess } from '../../../../packages/plugins/connectors/dist/manager.js';
 
 test('bundled example survives package relocation without rewriting independent MCP commands', async () => {
- const stale = {id:'workdsh-example',serverName:'workdsh-example',transport:'stdio',command:'/removed/old-package/node',args:['/removed/old-package/example-server.mjs']};
+ const stale = {id:'expertworkshop-example',serverName:'expertworkshop-example',transport:'stdio',command:'/removed/old-package/node',args:['/removed/old-package/example-server.mjs']};
  const resolved=connectorProcess(stale);
  assert.equal(resolved.command,process.execPath);
  const {access}=await import('node:fs/promises');await access(resolved.args[0]);
@@ -29,26 +29,26 @@ test('fixed-member connectors authorize native empty Sessions and deny foreign o
   ctx.provide('tools',{schemas:()=>[]});ctx.provide('mcpResources',{});ctx.provide('credentials',{});
   ctx.provide('agents',{list:()=>[own,foreign],get:id=>id===own.id?own:foreign});
   await ctx.plugin(Storage);await ctx.plugin(JsonStorage,{root});await ctx.plugin(Domain,{backend:'json'});
-  ctx.provide('workdshIdentity', {
-   id:'workdsh-enterprise-process',
+  ctx.provide('expertworkshopIdentity', {
+   id:'expertworkshop-enterprise-process',
    profile:()=>({principalId:'a',organization:{id:'org',kind:'team'}}),
    membership:(organizationId,principalId)=>({organizationId,principalId,principalKind:'human',state:'active',role:'member',revision:'1'}),
-   async resolve(evidence){if(!active)throw Error('member revoked');return {principalId:'a',organizationId:'org',requestId:'connector-read',resolvedBy:'workdsh-enterprise-process',sessionId:evidence?.sessionId};}
+   async resolve(evidence){if(!active)throw Error('member revoked');return {principalId:'a',organizationId:'org',requestId:'connector-read',resolvedBy:'expertworkshop-enterprise-process',sessionId:evidence?.sessionId};}
   });
   const reads=[];
   ctx.provide('sessionController',{async inspect(id){reads.push(id);if(!['a-session','new-session'].includes(id))throw Error('Session not found');return {meta:{id},events:[]};}});
   await ctx.plugin(AuditJournal);await ctx.plugin(AccessManager);
-  await ctx.workdshAccess.bindSession({principalId:'b',organizationId:'org',requestId:'foreign-bind',resolvedBy:'test'},{sessionId:foreign.id});
+  await ctx.expertworkshopAccess.bindSession({principalId:'b',organizationId:'org',requestId:'foreign-bind',resolvedBy:'test'},{sessionId:foreign.id});
   await ctx.plugin(SessionAccessBridge,{autoBindFixedMemberSessions:true});
   await ctx.plugin(ConnectorManager,{seedExample:false});
-  assert.deepEqual(await ctx.workdshConnectors.list(),[]);
-  assert.deepEqual(await ctx.workdshConnectors.setSelection(own.id,[]),[]);
-  assert.deepEqual(await ctx.workdshConnectors.setSelection('new-session',[]),[]);
-  assert.equal(ctx.workdshAccess.sessionOwner('new-session').ownerPrincipalId,'a');
-  await assert.rejects(ctx.workdshConnectors.selection(foreign.id),/Session not found/);
-  await assert.rejects(ctx.workdshConnectors.setSelection(foreign.id,[]),/Session not found/);
-  active=false;await assert.rejects(ctx.workdshConnectors.selection(own.id),/member revoked/);
-  await assert.rejects(ctx.workdshConnectors.setSelection(own.id,[]),/member revoked/);
+  assert.deepEqual(await ctx.expertworkshopConnectors.list(),[]);
+  assert.deepEqual(await ctx.expertworkshopConnectors.setSelection(own.id,[]),[]);
+  assert.deepEqual(await ctx.expertworkshopConnectors.setSelection('new-session',[]),[]);
+  assert.equal(ctx.expertworkshopAccess.sessionOwner('new-session').ownerPrincipalId,'a');
+  await assert.rejects(ctx.expertworkshopConnectors.selection(foreign.id),/Session not found/);
+  await assert.rejects(ctx.expertworkshopConnectors.setSelection(foreign.id,[]),/Session not found/);
+  active=false;await assert.rejects(ctx.expertworkshopConnectors.selection(own.id),/member revoked/);
+  await assert.rejects(ctx.expertworkshopConnectors.setSelection(own.id,[]),/member revoked/);
   assert.ok(!reads.includes(foreign.id));
   assert.equal(foreignTouches,0);
  } finally {await ctx.fiber.dispose();await rm(root,{recursive:true,force:true});}
@@ -65,9 +65,9 @@ test('resource inspection without a selected Agent does not fabricate a tool cal
   await ctx.plugin(Storage);await ctx.plugin(JsonStorage,{root});await ctx.plugin(Domain,{backend:'json'});
   await ctx.plugin(Tools);await ctx.plugin(McpResources);
   let resourceProbes=0;ctx.on('tools/pre-execute',async(exec,next)=>{if(exec.name.startsWith('list_mcp_'))resourceProbes++;return next();});
-  ctx.provide('workdshSessionAccess',{async inspect(){throw Error('No selected Session');}});
+  ctx.provide('expertworkshopSessionAccess',{async inspect(){throw Error('No selected Session');}});
   await ctx.plugin(ConnectorManager,{seedExample:false});
-  const row=await ctx.workdshConnectors.create({title:'Policy check',serverName:'policy-check',transport:'stdio',command:process.execPath,args:[fileURLToPath(new URL('../../scripts/fixtures/member-mcp-server.mjs',import.meta.url)),'policy-marker']});
+  const row=await ctx.expertworkshopConnectors.create({title:'Policy check',serverName:'policy-check',transport:'stdio',command:process.execPath,args:[fileURLToPath(new URL('../../scripts/fixtures/member-mcp-server.mjs',import.meta.url)),'policy-marker']});
   assert.equal(row.state,'ready');assert.ok(row.toolNames.length>0);assert.equal(row.resourceCount,0);assert.equal(row.diagnostic,'工具已连接，资源检查未完成。');assert.equal(resourceProbes,0);
  }finally{await ctx.fiber.dispose();await rm(root,{recursive:true,force:true});}
 });

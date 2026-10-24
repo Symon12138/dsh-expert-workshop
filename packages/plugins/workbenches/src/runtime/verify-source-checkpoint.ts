@@ -10,7 +10,7 @@ export async function verifySourceCheckpoint(directory:string,sha256:string,auth
   const handle=await open(path,constants.O_RDONLY|constants.O_NOFOLLOW);
   try{const before=await handle.stat();if(!before.isFile()||before.size>limit)throw Error('workbench/checkpoint-corrupt');const bytes=Buffer.alloc(before.size+1);let length=0;while(length<bytes.length){const part=await handle.read(bytes,length,bytes.length-length,length);if(!part.bytesRead)break;length+=part.bytesRead;}const after=await handle.stat();if(length!==before.size||before.size!==after.size||before.mtimeMs!==after.mtimeMs)throw Error('workbench/checkpoint-corrupt');check();return bytes.subarray(0,length);}finally{await handle.close();}
  }
- const metadata=await read(join(root,'.workdsh-checkpoint.json'),1024*1024);
+ const metadata=await read(join(root,'.expertworkshop-checkpoint.json'),1024*1024);
  if(createHash('sha256').update(metadata).digest('hex')!==sha256)throw Error('workbench/checkpoint-corrupt');
  const manifest=JSON.parse(metadata.toString('utf8'));
  if(manifest.schemaVersion!==1||!Array.isArray(manifest.files)||manifest.files.length>2000)throw Error('workbench/checkpoint-corrupt');

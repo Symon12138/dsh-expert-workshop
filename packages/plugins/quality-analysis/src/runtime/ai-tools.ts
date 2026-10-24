@@ -29,7 +29,7 @@ function selectedReport(binding:QualityAiContext,explicit?:ReturnType<typeof rep
 export function createQualityAiTools(ctx:Context,service:QualityAnalysisRunService,storage:DomainFacility,identity:IdentityService,
  executor?:Pick<QualityAnalysisExecutor,'execute'>,library?:QualityReportDraftLibrary&Pick<LibraryService,'readOriginal'>){
  const stores=new Map<string,Promise<QualityAiSessionStore>>();let closing=false;
- ctx.effect(()=>async()=>{closing=true;await Promise.allSettled([...stores.values()].map(async pending=>(await pending).close()));},'workdsh.quality.ai.close');
+ ctx.effect(()=>async()=>{closing=true;await Promise.allSettled([...stores.values()].map(async pending=>(await pending).close()));},'expertworkshop.quality.ai.close');
  async function actorStore(actor:ActorContext,guard:()=>void){
   const key=JSON.stringify([actor.organizationId,actor.principalId]);let pending=stores.get(key);
   if(!pending){pending=QualityAiSessionStore.open(storage,actor);stores.set(key,pending);pending.catch(()=>{if(stores.get(key)===pending)stores.delete(key);});}
@@ -38,7 +38,7 @@ export function createQualityAiTools(ctx:Context,service:QualityAnalysisRunServi
  async function authority(sessionId:string,signal?:AbortSignal){
   if(!sessionId.trim()||sessionId.length>256)throw Error('quality/request/invalid');
   signal?.throwIfAborted();if(closing)throw Error('quality/service/closed');
-  const access=ctx.get('workdshAccess') as RuntimeBindingService|undefined;
+  const access=ctx.get('expertworkshopAccess') as RuntimeBindingService|undefined;
   if(!access)throw Error('quality/service/session-unavailable');
   const actor=await identity.resolve({sessionId},signal);assertActorContext(actor);
   const guard=()=>{signal?.throwIfAborted();if(closing)throw Error('quality/service/closed');ctx.fiber.assertActive();const profile=identity.profile(),owner=access.sessionOwner(sessionId);

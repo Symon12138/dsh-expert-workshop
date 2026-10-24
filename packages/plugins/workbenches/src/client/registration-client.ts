@@ -6,7 +6,7 @@ export function createWorkbenchRegistrationClient(transport: typeof fetch = fetc
   return async (packageName, signal) => {
     const lifetime = AbortSignal.any([AbortSignal.timeout(30_000), ...(signal ? [signal] : [])]);
     lifetime.throwIfAborted();
-    const response = await transport('/api/workdsh-workbench-registration', { method: 'POST', credentials: 'same-origin',
+    const response = await transport('/api/expertworkshop-workbench-registration', { method: 'POST', credentials: 'same-origin',
       headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint: 'client-authority', payload: { packageName } }), signal: lifetime });
     const result = await response.json(); lifetime.throwIfAborted();
     if (!response.ok || result?.ok !== true) throw new Error('workbench/installation-unconfirmed');

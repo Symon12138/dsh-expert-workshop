@@ -8,11 +8,11 @@ import {runWorkbenchDelivery,resolveWorkbenchPackageManager} from '../scripts/ru
 const pnpmRoot=fileURLToPath(new URL('../../../../apps/web/node_modules/pnpm',import.meta.url));
 const pnpmVersion=JSON.parse(await readFile(join(pnpmRoot,'package.json'),'utf8')).version;
 async function fixture(failBuild=false,failStartup=false){
- const directory=await mkdtemp(join(tmpdir(),'workdsh-delivery-test-'));
+ const directory=await mkdtemp(join(tmpdir(),'expertworkshop-delivery-test-'));
  await mkdir(join(directory,'dist'));await symlink(fileURLToPath(new URL('../../../../apps/web/node_modules',import.meta.url)),join(directory,'node_modules'),process.platform==='win32'?'junction':'dir');
- await writeFile(join(directory,'package.json'),JSON.stringify({name:'workdsh-delivery-probe',version:'1.0.0',type:'module',packageManager:'pnpm@10.0.0',files:['dist'],scripts:{build:'node build.mjs',prepack:'node must-not-run.mjs'},exports:{'.':{default:'./dist/index.js'}},peerDependencies:{'@deepseek-ai/cordis':'4.0.5'},workdsh:{workbench:{id:'probe'}}}));
+ await writeFile(join(directory,'package.json'),JSON.stringify({name:'expertworkshop-delivery-probe',version:'1.0.0',type:'module',packageManager:'pnpm@10.0.0',files:['dist'],scripts:{build:'node build.mjs',prepack:'node must-not-run.mjs'},exports:{'.':{default:'./dist/index.js'}},peerDependencies:{'@deepseek-ai/cordis':'4.0.5'},expertworkshop:{workbench:{id:'probe'}}}));
  await writeFile(join(directory,'build.mjs'),failBuild?'process.exit(2)':'');
- await writeFile(join(directory,'dist/index.js'),failStartup?'export function apply(){throw Error("private-error-must-not-leak");}':"export const inject=['workdshWorkbenchRegistration'];export async function apply(ctx){await ctx.get('workdshWorkbenchRegistration').registerManaged(ctx,{id:'probe'},'probe-page');}");
+ await writeFile(join(directory,'dist/index.js'),failStartup?'export function apply(){throw Error("private-error-must-not-leak");}':"export const inject=['expertworkshopWorkbenchRegistration'];export async function apply(ctx){await ctx.get('expertworkshopWorkbenchRegistration').registerManaged(ctx,{id:'probe'},'probe-page');}");
  return directory;
 }
 async function cleanup(directory,result){await rm(directory,{recursive:true,force:true});if(result)await rm(dirname(result.reportPath),{recursive:true,force:true});}
@@ -33,13 +33,13 @@ test('a hanging build times out and cannot reach startup or packaging',async()=>
 });
 
 test('a bundled Node and pnpm JS entry deliver with no system npm or pnpm on PATH',async()=>{
- const dir=await fixture(),primary=await mkdtemp(join(tmpdir(),'workdsh primary runtime '));let result;
+ const dir=await fixture(),primary=await mkdtemp(join(tmpdir(),'expertworkshop primary runtime '));let result;
  try{
   await mkdir(join(primary,'dependencies'));
   await symlink(pnpmRoot,join(primary,'dependencies/pnpm'),process.platform==='win32'?'junction':'dir');
   await writeFile(join(primary,'runtime.json'),JSON.stringify({pnpm:pnpmVersion}));
-  await writeFile(join(dir,'build.mjs'),"import assert from 'node:assert/strict';import {writeFileSync} from 'node:fs';assert.equal(process.env.WORKDSH_TEST_SECRET,undefined);assert.match(process.env.npm_execpath,/pnpm\\.(?:cjs|mjs)$/);writeFileSync('build-engine.json',JSON.stringify({node:process.execPath,manager:process.env.npm_execpath}));");
-  result=await runWorkbenchDelivery(dir,{environment:{...process.env,PATH:'',DSH_BUNDLED_PRIMARY_RUNTIME:primary,WORKDSH_TEST_SECRET:'must-not-inherit'}});
+  await writeFile(join(dir,'build.mjs'),"import assert from 'node:assert/strict';import {writeFileSync} from 'node:fs';assert.equal(process.env.EXPERTWORKSHOP_TEST_SECRET,undefined);assert.match(process.env.npm_execpath,/pnpm\\.(?:cjs|mjs)$/);writeFileSync('build-engine.json',JSON.stringify({node:process.execPath,manager:process.env.npm_execpath}));");
+  result=await runWorkbenchDelivery(dir,{environment:{...process.env,PATH:'',DSH_BUNDLED_PRIMARY_RUNTIME:primary,EXPERTWORKSHOP_TEST_SECRET:'must-not-inherit'}});
   assert.equal(result.status,'passed',JSON.stringify(result));
   assert.deepEqual(result.packageManager,{name:'pnpm',version:pnpmVersion,source:'bundled-primary-runtime'});
   assert.equal(JSON.parse(await readFile(join(dir,'build-engine.json'),'utf8')).node,process.execPath);
@@ -47,7 +47,7 @@ test('a bundled Node and pnpm JS entry deliver with no system npm or pnpm on PAT
 });
 
 test('a mismatched bundled pnpm fails before business code runs without falling back to PATH',async()=>{
- const dir=await fixture(),primary=await mkdtemp(join(tmpdir(),'workdsh-pnpm-mismatch-'));let result;
+ const dir=await fixture(),primary=await mkdtemp(join(tmpdir(),'expertworkshop-pnpm-mismatch-'));let result;
  try{
   await mkdir(join(primary,'dependencies'));await symlink(pnpmRoot,join(primary,'dependencies/pnpm'),process.platform==='win32'?'junction':'dir');
   await writeFile(join(primary,'runtime.json'),JSON.stringify({pnpm:'0.0.0'}));
@@ -59,7 +59,7 @@ test('a mismatched bundled pnpm fails before business code runs without falling 
 });
 
 test('the bundled Node sibling layout resolves pnpm when tool environments omit DSH variables',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-node-sibling-'));
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-node-sibling-'));
  try{
   const source=join(root,'source'),primary=join(root,'primary');await mkdir(source);await mkdir(join(primary,'dependencies'),{recursive:true});
   await symlink(pnpmRoot,join(primary,'dependencies/pnpm'),process.platform==='win32'?'junction':'dir');
@@ -89,7 +89,7 @@ test('legacy packages cannot publish the development-only runtime anchor in thei
  try{
   const manifest=JSON.parse(await readFile(join(dir,'package.json'),'utf8'));delete manifest.files;
   await writeFile(join(dir,'package.json'),JSON.stringify(manifest));
-  await writeFile(join(dir,'.workdsh-runtime.json'),JSON.stringify({schemaVersion:1,installationAnchor:fileURLToPath(new URL('../../../../apps/web/package.json',import.meta.url))}));
+  await writeFile(join(dir,'.expertworkshop-runtime.json'),JSON.stringify({schemaVersion:1,installationAnchor:fileURLToPath(new URL('../../../../apps/web/package.json',import.meta.url))}));
   result=await runWorkbenchDelivery(dir);assert.equal(result.status,'failed');assert.equal(result.stages.at(-1).errorCode,'workbench/delivery-runtime-record-in-archive');assert.equal(result.candidate,undefined);assert.equal((await readdir(dir)).some(name=>name.endsWith('.tgz')),false);
  }finally{await cleanup(dir,result);}
 });

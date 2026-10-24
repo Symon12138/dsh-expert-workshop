@@ -13,7 +13,7 @@ export function createWorkbenchShortcuts(transport:typeof fetch=fetch){
     snapshot=Object.freeze({...value,apps,open,activeId:apps.some(app=>app.id===activeId)?activeId:undefined});for(const listener of listeners)listener();
   };
   async function invoke(body:unknown){
-    const response=await transport('/api/workdsh-workbench-shortcuts',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.any([lifetime.signal,AbortSignal.timeout(15000)])});
+    const response=await transport('/api/expertworkshop-workbench-shortcuts',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.any([lifetime.signal,AbortSignal.timeout(15000)])});
     const result=await response.json();lifetime.signal.throwIfAborted();
     if(!response.ok||result?.ok!==true)throw Error(result?.error?.code==='workbench/shortcuts-limit'?'最多设置 8 个常用应用，请先取消一个。':'常用应用设置未确认，请重新读取。');
     const value=result.value;

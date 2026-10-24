@@ -3,7 +3,7 @@ const require=createRequire(new URL('../../../../apps/web/package.json',import.m
 const {build}=require('esbuild');const built=await build({entryPoints:[fileURLToPath(new URL('../src/runtime/record-rpc.ts',import.meta.url))],bundle:true,platform:'node',format:'esm',write:false,plugins:[{name:'zod',setup(b){b.onResolve({filter:/^zod$/},()=>({path:pathToFileURL(runtime.resolve('zod')).href,external:true}));}}]});
 const {handleQualityRecordsRequest:handle}=await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
 const source={recordId:'record',runId:'run',contentHash:'a'.repeat(64)},fields={title:'报告',analysis:'文字',conclusion:'',recommendations:''};
-function request(endpoint,payload){return new Request('http://fixture/api/workdsh-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})});}
+function request(endpoint,payload){return new Request('http://fixture/api/expertworkshop-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})});}
 test('report RPC only delegates selected business scope and editable text',async()=>{
  let saved;const service={async saveReportDocument(...args){saved=args;return {verified:true};}};
  const response=await handle(request('save-report-document',{...source,operationId:'intent',fields}),service,undefined,undefined,{});

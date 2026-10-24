@@ -1,7 +1,7 @@
 import {createHash,randomUUID} from 'node:crypto';
 import {mkdir,readdir,realpath,lstat,open,writeFile,rename,rm,readFile} from 'node:fs/promises';
 import {constants} from 'node:fs';import {join,relative,isAbsolute,sep} from 'node:path';
-const excludedDirectories=['node_modules','.git','dist','.workdsh-npm-cache','.workdsh-pnpm-store'];
+const excludedDirectories=['node_modules','.git','dist','.expertworkshop-npm-cache','.expertworkshop-pnpm-store'];
 /** Source files only; not a live business database backup. */
 export async function checkpointWorkbenchSource(source:string,destination:string,authorize:()=>void,signal?:AbortSignal){
  const check=()=>{signal?.throwIfAborted();authorize();signal?.throwIfAborted();};check();
@@ -15,7 +15,7 @@ export async function checkpointWorkbenchSource(source:string,destination:string
   check();const directory=join(root,relative);if(await realpath(directory)!==directory)throw Error('workbench/source-directory-outside');
   for(const entry of (await readdir(directory,{withFileTypes:true})).sort((a,b)=>a.name<b.name?-1:a.name>b.name?1:0)){
    if(excludedDirectories.includes(entry.name))continue;
-   if(entry.name==='.workdsh-checkpoint.json')throw Error('workbench/source-reserved-name');
+   if(entry.name==='.expertworkshop-checkpoint.json')throw Error('workbench/source-reserved-name');
    check();const name=relative?relative+'/'+entry.name:entry.name,path=join(root,name);
    if(entry.isSymbolicLink())throw Error('workbench/source-link-unsupported');
    if(entry.isDirectory()){await mkdir(join(staging,name),{recursive:true,mode:0o700});await walk(name);continue;}
@@ -50,11 +50,11 @@ export async function checkpointWorkbenchSource(source:string,destination:string
  try{
   await walk('');check();await verifySource();const manifest={schemaVersion:1,excludes:excludedDirectories,files:entries};
   const hash=createHash('sha256').update(JSON.stringify(manifest)).digest('hex');
-  await writeFile(join(staging,'.workdsh-checkpoint.json'),JSON.stringify(manifest),{flag:'wx',mode:0o600});check();const directory=join(destination,hash);
+  await writeFile(join(staging,'.expertworkshop-checkpoint.json'),JSON.stringify(manifest),{flag:'wx',mode:0o600});check();const directory=join(destination,hash);
   try{await rename(staging,directory);}catch(cause){
    if(!(cause instanceof Error)||!('code' in cause)||!['EEXIST','ENOTEMPTY'].includes(String(cause.code)))throw cause;
    check();if(await realpath(directory)!==directory)throw Error('workbench/checkpoint-corrupt');
-   const metadata=await readFile(join(directory,'.workdsh-checkpoint.json'),'utf8');
+   const metadata=await readFile(join(directory,'.expertworkshop-checkpoint.json'),'utf8');
    if(metadata!==JSON.stringify(manifest))throw Error('workbench/checkpoint-corrupt');
    for(const entry of entries){check();const path=join(directory,entry.path);if(await realpath(path)!==path)throw Error('workbench/checkpoint-corrupt');const stat=await lstat(path);if(!stat.isFile()||stat.size!==entry.bytes)throw Error('workbench/checkpoint-corrupt');const bytes=await readFile(path);if(createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error('workbench/checkpoint-corrupt');}
   }

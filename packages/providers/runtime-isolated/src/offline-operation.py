@@ -63,7 +63,7 @@ def run(payload):
         stage = "HOST_DEPENDENCY"
         host = host_identity(payload["hostPackages"])
     stage = "TEMPORARY_DIRECTORY"
-    with tempfile.TemporaryDirectory(prefix=".workdsh-compute-", dir=os.getcwd()) as temporary:
+    with tempfile.TemporaryDirectory(prefix=".expertworkshop-compute-", dir=os.getcwd()) as temporary:
         temporary = Path(temporary)
         wheels = temporary / "wheels"
         wheels.mkdir()
@@ -146,7 +146,7 @@ if __name__ == "__main__":
         if sys.argv[1] == "--payload-file":
             input_path = Path(sys.argv[2])
             if (not input_path.is_absolute() or input_path.name != "payload.json"
-                    or not input_path.parent.name.startswith(".workdsh-compute-input-")
+                    or not input_path.parent.name.startswith(".expertworkshop-compute-input-")
                     or input_path.is_symlink() or input_path.parent.is_symlink()):
                 input_path = None
                 raise ValueError("INPUT_INVALID_PATH")

@@ -39,10 +39,10 @@ export interface BrowserSessionView {
 }
 
 declare module '@deepseek-ai/cordis' {
-  interface Context { workdshBrowserSession: BrowserSessionView; }
+  interface Context { expertworkshopBrowserSession: BrowserSessionView; }
 }
 
-export const name = 'workdsh-browser-session';
+export const name = 'expertworkshop-browser-session';
 export const inject = ['browserUse', 'agents', 'tools', 'systemPrompt'];
 
 export interface Config {
@@ -59,14 +59,14 @@ interface BrowserResource {
   scope: Scope;
 }
 
-const MCP_NAME = 'workdsh-playwright';
+const MCP_NAME = 'expertworkshop-playwright';
 const TOOL_PREFIX = `mcp__${MCP_NAME}__`;
 const RESOURCE_TOOLS = new Set(['list_mcp_resources', 'list_mcp_resource_templates', 'read_mcp_resource']);
 
 /** Register only for future Agent activations; existing sessions keep their original provider. */
 export function apply(ctx: Context, config: Config): void {
   if (!config.electronExecutable?.trim() && !config.executablePath?.trim()) {
-    throw new Error('workdsh-browser-session: Electron worker or browser executable is required');
+    throw new Error('expertworkshop-browser-session: Electron worker or browser executable is required');
   }
   const cli = join(dirname(fileURLToPath(import.meta.resolve('@playwright/mcp/package.json'))), 'cli.js');
   const scrubbedMcpEnv = Object.fromEntries(Object.keys(process.env)
@@ -109,7 +109,7 @@ export function apply(ctx: Context, config: Config): void {
       };
     });
   };
-  ctx.provide('workdshBrowserSession', {
+  ctx.provide('expertworkshopBrowserSession', {
     available: agent => !stopping && ready.has(agent) && resources.available(agent),
     active: agent => !stopping && active.has(agent) && resources.available(agent),
     revision: agent => revisions.get(agent) ?? 0,
@@ -147,7 +147,7 @@ export function apply(ctx: Context, config: Config): void {
       return view(agent, signal, async page => { await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 20_000 }); });
     },
   } satisfies BrowserSessionView);
-  ctx.inject(['connection', 'workdshIdentity'], remote => registerBrowserSessionConnection(remote));
+  ctx.inject(['connection', 'expertworkshopIdentity'], remote => registerBrowserSessionConnection(remote));
 
   ctx.effect(function* () {
     yield ctx.browserUse.register(BrowserUseProviderName(MCP_NAME));
@@ -205,12 +205,12 @@ export function apply(ctx: Context, config: Config): void {
       active.clear();
       revisions.clear();
     };
-  }, 'workdsh.browser.sessions');
+  }, 'expertworkshop.browser.sessions');
 
   ctx.on('agent/created', async ({ agent, signal }) => {
     await resources.get(agent, signal);
     ready.add(agent);
-    agent.ctx.effect(() => () => { ready.delete(agent); active.delete(agent); revisions.delete(agent); }, 'workdsh.browser.activation');
+    agent.ctx.effect(() => () => { ready.delete(agent); active.delete(agent); revisions.delete(agent); }, 'expertworkshop.browser.activation');
   }, { prepend: true });
 
   ctx.on('tools/execute', async (exec, next) => {

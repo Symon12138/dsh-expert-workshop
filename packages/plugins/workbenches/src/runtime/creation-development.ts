@@ -20,7 +20,7 @@ export async function confirmCreationDevelopment(row:CreationRecord,requirements
  if(!saved){saved=await ports.requirements.append(row.id,requirements,undefined,signal);check();}
  let stage:'development'|'source'|'session'='development';
  try{
-  let entry=await ports.development.create(row.id,`workdsh.user-${row.id}`,`workdsh-workbench-${row.id}`,saved.id,signal);check();
+  let entry=await ports.development.create(row.id,`expertworkshop.user-${row.id}`,`expertworkshop-workbench-${row.id}`,saved.id,signal);check();
   if(row.phase==='confirmed')return entry;
   stage='source';entry=await ports.development.bindVerifiedSource(row.id,entry.development.revision,ports.source,signal);check();
   stage='session';entry=await ports.development.bindVerifiedSession(row.id,entry.development.revision,ports.session,signal);check();

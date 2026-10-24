@@ -54,7 +54,7 @@ test('inactive or invalid browser status never opens a pane; real activity opens
       status = { active: true, revision }; f.tick(); await settle(); assert.deepEqual(f.opened, []);
     }
     status = { active: true, revision: 2 }; f.tick(); await settle();
-    assert.deepEqual(f.opened, [{ sessionId: 'first', kind: 'workdsh-managed-browser' }]);
+    assert.deepEqual(f.opened, [{ sessionId: 'first', kind: 'expertworkshop-managed-browser' }]);
     f.tick(); await settle(); assert.equal(f.opened.length, 1);
   } finally { f.dispose(); }
 });
@@ -75,7 +75,7 @@ test('close removes only this Session browser pane and new page activity can reo
   const f = fixture(() => status);
   try {
     await settle(); assert.equal(f.opened.length, 1);
-    f.tabs.push({ sessionId: 'first', tabId: 'native', kind: 'conversation' }, { sessionId: 'other', tabId: 'other-browser', kind: 'workdsh-managed-browser' });
+    f.tabs.push({ sessionId: 'first', tabId: 'native', kind: 'conversation' }, { sessionId: 'other', tabId: 'other-browser', kind: 'expertworkshop-managed-browser' });
     status = { active: false, revision: 2 }; f.tick(); await settle();
     assert.deepEqual(f.closed, [{ sessionId: 'first', tabId: 'tab-1' }]);
     assert.deepEqual(f.tabs.map(tab => tab.tabId), ['native', 'other-browser']);
@@ -90,7 +90,7 @@ test('close removes only this Session browser pane and new page activity can reo
 test('an unused manually opened browser guide is not closed before page activity', async () => {
   const f = fixture(() => ({ active: false, revision: 0 }));
   try {
-    f.tabs.push({ sessionId: 'first', tabId: 'manual-browser', kind: 'workdsh-managed-browser' });
+    f.tabs.push({ sessionId: 'first', tabId: 'manual-browser', kind: 'expertworkshop-managed-browser' });
     await settle(); f.tick(); await settle(); assert.deepEqual(f.closed, []);
   } finally { f.dispose(); }
 });
@@ -99,7 +99,7 @@ test('old closed activity is consumed once and unavailable status is not a succe
   let status = { active: false, revision: 2 };
   const f = fixture(() => status);
   try {
-    await settle(); f.tabs.push({ sessionId: 'first', tabId: 'manual', kind: 'workdsh-managed-browser' });
+    await settle(); f.tabs.push({ sessionId: 'first', tabId: 'manual', kind: 'expertworkshop-managed-browser' });
     f.tick(); await settle(); assert.deepEqual(f.closed, [], 'an old close does not remove a later manual guide');
     status = { active: true, revision: 3 }; f.tick(); await settle();
     status = new Response(null, { status: 404 }); f.tick(); await settle();

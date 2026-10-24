@@ -32,7 +32,7 @@ test('real Client → record RPC → Library CSV worker → analysis worker → 
     alias:{'expert-workshop-contracts':fileURLToPath(new URL('../../../contracts/src/index.ts',import.meta.url))},
     plugins:[{name:'published-runtime-owner',setup(builder){
       builder.onResolve({filter:/^(?:@deepseek-ai\/cordis|@deepseek-ai\/dsh-storage-domain|zod)$/},args=>({path:pathToFileURL(runtimeRequire.resolve(args.path)).href,external:true}));
-      builder.onResolve({filter:/^(?:workdsh-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},args=>({path:pathToFileURL(libraryRequire.resolve(args.path)).href,external:true}));
+      builder.onResolve({filter:/^(?:expertworkshop-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},args=>({path:pathToFileURL(libraryRequire.resolve(args.path)).href,external:true}));
     }}],
   });
   const bundlePath=join(root,'report-flow.mjs');await writeFile(bundlePath,compiled.outputFiles[0].text);
@@ -54,13 +54,13 @@ test('real Client → record RPC → Library CSV worker → analysis worker → 
   // Every request goes through the source RPC handler and real services. Only
   // HTTP transport is kept in-process; neither parsing nor analysis is replaced.
   const client=createQualityRecordClient(async(path,init)=>{
-    assert.equal(path,'/api/workdsh-quality-records');assert.equal(init.method,'POST');assert.equal(init.credentials,'same-origin');
+    assert.equal(path,'/api/expertworkshop-quality-records');assert.equal(init.method,'POST');assert.equal(init.credentials,'same-origin');
     calls.push(JSON.parse(init.body).endpoint);
-    return handleQualityRecordsRequest(new Request('http://quality-fixture'+path,init),service,executor,{library:ctx.workdshLibrary,csv},ctx.workdshLibrary);
+    return handleQualityRecordsRequest(new Request('http://quality-fixture'+path,init),service,executor,{library:ctx.expertworkshopLibrary,csv},ctx.expertworkshopLibrary);
   });
   const record=await client.create('十月检验趋势','create-analysis');
   const originalBytes=new TextEncoder().encode('id,date,total,bad,unit,type\nINS-001,2026-10-10,100,5,piece,initial\nINS-002,2026-10-11,200,10,piece,initial\n');
-  const source=await ctx.workdshLibrary.importAsset(actor,{name:'inspection.csv',bytes:originalBytes,operationId:'upload-inspection-csv'});
+  const source=await ctx.expertworkshopLibrary.importAsset(actor,{name:'inspection.csv',bytes:originalBytes,operationId:'upload-inspection-csv'});
   assert.equal(source.revision.originalSha256,sha256(originalBytes));
   const imported=await client.importLibrary({
     recordId:record.id,reference:{assetId:source.asset.id,revisionId:source.revision.id},
@@ -91,7 +91,7 @@ test('real Client → record RPC → Library CSV worker → analysis worker → 
   const v1=await client.saveReportDocument(record.id,runId,contentHash,{operationId:'create-report-v1',fields:firstFields});
   assert.equal(v1.version,1);assert.deepEqual(v1.fields,firstFields);
   assert.match(v1.markdown,/固定统计：检验数量 300；不合格数量 15；合格率 95\.00%。/);
-  const v1Bytes=await ctx.workdshLibrary.readOriginal(actor,v1.receipt.assetId,v1.revisionId);
+  const v1Bytes=await ctx.expertworkshopLibrary.readOriginal(actor,v1.receipt.assetId,v1.revisionId);
   assert.equal(sha256(v1Bytes),v1.receipt.sha256);assert.equal(new TextDecoder().decode(v1Bytes),v1.markdown);
   const editedFields={...firstFields,title:'检验质量报告 · 人工复核',analysis:'两个检验日的不合格率相同。\n采用检验数量加权汇总，避免直接平均样本数。',conclusion:'已完成统计复核；现有两日样本不足以判断长期改善。',recommendations:'追加下一周期检验数据。\n缺陷原因保持待核实，不把推测写成事实。'};
   const v2=await client.saveReportDocument(record.id,runId,contentHash,{reportId:v1.reportId,expectedRevisionId:v1.revisionId,operationId:'edit-report-v2',fields:editedFields});
@@ -107,11 +107,11 @@ test('real Client → record RPC → Library CSV worker → analysis worker → 
   assert.deepEqual(reopened.fields,editedFields);assert.equal(reopened.version,2);assert.equal(reopened.revisionId,v2.revisionId);
   const historical=await client.reportDocument(record.id,runId,contentHash,v1.reportId,v1.revisionId);
   assert.deepEqual(historical.fields,firstFields);assert.equal(historical.version,1);assert.equal(historical.currentRevisionId,v2.revisionId);assert.equal(historical.markdown,v1.markdown);
-  assert.equal(sha256(await ctx.workdshLibrary.readOriginal(actor,historical.receipt.assetId,historical.revisionId)),v1.receipt.sha256);
-  assert.deepEqual(await ctx.workdshLibrary.readOriginal(actor,source.asset.id,source.revision.id),originalBytes);
+  assert.equal(sha256(await ctx.expertworkshopLibrary.readOriginal(actor,historical.receipt.assetId,historical.revisionId)),v1.receipt.sha256);
+  assert.deepEqual(await ctx.expertworkshopLibrary.readOriginal(actor,source.asset.id,source.revision.id),originalBytes);
   assert.deepEqual((await client.view(record.id,runId,contentHash)).statistics,view.statistics);
   const changedBytes=new TextEncoder().encode('id,date,total,bad,unit,type\nINS-001,2026-10-10,100,5,piece,initial\nINS-002,2026-10-11,200,20,piece,initial\n');
-  const changedSource=await ctx.workdshLibrary.saveOriginalRevision(actor,{assetId:source.asset.id,expectedRevisionId:source.revision.id,operationId:'inspection-source-v2',bytes:changedBytes});
+  const changedSource=await ctx.expertworkshopLibrary.saveOriginalRevision(actor,{assetId:source.asset.id,expectedRevisionId:source.revision.id,operationId:'inspection-source-v2',bytes:changedBytes});
   assert.equal(changedSource.asset.id,source.asset.id);assert.equal(changedSource.revision.number,2);
   const currentRecord=await client.get(record.id);
   const changedImport=await client.importLibrary({recordId:record.id,reference:{assetId:changedSource.asset.id,revisionId:changedSource.revision.id},format:'csv',tableKind:'inspections',headerRow:1,expectedGeneration:currentRecord.generation});
@@ -128,7 +128,7 @@ test('real Client → record RPC → Library CSV worker → analysis worker → 
   assert.match(preservedReport.markdown,/固定统计：检验数量 300；不合格数量 15；合格率 95\.00%。/);
   assert.deepEqual((await client.reportDocument(record.id,runId,contentHash,v1.reportId,v1.revisionId)).fields,firstFields);
   assert.deepEqual((await client.view(record.id,runId,contentHash)).statistics,view.statistics);
-  assert.deepEqual(await ctx.workdshLibrary.readOriginal(actor,source.asset.id,source.revision.id),originalBytes);
+  assert.deepEqual(await ctx.expertworkshopLibrary.readOriginal(actor,source.asset.id,source.revision.id),originalBytes);
   assert.deepEqual(calls.slice(0,9),['create','import-library','sources','configure','analyze','run-view','report-documents','save-report-document','save-report-document']);
-  assert.equal((await ctx.workdshLibrary.list(actor)).filter(entry=>entry.asset?.kind==='markdown')[0].revision.number,2);
+  assert.equal((await ctx.expertworkshopLibrary.list(actor)).filter(entry=>entry.asset?.kind==='markdown')[0].revision.number,2);
 });

@@ -14,7 +14,7 @@ export async function prepareSourceRestoration(checkpoints:string,sha256:string,
  const files:{path:string;bytes:number;sha256:string}[]=[];
  try{
   const receipt=await verifySourceCheckpoint(checkpoints,sha256,authorize,signal,async(path,bytes)=>{
-   check();if(path.split('/').includes('.workdsh-checkpoint.json'))throw Error('workbench/source-reserved-name');
+   check();if(path.split('/').includes('.expertworkshop-checkpoint.json'))throw Error('workbench/source-reserved-name');
    const target=join(staging,path);await mkdir(dirname(target),{recursive:true,mode:0o700});check();
    await writeFile(target,bytes,{flag:'wx',mode:0o600});files.push({path,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')});check();
   });

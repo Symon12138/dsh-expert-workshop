@@ -10,13 +10,13 @@ const root = resolve(import.meta.dirname, '../..');
 const installer = join(root, 'scripts/install-project-release.mjs');
 const harnessVersion = '0.2.1-rc.1';
 const packageNames = [
-  'workdsh-provider-identity-local', 'workdsh-provider-browser-session', 'workdsh-plugin-audit', 'workdsh-plugin-access',
-  'workdsh-plugin-skills', 'workdsh-plugin-experts', 'workdsh-plugin-connectors',
-  'workdsh-plugin-workbenches', 'workdsh-plugin-activity', 'workdsh-plugin-office', 'workdsh-plugin-library', 'workdsh-plugin-projects', 'workdsh-bundle',
+  'expertworkshop-provider-identity-local', 'expertworkshop-provider-browser-session', 'expertworkshop-plugin-audit', 'expertworkshop-plugin-access',
+  'expertworkshop-plugin-skills', 'expertworkshop-plugin-experts', 'expertworkshop-plugin-connectors',
+  'expertworkshop-plugin-workbenches', 'expertworkshop-plugin-activity', 'expertworkshop-plugin-office', 'expertworkshop-plugin-library', 'expertworkshop-plugin-projects', 'expertworkshop-bundle',
 ];
 
 async function fixture(version = harnessVersion) {
-  const home = await mkdtemp(join(tmpdir(), 'workdsh-installer-'));
+  const home = await mkdtemp(join(tmpdir(), 'expertworkshop-installer-'));
   const release = join(home, 'release');
   await mkdir(release, { recursive: true });
   const packages = [];
@@ -75,7 +75,7 @@ test('project installer initializes a new profile exactly once', async () => {
     assert.deepEqual(recorded[1], ['--profile', 'fresh', '--from-default-profile', 'web', '--dump-config']);
     assert.equal(recorded.filter(args => args[0] === 'plugin').length, 1);
     const added = recorded.flatMap(args => args[0] === 'plugin' ? args : []);
-    for (const optional of ['activity', 'office', 'projects']) assert.ok(!added.some(arg => arg.includes(`workdsh-plugin-${optional}-fixture.tgz`)));
+    for (const optional of ['activity', 'office', 'projects']) assert.ok(!added.some(arg => arg.includes(`expertworkshop-plugin-${optional}-fixture.tgz`)));
     assert.ok(recorded.some(args => args.includes(`@deepseek-ai/dsh@${harnessVersion}`) && args.includes(`@deepseek-ai/dsh-deepseek-account@${harnessVersion}`)));
   } finally { await rm(input.home, { recursive: true, force: true }); }
 });
@@ -95,7 +95,7 @@ test('project installer upgrades an existing profile without reinitializing it',
     assert.match(await readFile(join(profileDir, 'package.json'), 'utf8'), /preserve/);
     assert.equal(recorded.filter(args => args[0] === 'plugin').length, 1);
     const added = recorded.flatMap(args => args[0] === 'plugin' ? args : []);
-    for (const optional of ['activity', 'office', 'projects']) assert.ok(!added.some(arg => arg.includes(`workdsh-plugin-${optional}-fixture.tgz`)));
+    for (const optional of ['activity', 'office', 'projects']) assert.ok(!added.some(arg => arg.includes(`expertworkshop-plugin-${optional}-fixture.tgz`)));
     assert.ok(recorded.some(args => args.includes(`@deepseek-ai/dsh@${harnessVersion}`) && args.includes(`@deepseek-ai/dsh-deepseek-account@${harnessVersion}`)));
   } finally { await rm(input.home, { recursive: true, force: true }); }
 });
@@ -147,12 +147,12 @@ test('installer resolves required official peers without fetching bundled worksp
     await writeFile(join(dir, 'package.json'), '{}');
     await writeFile(join(dir, 'pnpm-workspace.yaml'), 'packages: []\n');
     await writeFile(join(consumer, 'package.json'), JSON.stringify({peerDependencies: {
-      '@deepseek-ai/dsh-scope': '^0.1.7-alpha.1', 'workdsh-ui': '*', '@deepseek-ai/dsh-optional': '*',
+      '@deepseek-ai/dsh-scope': '^0.1.7-alpha.1', 'expertworkshop-ui': '*', '@deepseek-ai/dsh-optional': '*',
     }, peerDependenciesMeta: {'@deepseek-ai/dsh-optional': {optional: true}}}));
     const result = run(input, 'peers');
     assert.equal(result.status, 0, result.stderr);
     const recorded = await calls(input);
     assert.ok(recorded.some(args => args.includes(`@deepseek-ai/dsh-scope@${harnessVersion}`)));
-    assert.ok(recorded.every(args => !args.some(arg => arg.startsWith('workdsh-ui@') || arg.startsWith('@deepseek-ai/dsh-optional@'))));
+    assert.ok(recorded.every(args => !args.some(arg => arg.startsWith('expertworkshop-ui@') || arg.startsWith('@deepseek-ai/dsh-optional@'))));
   } finally { await rm(input.home, {recursive: true, force: true}); }
 });

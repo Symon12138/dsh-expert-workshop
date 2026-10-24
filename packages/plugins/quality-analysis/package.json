@@ -38,9 +38,9 @@
       ]
     }
   },
-  "workdsh": {
+  "expertworkshop": {
     "workbench": {
-      "id": "workdsh.quality-analysis",
+      "id": "expertworkshop.quality-analysis",
       "title": "质量分析",
       "description": "检验数据、缺陷分析和可追溯报告",
       "protocolVersion": "1.0",
@@ -85,7 +85,7 @@
     "expert-workshop-contracts": "workspace:*",
     "expert-workshop-plugin-library": "workspace:*",
     "@deepseek-ai/dsh-client-ui-layout": "0.2.1-rc.2",
-    "workdsh-tabular": "workspace:*",
+    "expertworkshop-tabular": "workspace:*",
     "expert-workshop-plugin-workbenches": "workspace:*",
     "@deepseek-ai/dsh-api-session-controller": "0.2.1-rc.2",
     "@deepseek-ai/dsh-client-ui-conversation": "0.2.1-rc.2",

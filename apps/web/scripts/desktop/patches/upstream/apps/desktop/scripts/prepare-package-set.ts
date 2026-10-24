@@ -169,7 +169,7 @@ function main(): void {
     buildPaths.packedDsh,
     buildPaths.packedVendor,
     buildPaths.packedLandlock,
-    buildPaths.packedWorkdsh,
+    buildPaths.packedExpertworkshop,
   ]
   const { values } = parseArgs({
     options: { from: { type: 'string', multiple: true }, out: { type: 'string' } },

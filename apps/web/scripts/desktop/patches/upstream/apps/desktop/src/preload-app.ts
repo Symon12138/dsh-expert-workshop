@@ -38,7 +38,7 @@ header[class$="_header"] [class$="_headerCorner"] {
 }
 `
 
-function applyWorkdshShell(): void {
+function applyExpertworkshopShell(): void {
   if (process.platform !== 'darwin') return
   if (document.querySelector('style[data-expertworkshop-shell]') !== null) return
   document.documentElement.dataset.expertworkshopShell = 'inset'
@@ -52,9 +52,9 @@ if (!document.documentElement) {
   const observer = new MutationObserver(() => {
     if (!document.documentElement) return
     observer.disconnect()
-    applyWorkdshShell()
+    applyExpertworkshopShell()
   })
   observer.observe(document, { childList: true })
 } else {
-  applyWorkdshShell()
+  applyExpertworkshopShell()
 }

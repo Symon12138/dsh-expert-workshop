@@ -6,12 +6,12 @@ import type { HostConnectionHandle } from '@deepseek-ai/dsh-client-connection';
 import type { IdentityService } from 'expert-workshop-contracts';
 import type { BrowserSessionView } from './index.js';
 
-export const browserSessionPath = '/api/workdsh-browser-session';
+export const browserSessionPath = '/api/expertworkshop-browser-session';
 
 type BrowserHost = Context & {
   connection: HostConnectionHandle;
-  workdshIdentity: IdentityService;
-  workdshBrowserSession: BrowserSessionView;
+  expertworkshopIdentity: IdentityService;
+  expertworkshopBrowserSession: BrowserSessionView;
 };
 
 function record(value: unknown): Record<string, unknown> | undefined {
@@ -31,7 +31,7 @@ export function registerBrowserSessionConnection(ctx: Context): void {
     methods: ['POST'],
     requestBody: 'buffered',
     fetch: async request => {
-      const profile = host.workdshIdentity.profile();
+      const profile = host.expertworkshopIdentity.profile();
       if (profile.organization.kind !== 'personal'
         || profile.membership.principalId !== profile.principalId
         || profile.membership.organizationId !== profile.organization.id
@@ -47,12 +47,12 @@ export function registerBrowserSessionConnection(ctx: Context): void {
         return response({ error: 'invalid browser request' }, 400);
       }
       const agent = ctx.agents.get(sessionId as Agent['id']);
-      if (!agent || agent.id !== sessionId || !host.workdshBrowserSession.available(agent)) {
+      if (!agent || agent.id !== sessionId || !host.expertworkshopBrowserSession.available(agent)) {
         return response({ error: 'browser Session is unavailable' }, 404);
       }
-      if (operation === 'status') return response({ active: host.workdshBrowserSession.active(agent), revision: host.workdshBrowserSession.revision(agent) });
+      if (operation === 'status') return response({ active: host.expertworkshopBrowserSession.active(agent), revision: host.expertworkshopBrowserSession.revision(agent) });
       try {
-        const view = host.workdshBrowserSession;
+        const view = host.expertworkshopBrowserSession;
         const frame = operation === 'capture'
           ? await view.capture(agent, request.signal)
           : operation === 'click' && typeof payload.x === 'number' && typeof payload.y === 'number'
@@ -77,5 +77,5 @@ export function registerBrowserSessionConnection(ctx: Context): void {
       }
     },
   });
-  ctx.effect(() => unregister, 'workdsh.browserSession.fetch');
+  ctx.effect(() => unregister, 'expertworkshop.browserSession.fetch');
 }

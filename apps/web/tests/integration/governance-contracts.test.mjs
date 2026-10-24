@@ -11,7 +11,7 @@ const actor = {
   principalId: 'principal-local',
   organizationId: 'organization-personal',
   requestId: 'request-1',
-  resolvedBy: 'workdsh-identity-local',
+  resolvedBy: 'expertworkshop-identity-local',
 };
 
 test('governance contracts accept Host-resolved actors and enforce resource scope shape', () => {

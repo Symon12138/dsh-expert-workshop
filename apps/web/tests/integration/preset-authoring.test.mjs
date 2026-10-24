@@ -13,7 +13,7 @@ const harnessRequire = createRequire(require.resolve('@deepseek-ai/dsh/package.j
 const { default: Loader } = await import(pathToFileURL(harnessRequire.resolve('@deepseek-ai/cordis-plugin-loader')).href);
 
 test('published registry registers frozen expert declaration and restores it after disposal', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-presets-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-presets-'));
   const oldHome = process.env.DSH_AGENTS_HOME;
   process.env.DSH_AGENTS_HOME = root;
   const contexts = [];
@@ -53,7 +53,7 @@ test('published registry registers frozen expert declaration and restores it aft
 });
 
 test('explicit expert homes compile and restore without reading another home or changing personal defaults', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-preset-homes-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-preset-homes-'));
   const oldHome = process.env.DSH_AGENTS_HOME;
   const contexts = [];
   const { readExpertPreset } = await import('../../../../packages/plugins/experts/dist/runtime/preset-compiler.js');

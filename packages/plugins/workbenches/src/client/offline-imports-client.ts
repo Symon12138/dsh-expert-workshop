@@ -3,7 +3,7 @@ export interface WorkbenchOfflineImport {readonly importId:string;readonly packa
 export function createWorkbenchOfflineImportsClient(transport:typeof fetch=fetch) {
   return async(signal?:AbortSignal):Promise<readonly WorkbenchOfflineImport[]>=>{
     const lifetime=AbortSignal.any([AbortSignal.timeout(30_000),...(signal?[signal]:[])]);lifetime.throwIfAborted();
-    const response=await transport('/api/workdsh-workbench-offline-imports',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:'{}',signal:lifetime});
+    const response=await transport('/api/expertworkshop-workbench-offline-imports',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:'{}',signal:lifetime});
     const envelope=await response.json();lifetime.throwIfAborted();
     if(!response.ok||envelope?.ok!==true||!Array.isArray(envelope.value))throw new Error('workbench/records-unavailable');
     const ids=new Set<string>();

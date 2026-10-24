@@ -10,7 +10,7 @@ const selection={developmentId:'dev',expectedRevision:'r1',packageName:'quality-
 const value={developmentId:selection.developmentId,package:{packageName:selection.packageName,version:selection.version,sha256:selection.sha256},descriptor,installedVerified:true,activationVerified:false};
 test('native reconciliation sends only the selected baseline and never claims activation',async()=>{
  const result=await createWorkbenchNativeInstallationClient(async(path,options)=>{
-  assert.equal(path,'/api/workdsh-workbench-native-installation');
+  assert.equal(path,'/api/expertworkshop-workbench-native-installation');
   assert.deepEqual(JSON.parse(options.body),{developmentId:'dev',expectedRevision:'r1',version:'1.0.0',sha256:selection.sha256});
   assert.equal(options.credentials,'same-origin');
   return Response.json({ok:true,value:{...value,path:'/private',package:{...value.package,path:'/private'},activation:{status:'not-checked',reason:'verification-only'},clientPage:{status:'not-checked'},nextStep:{ifActivationAuthorized:{enable:{tool:'plugin_manager',arguments:{action:'set_bundle',target:selection.packageName,enabled:true}}}}}});

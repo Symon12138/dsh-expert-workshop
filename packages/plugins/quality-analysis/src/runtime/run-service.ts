@@ -351,7 +351,7 @@ export class QualityAnalysisRunService {
     const guard=()=>{signal?.throwIfAborted();if(this.closing)throw Error('quality/service/closed');this.authorize(actor);};
     guard();const run=store.history().runs.find(row=>row.runId===candidate.runId);
     if(!run||run.contentHash!==candidate.contentHash)throw Error('quality/store/run-hash-conflict');
-    const sessionId=`session-${createHash('sha256').update(JSON.stringify(['workdsh-quality-analysis',actor.organizationId,actor.principalId,candidate.recordId,candidate.runId,candidate.contentHash])).digest('hex').slice(0,32)}`;
+    const sessionId=`session-${createHash('sha256').update(JSON.stringify(['expertworkshop-quality-analysis',actor.organizationId,actor.principalId,candidate.recordId,candidate.runId,candidate.contentHash])).digest('hex').slice(0,32)}`;
     if(expert){
       const association=store.listExpertAssociations(candidate.runId,candidate.contentHash).find(row=>row.sessionId===candidate.sessionId);
       if(!association||JSON.stringify(association)!==JSON.stringify(expert.association))throw Error('quality/service/access-denied');

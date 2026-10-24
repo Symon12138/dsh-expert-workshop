@@ -11,7 +11,7 @@ export async function receiveWorkbenchArtifact(root: string, body: ReadableStrea
   const captured = expected && { ...expected };
   const check = () => { signal?.throwIfAborted(); authorize(); };
   check();
-  const directory = join(await realpath(root), '.workdsh-workbench-uploads');
+  const directory = join(await realpath(root), '.expertworkshop-workbench-uploads');
   await mkdir(directory, { recursive: true, mode: 0o700 });
   if (await realpath(directory) !== directory) throw new Error('workbench/archive-directory-outside');
   check();

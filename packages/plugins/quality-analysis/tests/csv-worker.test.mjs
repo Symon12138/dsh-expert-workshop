@@ -78,21 +78,21 @@ test('real LibraryManager supplies exact CSV bytes, rejects wrong revisions and 
  try{
  await ctx.plugin(Storage);await ctx.plugin(JsonStorage,{root:join(root,'storage')});await ctx.plugin(StorageDomain,{backend:'json'});await ctx.plugin(LibraryManager,{root:join(root,'library')});
  const bytes=new TextEncoder().encode('id,date,total,bad,unit,type\n001,2026-10-10,100,2,piece,initial');
- const first=await ctx.workdshLibrary.importAsset(actor,{name:'inspection.csv',bytes,operationId:'first'});
- const second=await ctx.workdshLibrary.importAsset(actor,{name:'other.csv',bytes:new TextEncoder().encode('id,count\n002,200'),operationId:'second'});
- const result=await importQualityLibraryCsv(ctx.workdshLibrary,importer,actor,{assetId:first.asset.id,revisionId:first.revision.id},()=>{});
+ const first=await ctx.expertworkshopLibrary.importAsset(actor,{name:'inspection.csv',bytes,operationId:'first'});
+ const second=await ctx.expertworkshopLibrary.importAsset(actor,{name:'other.csv',bytes:new TextEncoder().encode('id,count\n002,200'),operationId:'second'});
+ const result=await importQualityLibraryCsv(ctx.expertworkshopLibrary,importer,actor,{assetId:first.asset.id,revisionId:first.revision.id},()=>{});
  assert.deepEqual(result.imported.table.rows,[['001','2026-10-10','100','2','piece','initial']]);assert.equal(result.imported.sha256,first.revision.originalSha256);
- await assert.rejects(importQualityLibraryCsv(ctx.workdshLibrary,importer,actor,{assetId:first.asset.id,revisionId:second.revision.id},()=>{}),/revision-asset-mismatch/);
- await assert.rejects(importQualityLibraryCsv(ctx.workdshLibrary,importer,{...actor,principalId:'other'},{assetId:first.asset.id,revisionId:first.revision.id},()=>{}),/not-found/);
+ await assert.rejects(importQualityLibraryCsv(ctx.expertworkshopLibrary,importer,actor,{assetId:first.asset.id,revisionId:second.revision.id},()=>{}),/revision-asset-mismatch/);
+ await assert.rejects(importQualityLibraryCsv(ctx.expertworkshopLibrary,importer,{...actor,principalId:'other'},{assetId:first.asset.id,revisionId:first.revision.id},()=>{}),/not-found/);
  const run=createQualityAnalysisRun({runId:'library-run',createdAt:'2026-10-10T00:00:00Z',sourceNamespace:'library',rules:{timeZone:'UTC',dateFormat:'yyyy-mm-dd',inspectionTypes:{initial:'initial'}},inspections:{...result,mapping:{inspectionId:'id',inspectionDate:'date',inspectedQuantity:'total',nonconformingQuantity:'bad',quantityUnit:'unit',inspectionType:'type'}}});
- const receipt=await saveQualityReportToLibrary(ctx.workdshLibrary,actor,run,'质量报告',()=>{});
- const repeated=await saveQualityReportToLibrary(ctx.workdshLibrary,actor,run,'质量报告',()=>{});
+ const receipt=await saveQualityReportToLibrary(ctx.expertworkshopLibrary,actor,run,'质量报告',()=>{});
+ const repeated=await saveQualityReportToLibrary(ctx.expertworkshopLibrary,actor,run,'质量报告',()=>{});
  assert.deepEqual(receipt,repeated);
- const reportBytes=await ctx.workdshLibrary.readOriginal(actor,receipt.assetId,receipt.revisionId);
+ const reportBytes=await ctx.expertworkshopLibrary.readOriginal(actor,receipt.assetId,receipt.revisionId);
  assert.equal(createHash('sha256').update(reportBytes).digest('hex'),receipt.sha256);
  assert.ok(new TextDecoder().decode(reportBytes).includes(first.revision.id));
  assert.ok(new TextDecoder().decode(reportBytes).includes('2.00%'));
- await ctx.workdshLibrary.setAssetStatus(actor,first.asset.id,'disabled');
- await assert.rejects(importQualityLibraryCsv(ctx.workdshLibrary,importer,actor,{assetId:first.asset.id,revisionId:first.revision.id},()=>{}),/disabled/);
+ await ctx.expertworkshopLibrary.setAssetStatus(actor,first.asset.id,'disabled');
+ await assert.rejects(importQualityLibraryCsv(ctx.expertworkshopLibrary,importer,actor,{assetId:first.asset.id,revisionId:first.revision.id},()=>{}),/disabled/);
  }finally{await importer.close();await ctx.fiber.dispose();await rm(root,{recursive:true,force:true});}
 });

@@ -26,7 +26,7 @@ test('report list is bound to selected record/run and rejects duplicate identiti
  for(const invalid of [[summary,summary],[{...summary,contentHash:'b'.repeat(64)}],[{...summary,version:0}],[{...summary,assetId:'arbitrary'}]])assert.throws(()=>parseQualityReportDocuments(invalid,'record','run',hash));
 });
 test('save preserves one captured intent across transport and verifies matching edited fields',async()=>{
- let submitted;const client=createQualityRecordClient(async(path,init)=>{assert.equal(path,'/api/workdsh-quality-records');assert.equal(init.credentials,'same-origin');submitted=JSON.parse(init.body);return Response.json({ok:true,value:view});});
+ let submitted;const client=createQualityRecordClient(async(path,init)=>{assert.equal(path,'/api/expertworkshop-quality-records');assert.equal(init.credentials,'same-origin');submitted=JSON.parse(init.body);return Response.json({ok:true,value:view});});
  const input={operationId:'intent-1',fields:structuredClone(fields)};const saving=client.saveReportDocument('record','run',hash,input);input.fields.conclusion='mutated after send';
  assert.equal((await saving).fields.conclusion,'继续观察');assert.equal(submitted.payload.fields.conclusion,'继续观察');assert.equal(submitted.endpoint,'save-report-document');
  const wrong=createQualityRecordClient(async()=>Response.json({ok:true,value:{...view,fields:{...fields,conclusion:'unrelated'}}}));

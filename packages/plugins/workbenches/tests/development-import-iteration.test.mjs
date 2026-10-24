@@ -55,14 +55,14 @@ const target = { hostId: 'host', installationId: 'web', profileId: 'preview', ha
 const expected = { packageName: 'quality-plugin', workbenchId: 'company.quality', version: '0.2.0', sha256: 'a'.repeat(64) };
 
 async function fixture() {
-  const dir = await mkdtemp(join(tmpdir(), 'workdsh-import-iteration-'));
+  const dir = await mkdtemp(join(tmpdir(), 'expertworkshop-import-iteration-'));
   const storage = new Context(); await storage.plugin(Storage); await storage.plugin(JsonStorage, { root: join(dir, 'storage') }); await storage.plugin(StorageDomain, { backend: 'json' });
   const disposers = [], provided = new Map();
   let current = { id: 'dev', workbenchId: expected.workbenchId, packageName: expected.packageName, target, iterationId: 'iteration-1', requirementsRevision: 'req-1' };
   const state = { target, installs: 0, inspections: 0 }; const previous = globalThis.__iterationImportFixture; globalThis.__iterationImportFixture = state;
   const identity = { async resolve() { return actor; }, profile() { return { principalId: actor.principalId, organization: { id: actor.organizationId }, resolvedBy: actor.resolvedBy }; }, membership() { return { state: 'active' }; } };
   const profile = { name: 'preview', dir };
-  provided.set('workdshIdentity', identity); provided.set('storageDomain', storage.storageDomain); provided.set('profileContext', profile);
+  provided.set('expertworkshopIdentity', identity); provided.set('storageDomain', storage.storageDomain); provided.set('profileContext', profile);
   const ctx = { get: key => provided.get(key), provide: (key, value) => provided.set(key, value), fiber: { assertActive() {} }, effect: run => { disposers.push(run()); } };
   const service = await mountProfileWorkbenchImportHost(ctx, { list: async () => [{ title: '质量分析', development: structuredClone(current) }] }, () => true, '4.0.5', {});
   const request = { developmentId: 'dev', expected, archivePath: 'fixture-archive', intent: { id: 'operation-1', iterationId: 'iteration-1', kind: 'install', inputHash: expected.sha256, target } };

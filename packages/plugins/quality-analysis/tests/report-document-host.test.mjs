@@ -17,7 +17,7 @@ const built=await build({
   alias:{'expert-workshop-contracts':fileURLToPath(new URL('../../../contracts/src/index.ts',import.meta.url))},
   plugins:[{name:'published-runtime-owner',setup(builder){
     builder.onResolve({filter:/^(?:@deepseek-ai\/cordis|@deepseek-ai\/dsh-storage-domain|zod)$/},args=>({path:pathToFileURL(runtimeRequire.resolve(args.path)).href,external:true}));
-    builder.onResolve({filter:/^(?:workdsh-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},args=>({path:pathToFileURL(libraryRequire.resolve(args.path)).href,external:true}));
+    builder.onResolve({filter:/^(?:expertworkshop-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},args=>({path:pathToFileURL(libraryRequire.resolve(args.path)).href,external:true}));
   }}],
 });
 const bundleRoot=await mkdtemp(join(tmpdir(),'quality-report-host-bundle-'));
@@ -61,7 +61,7 @@ function proxyMethods(target,overrides){
 function injectReportStoreWrite(storage,fault){
   return proxyMethods(storage,{open:async spec=>{
     const domain=await storage.open(spec);
-    if(!spec.name.startsWith('workdsh_quality_'))return domain;
+    if(!spec.name.startsWith('expertworkshop_quality_'))return domain;
     const global=proxyMethods(domain.global,{set:async value=>{
       if(value.reportDocuments?.length&&fault.armed){
         fault.armed=false;
@@ -83,7 +83,7 @@ async function fixture(t,{storageFault}={}){
     f.ctx=new Context();
     await f.ctx.plugin(Storage);await f.ctx.plugin(JsonStorage,{root:join(root,'storage')});await f.ctx.plugin(StorageDomain,{backend:'json'});
     await f.ctx.plugin(LibraryManager,{root:join(root,'library')});
-    f.library=f.ctx.workdshLibrary;
+    f.library=f.ctx.expertworkshopLibrary;
     f.service=new QualityAnalysisRunService(storageFault?injectReportStoreWrite(f.ctx.storageDomain,storageFault):f.ctx.storageDomain,identity);
   }
   f.close=async()=>{await f.service?.close();f.service=undefined;await f.ctx?.fiber.dispose();f.ctx=undefined;};

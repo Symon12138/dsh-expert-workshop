@@ -32,7 +32,7 @@ async function storageBoot(root){const ctx=new Context();await ctx.plugin(Storag
 const layoutBuilt = await build({ entryPoints: [fileURLToPath(new URL('../src/runtime/package-layout.ts', import.meta.url))], bundle: true, platform: 'node', format: 'esm', write: false });
 const { validateWorkbenchPackageLayout } = await import(`data:text/javascript;base64,${Buffer.from(layoutBuilt.outputFiles[0].text).toString('base64')}`);
 const descriptor = { id: 'company.quality', title: '质量分析', description: '', protocolVersion: '1.0', layout: 'full-page', hostCompatibility: { sdk: '^1.0.0', harness: '0.2.0-rc.2' }, capabilities: [] };
-const manifest = { name: 'quality-fixture', version: '0.1.0', type: 'module', workdsh: { workbench: descriptor }, files: ['index.js', 'index.d.ts', 'client.js', 'client.d.ts', 'cordis.patch.yml'], exports: { '.': { types: './index.d.ts', default: './index.js' }, './client': { types: './client.d.ts', default: './client.js' } }, peerDependencies: { '@deepseek-ai/cordis': '4.0.4', '@deepseek-ai/dsh-client-ui-slots': '0.2.0-rc.2' }, dsh: { bundle: { patch: './cordis.patch.yml' }, client: { platform: 'web' } } };
+const manifest = { name: 'quality-fixture', version: '0.1.0', type: 'module', expertworkshop: { workbench: descriptor }, files: ['index.js', 'index.d.ts', 'client.js', 'client.d.ts', 'cordis.patch.yml'], exports: { '.': { types: './index.d.ts', default: './index.js' }, './client': { types: './client.d.ts', default: './client.js' } }, peerDependencies: { '@deepseek-ai/cordis': '4.0.4', '@deepseek-ai/dsh-client-ui-slots': '0.2.0-rc.2' }, dsh: { bundle: { patch: './cordis.patch.yml' }, client: { platform: 'web' } } };
 const expected = { packageName: manifest.name, version: manifest.version, workbenchId: descriptor.id };
 function archive(entries) {
   const chunks = [];
@@ -51,7 +51,7 @@ function archive(entries) {
   return gzipSync(Buffer.concat(chunks));
 }
 test('inspect actual pnpm archive derives receipt hash and identity without executing package entry', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-package-artifact-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-package-artifact-'));
   try {
     const source = join(root, 'source'), output = join(root, 'packed');
     await mkdir(source); await mkdir(output);
@@ -85,7 +85,7 @@ test('inspect actual pnpm archive derives receipt hash and identity without exec
       await archives.close();await storageContext.fiber.dispose();
       storageContext=await storageBoot(join(root,'storage'));
       archives=await WorkbenchInstallationArchives.open(storageContext.storageDomain,'installation-fixture',installation);
-      assert.deepEqual(archives.resolve(expected.packageName,expected.version),{path:join(await realpath(installation),'.workdsh-workbench-archives',hash+'.tgz'),sha256:hash,workbenchId:descriptor.id});
+      assert.deepEqual(archives.resolve(expected.packageName,expected.version),{path:join(await realpath(installation),'.expertworkshop-workbench-archives',hash+'.tgz'),sha256:hash,workbenchId:descriptor.id});
       await archives.close();
       await assert.rejects(WorkbenchInstallationArchives.open(storageContext.storageDomain,'installation-fixture',root),/target-mismatch/);
       archives=await WorkbenchInstallationArchives.open(storageContext.storageDomain,'installation-fixture',installation);
@@ -133,7 +133,7 @@ test('inspect actual pnpm archive derives receipt hash and identity without exec
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 test('archive metadata inspection rejects traversal, duplicates and links rather than extracting them', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-package-invalid-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-package-invalid-'));
   try {
     const path = join(root, 'bad.tgz'), metadata = { name: 'package/package.json', data: JSON.stringify(manifest) };
     for (const [extra, code] of [[{ name: 'package/../outside', data: 'escape' }, 'package-invalid-path'],
@@ -146,7 +146,7 @@ test('archive metadata inspection rejects traversal, duplicates and links rather
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 test('compressed and expanded byte budgets reject oversized inputs without accepting partial metadata', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-package-budgets-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-package-budgets-'));
   try {
     const path = join(root, 'oversized.tgz');
     await writeFile(path, Buffer.alloc(8 * 1024 * 1024 + 1));
@@ -159,7 +159,7 @@ test('compressed and expanded byte budgets reject oversized inputs without accep
 });
 
 test('actual archive tool errors are blocked by the common package gate before any entry executes',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-tool-gate-'));
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-tool-gate-'));
  try{
   const entries=Object.keys({'index.js':1,'index.d.ts':1,'client.js':1,'client.d.ts':1,'cordis.patch.yml':1}).map(name=>({name:'package/'+name,data:name==='index.js'?"import {defineTool} from '@deepseek-ai/dsh-tools';throw Error('must not execute');function mount(){defineTool({parameters:{weekKey:{type:'string',required:false}}})}":''}));
   const path=join(root,'candidate.tgz');await writeFile(path,archive([{name:'package/package.json',data:JSON.stringify(manifest)},...entries]));

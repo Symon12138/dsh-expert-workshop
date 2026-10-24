@@ -7,7 +7,7 @@ import { WorkbenchPageLifecycle, type WorkbenchPageMount, type WorkbenchPagePort
 import type {WorkbenchShortcuts} from './shortcuts.js';
 import {createNativeFrame} from './native-frame.js';
 
-export const WORKBENCH_MANAGER_PANEL = 'workdsh-workbench-manager';
+export const WORKBENCH_MANAGER_PANEL = 'expertworkshop-workbench-manager';
 export interface WorkbenchPageProps { readonly workbench: WorkbenchPageMount }
 export type WorkbenchPageComponent = React.ComponentType<WorkbenchPageProps>;
 type NativePageContext = Pick<Context, 'slots' | 'layout' | 'uiWorkspace'>;
@@ -21,7 +21,7 @@ export function createNativeWorkbenchPagePorts(ctx:NativePageContext,shortcuts?:
    let stopPage:()=>void;
    try{stopPage=ctx.slots.register({name:'main',key:mount.panelKey},()=>{React.useLayoutEffect(()=>{frame.activate(mount.panelKey);},[]);return null;});}catch(error){remove();throw error;}
    let untrack:(()=>void)|undefined;
-   try{untrack=mount.panelKey.startsWith('workdsh-workbench:')?shortcuts?.track(mount):undefined;}catch(error){stopPage();remove();throw error;}
+   try{untrack=mount.panelKey.startsWith('expertworkshop-workbench:')?shortcuts?.track(mount):undefined;}catch(error){stopPage();remove();throw error;}
    return()=>{try{untrack?.();}finally{try{stopPage();}finally{remove();}}};
   },
   selectedPanel(){return ctx.layout.panelInfo.getSnapshot().activePanelId??frame.active();},

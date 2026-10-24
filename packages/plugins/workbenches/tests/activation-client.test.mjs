@@ -8,7 +8,7 @@ const {createWorkbenchActivationClient}=await import(`data:text/javascript;base6
 const selection={developmentId:'dev',packageName:'quality-plugin',version:'1.0.0',workbenchId:'company.quality',sha256:'a'.repeat(64)};
 const observed={packageName:selection.packageName,version:selection.version,selected:true,application:'restart-required',confirmed:false,pendingRestart:true};
 test('activation retains pending restart without claiming applied and sends no paths',async()=>{
- const result=await createWorkbenchActivationClient(async(path,options)=>{assert.equal(path,'/api/workdsh-workbench-activation');assert.deepEqual(JSON.parse(options.body),{...selection,enabled:true});return Response.json({ok:true,value:{...observed,path:'/private'}});})({...selection,path:'/never-send'},true);
+ const result=await createWorkbenchActivationClient(async(path,options)=>{assert.equal(path,'/api/expertworkshop-workbench-activation');assert.deepEqual(JSON.parse(options.body),{...selection,enabled:true});return Response.json({ok:true,value:{...observed,path:'/private'}});})({...selection,path:'/never-send'},true);
  assert.equal(result.confirmed,false);assert.equal(result.pendingRestart,true);assert.equal(result.path,undefined);assert.ok(Object.isFrozen(result));
 });
 test('activation rejects contradictory, foreign or late success without retry',async()=>{

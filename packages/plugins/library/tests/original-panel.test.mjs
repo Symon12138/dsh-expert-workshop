@@ -15,7 +15,7 @@ function fixture({session=true,mintAfter=0}={}){
 const input={assetId:'asset',revisionId:'fixed-revision',name:'检验.csv',kind:'csv',returnPanel:{id:'quality',label:'返回质量分析'}};
 test('opens only in a real selected Session through public navigation; pinned revision and JSON return route survive',async()=>{
  const f=fixture();await createLibraryOriginalPanelClient(f.ctx).open(input);
- assert.deepEqual(f.calls,[['session','real-session'],['panel',null],['tab','workdsh-library-preview',{params:{assetId:'asset',revisionId:'fixed-revision',name:'检验.csv',kind:'csv',returnPanelId:'quality',returnLabel:'返回质量分析'}}]]);
+ assert.deepEqual(f.calls,[['session','real-session'],['panel',null],['tab','expertworkshop-library-preview',{params:{assetId:'asset',revisionId:'fixed-revision',name:'检验.csv',kind:'csv',returnPanelId:'quality',returnLabel:'返回质量分析'}}]]);
  assert.equal(f.connected,0);f.dispose();
 });
 test('no selected Session uses the official Workspace connection; XLSX explicitly enables owner save',async()=>{

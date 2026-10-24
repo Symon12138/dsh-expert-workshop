@@ -30,18 +30,18 @@ async function boot(root, identityConfig = config) {
 }
 
 test('local identity Cordis service persists one coherent personal profile across cold restart', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-identity-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-identity-'));
   let first;
   let second;
   try {
     first = await boot(root);
-    const initial = first.workdshIdentity.profile();
+    const initial = first.expertworkshopIdentity.profile();
     assert.equal(initial.organization.id, config.organizationId);
     assert.equal(initial.membership.organizationId, initial.organization.id);
     assert.equal(initial.membership.principalId, initial.principalId);
     assert.equal(initial.membership.role, 'owner');
-    assert.deepEqual(first.workdshIdentity.membership(initial.organization.id, initial.principalId), initial.membership);
-    assert.equal(first.workdshIdentity.membership('another-organization', initial.principalId), undefined);
+    assert.deepEqual(first.expertworkshopIdentity.membership(initial.organization.id, initial.principalId), initial.membership);
+    assert.equal(first.expertworkshopIdentity.membership('another-organization', initial.principalId), undefined);
     assert.ok(Object.isFrozen(initial));
     assert.ok(Object.isFrozen(initial.organization));
     assert.ok(Object.isFrozen(initial.membership));
@@ -49,13 +49,13 @@ test('local identity Cordis service persists one coherent personal profile acros
     first = undefined;
 
     second = await boot(root);
-    assert.deepEqual(second.workdshIdentity.profile(), initial);
-    const actor = await second.workdshIdentity.resolve({ sessionId: 'session-cold-restart' });
+    assert.deepEqual(second.expertworkshopIdentity.profile(), initial);
+    const actor = await second.expertworkshopIdentity.resolve({ sessionId: 'session-cold-restart' });
     assert.equal(actor.principalId, initial.principalId);
     assert.equal(actor.organizationId, initial.organization.id);
     assert.equal(actor.sessionId, 'session-cold-restart');
 
-    const medium = await readFile(join(root, 'workdsh_identity_local.json'), 'utf8');
+    const medium = await readFile(join(root, 'expertworkshop_identity_local.json'), 'utf8');
     assert.ok(medium.length > 0);
   } finally {
     if (first) await first.fiber.dispose();
@@ -65,7 +65,7 @@ test('local identity Cordis service persists one coherent personal profile acros
 });
 
 test('local identity refuses a Host config that conflicts with persisted identity', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-identity-conflict-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-identity-conflict-'));
   let first;
   try {
     first = await boot(root);

@@ -1,7 +1,7 @@
 import type { Context } from '@deepseek-ai/cordis';
 import type { ConnectionRpcResult, HostConnectionHandle } from '@deepseek-ai/dsh-client-connection';
 
-export const libraryManagementPath = '/api/workdsh-library';
+export const libraryManagementPath = '/api/expertworkshop-library';
 const ok = <T>(value: T): ConnectionRpcResult<T> => ({ ok: true, value });
 const fail = (code: string, message: string): ConnectionRpcResult<never> => ({ ok: false, error: { code, message, details: {} } });
 const record = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
@@ -13,7 +13,7 @@ export function registerLibraryConnection(ctx: Context): void {
     fetch: async request => {
       try {
         const body = record(await request.json()); const endpoint = body?.endpoint; const payload = record(body?.payload) ?? {};
-        const current = await ctx.workdshIdentity.resolve(undefined, request.signal); const manager = ctx.workdshLibrary;
+        const current = await ctx.expertworkshopIdentity.resolve(undefined, request.signal); const manager = ctx.expertworkshopLibrary;
         if (endpoint === 'space') return Response.json(ok(await manager.space(current, request.signal)));
         if (endpoint === 'list' && (payload.parentId === undefined || typeof payload.parentId === 'string')) return Response.json(ok(await manager.list(current, payload.parentId as string | undefined, request.signal)));
         if (endpoint === 'create-folder' && typeof payload.name === 'string' && (payload.parentId === undefined || typeof payload.parentId === 'string')) return Response.json(ok(await manager.createFolder(current, payload.name, payload.parentId as string | undefined, request.signal)));
@@ -28,8 +28,8 @@ export function registerLibraryConnection(ctx: Context): void {
             return Response.json(fail('library/invalid-request','保存请求无效。'),{status:400});
           if(!manager.saveOriginalRevision)return Response.json(fail('library/revision-save-unavailable','原件版本保存服务尚未加载。'),{status:503});
           const bytes=Buffer.from(payload.base64,'base64');if(bytes.toString('base64')!==payload.base64)return Response.json(fail('library/invalid-request','文件编码无效。'),{status:400});
-          const guard=()=>{request.signal.throwIfAborted();ctx.fiber.assertActive();const profile=ctx.workdshIdentity.profile();
-            if(profile.principalId!==current.principalId||profile.organization.id!==current.organizationId||profile.resolvedBy!==current.resolvedBy||ctx.workdshIdentity.membership(current.organizationId,current.principalId)?.state!=='active')throw new Error('library/actor-changed');};
+          const guard=()=>{request.signal.throwIfAborted();ctx.fiber.assertActive();const profile=ctx.expertworkshopIdentity.profile();
+            if(profile.principalId!==current.principalId||profile.organization.id!==current.organizationId||profile.resolvedBy!==current.resolvedBy||ctx.expertworkshopIdentity.membership(current.organizationId,current.principalId)?.state!=='active')throw new Error('library/actor-changed');};
           guard();const value=await manager.saveOriginalRevision(current,{assetId:payload.assetId as string,expectedRevisionId:payload.expectedRevisionId as string,operationId:payload.operationId as string,bytes},request.signal,guard);guard();return Response.json(ok(value));
         }
         if (endpoint === 'search' && typeof payload.query === 'string') {
@@ -57,5 +57,5 @@ export function registerLibraryConnection(ctx: Context): void {
       }
     },
   });
-  ctx.effect(() => unregister, 'workdsh.library.fetch');
+  ctx.effect(() => unregister, 'expertworkshop.library.fetch');
 }

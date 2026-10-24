@@ -1,5 +1,5 @@
 import { receiveWorkbenchArtifact } from './upload-artifact.js';
-export const workbenchUploadPath = '/api/workdsh-workbench-upload';
+export const workbenchUploadPath = '/api/expertworkshop-workbench-upload';
 export type WorkbenchUploadMetadata = { developmentId: string; packageName: string; version: string; workbenchId: string };
 /** Raw binary endpoint. Metadata is bounded separately; no filesystem paths,
  * actor claims or installation targets are accepted or returned. */
@@ -10,7 +10,7 @@ export async function handleWorkbenchUploadRequest(request: Request, root: strin
   try {
     if (request.headers.get('content-type')?.split(';')[0].trim() !== 'application/octet-stream' || !request.body)
       throw new Error('workbench/invalid-request');
-    const header = request.headers.get('x-workdsh-upload');
+    const header = request.headers.get('x-expertworkshop-upload');
     if (!header || header.length > 4096) throw new Error('workbench/invalid-request');
     let metadata: WorkbenchUploadMetadata;
     try {

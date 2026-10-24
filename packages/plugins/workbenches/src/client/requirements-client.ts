@@ -22,7 +22,7 @@ export function createWorkbenchRequirementsClient(lifetime?: AbortSignal, transp
     const signals = [AbortSignal.timeout(30_000), lifetime, signal].filter((value): value is AbortSignal => value !== undefined);
     const requestSignal = AbortSignal.any(signals);
     requestSignal.throwIfAborted();
-    const response = await transport('/api/workdsh-workbench-requirements', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: requestSignal });
+    const response = await transport('/api/expertworkshop-workbench-requirements', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: requestSignal });
     requestSignal.throwIfAborted();
     const invalid = () => new WorkbenchRequirementsRequestError('workbench/invalid-response', '需求服务返回了无效响应，请核对保存状态。', response.status);
     let result: unknown;

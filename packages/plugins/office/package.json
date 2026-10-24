@@ -101,7 +101,7 @@
     "@univerjs/slides-ui": "0.25.1",
     "expert-workshop-contracts": "workspace:*",
     "@deepseek-ai/dsh-fs": "0.2.1-rc.2",
-    "workdsh-tabular": "workspace:*"
+    "expertworkshop-tabular": "workspace:*"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "4.0.5",

@@ -11,7 +11,7 @@ import{createProfileWorkbenchTarget}from'./profile-target.js';
 import{readWorkbenchRequestBody}from'./request-body.js';
 import{WorkbenchAcceptanceService,type AcceptanceBinding}from'./acceptance-service.js';
 export async function mountWorkbenchAcceptanceHost(ctx:Context,development:WorkbenchDevelopmentService,requirements:WorkbenchRequirementsService,directory:string,archives:WorkbenchInstallationArchives,registration:HostWorkbenchRegistration<unknown>,compatible:(d:WorkbenchDescriptor)=>boolean){
- const identity=ctx.get('workdshIdentity') as IdentityService,storage=ctx.get('storageDomain') as DomainFacility,connection=ctx.get('connection') as HostConnectionHandle;
+ const identity=ctx.get('expertworkshopIdentity') as IdentityService,storage=ctx.get('storageDomain') as DomainFacility,connection=ctx.get('connection') as HostConnectionHandle;
  const target=await createProfileWorkbenchTarget(ctx);
  const service=new WorkbenchAcceptanceService(storage,identity,async(id,actor,signal)=>{
   const check=()=>{signal?.throwIfAborted();ctx.fiber.assertActive();const p=identity.profile();if(p.principalId!==actor.principalId||p.organization.id!==actor.organizationId||p.resolvedBy!==actor.resolvedBy||identity.membership(actor.organizationId,actor.principalId)?.state!=='active')throw Error('workbench/development-access-denied');};
@@ -24,10 +24,10 @@ export async function mountWorkbenchAcceptanceHost(ctx:Context,development:Workb
   const binding=installed?{developmentId:id,requirementsRevision:d.requirementsRevision,packageName:d.packageName,version:installed.version,sha256:installed.sha256,hostId:d.target.hostId,profileId:d.target.profileId,installationId:d.target.installationId}:undefined;
   return {binding,criteria:latest.requirements.acceptance,ready:!!(installed&&row?.registered&&row.selected&&row.compatible&&!row.errorCode&&row.runtimeStatus==='active')};
  });
- ctx.effect(()=>()=>service.close(),'workdsh.acceptance.close');
- ctx.effect(()=>connection.fetch.register({path:'/api/workdsh-workbench-acceptance',methods:['POST'],requestBody:'streaming',fetch:async request=>{try{
+ ctx.effect(()=>()=>service.close(),'expertworkshop.acceptance.close');
+ ctx.effect(()=>connection.fetch.register({path:'/api/expertworkshop-workbench-acceptance',methods:['POST'],requestBody:'streaming',fetch:async request=>{try{
   const body=await readWorkbenchRequestBody(request) as Record<string,unknown>;
   if(!body||typeof body!=='object'||Array.isArray(body)||Object.keys(body).some(k=>!['developmentId','accept'].includes(k))||typeof body.developmentId!=='string'||('accept'in body&&(!body.accept||typeof body.accept!=='object')))throw Error('workbench/invalid-request');
   const value=await service.invoke(body.developmentId,body.accept as AcceptanceBinding|undefined,request.signal);ctx.fiber.assertActive();return Response.json({ok:true,value});
- }catch(error){const code=error instanceof Error&&/^workbench\/[a-z-]+$/.test(error.message)?error.message:'workbench/acceptance-unavailable';return Response.json({ok:false,error:{code}},{status:code==='workbench/invalid-request'?400:409});}}}),'workdsh.acceptance.rpc');
+ }catch(error){const code=error instanceof Error&&/^workbench\/[a-z-]+$/.test(error.message)?error.message:'workbench/acceptance-unavailable';return Response.json({ok:false,error:{code}},{status:code==='workbench/invalid-request'?400:409});}}}),'expertworkshop.acceptance.rpc');
 }

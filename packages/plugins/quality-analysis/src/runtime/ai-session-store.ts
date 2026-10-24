@@ -15,7 +15,7 @@ export type QualityAiContext=z.infer<typeof context>;
 const operation=z.object({id:hash,requestHash:hash,result:context}).strict();
 const stateSchema=z.object({organizationId:id,principalId:id,bindings:z.array(context).max(1000),operations:z.array(operation).max(1000)}).strict();
 function spec(actor:ActorContext){const key=createHash('sha256').update(JSON.stringify([actor.organizationId,actor.principalId])).digest('hex').slice(0,40);
- return defineDomain({name:`workdsh_quality_ai_${key}`,version:1,global:{schema:stateSchema,initial:{organizationId:actor.organizationId,principalId:actor.principalId,bindings:[] as QualityAiContext[],operations:[] as z.infer<typeof operation>[]}},tables:{}});
+ return defineDomain({name:`expertworkshop_quality_ai_${key}`,version:1,global:{schema:stateSchema,initial:{organizationId:actor.organizationId,principalId:actor.principalId,bindings:[] as QualityAiContext[],operations:[] as z.infer<typeof operation>[]}},tables:{}});
 }
 /** The Host owns the Session -> immutable analytical basis binding. It contains
  * no credentials, model state or report body. The Session remains native. */

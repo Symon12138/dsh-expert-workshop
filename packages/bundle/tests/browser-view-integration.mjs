@@ -9,7 +9,7 @@ import { pathToFileURL } from 'node:url';
 import { test } from 'node:test';
 import { registerBrowserView } from '../dist/browser-view.js';
 
-const profile = process.env.WORKDSH_PREVIEW_HOME;
+const profile = process.env.EXPERTWORKSHOP_PREVIEW_HOME;
 const executable = process.env.DSH_BROWSER_EXECUTABLE;
 
 test('real Playwright MCP navigation appears in its Session sidebar frame', { skip: !profile || !executable }, async () => {
@@ -29,7 +29,7 @@ test('real Playwright MCP navigation appears in its Session sidebar frame', { sk
   const { default: Projections } = await load('@deepseek-ai/dsh-session-projection');
   const { default: Attachments } = await load('@deepseek-ai/dsh-attachment-local');
 
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-browser-view-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-browser-view-'));
   const requests = new Set();
   const server = createServer((request, response) => {
     requests.add(request.url);
@@ -79,39 +79,39 @@ test('real Playwright MCP navigation appears in its Session sidebar frame', { sk
     assert.equal(result.isError, false, JSON.stringify(result.content));
     let frame;
     for (let i = 0; i < 100; i++) {
-      const response = await handler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real' }) }));
+      const response = await handler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real' }) }));
       frame = (await response.json()).frame;
       if (frame?.image) break;
       await new Promise(resolve => setTimeout(resolve, 100));
     }
     assert.equal(frame?.url, url);
     assert.match(frame?.image ?? '', /^data:image\/png;base64,/, JSON.stringify({ frame, screenshots }));
-    const click = await handler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'click', x: 50, y: 80 } }) }));
+    const click = await handler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'click', x: 50, y: 80 } }) }));
     assert.equal(click.status, 200, await click.text());
     assert.equal(requests.has('/clicked'), true);
     let clickedFrame;
     for (let i = 0; i < 100; i++) {
-      const response = await handler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real' }) }));
+      const response = await handler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real' }) }));
       clickedFrame = (await response.json()).frame;
       if (clickedFrame?.revision > frame.revision && clickedFrame.image !== frame.image) break;
       await new Promise(resolve => setTimeout(resolve, 100));
     }
     assert.ok(clickedFrame?.revision > frame.revision);
     assert.notEqual(clickedFrame?.image, frame.image);
-    const focus = await handler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'click', x: 50, y: 140 } }) }));
+    const focus = await handler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'click', x: 50, y: 140 } }) }));
     assert.equal(focus.status, 200, await focus.text());
-    const typed = await handler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'type', text: 'abc' } }) }));
+    const typed = await handler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'type', text: 'abc' } }) }));
     assert.equal(typed.status, 200, await typed.text());
     assert.equal(requests.has('/typed?value=abc'), true);
     const nextUrl = `http://127.0.0.1:${server.address().port}/second`;
-    const navigate = await handler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'navigate', url: nextUrl } }) }));
+    const navigate = await handler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'navigate', url: nextUrl } }) }));
     assert.equal(navigate.status, 200, await navigate.text());
     assert.equal(requests.has('/second'), true);
-    const navigatedFrame = (await (await handler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real' }) }))).json()).frame;
+    const navigatedFrame = (await (await handler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real' }) }))).json()).frame;
     assert.equal(navigatedFrame.url, nextUrl);
-    const invalidUrl = await handler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'navigate', url: 'javascript:alert(1)' } }) }));
+    const invalidUrl = await handler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'browser-view-real', action: { kind: 'navigate', url: 'javascript:alert(1)' } }) }));
     assert.equal(invalidUrl.status, 400);
-    const otherSession = await handler(new Request('http://localhost/api/workdsh-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'not-this-session', action: { kind: 'click', x: 50, y: 80 } }) }));
+    const otherSession = await handler(new Request('http://localhost/api/expertworkshop-agent-browser', { method: 'POST', body: JSON.stringify({ sessionId: 'not-this-session', action: { kind: 'click', x: 50, y: 80 } }) }));
     assert.equal(otherSession.status, 400);
     await owner.dispose();
   } finally {

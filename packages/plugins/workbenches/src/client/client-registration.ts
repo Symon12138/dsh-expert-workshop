@@ -69,7 +69,7 @@ export class ClientWorkbenchRegistration<Page> {
       release = () => { this.releases.delete(release); };
       this.releases.add(release);
     }
-    try { return caller.effect(() => release, 'workdsh.workbench.client-registration'); }
+    try { return caller.effect(() => release, 'expertworkshop.workbench.client-registration'); }
     catch (cause) { release(); throw cause; }
   }
   close() {

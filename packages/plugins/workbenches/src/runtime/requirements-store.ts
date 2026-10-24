@@ -8,7 +8,7 @@ const revisionSchema = z.object({ id: z.string(), developmentId: z.string(), par
 const stateSchema = z.object({ organizationId: z.string(), principalId: z.string(), developmentId: z.string(), revisions: z.array(revisionSchema) });
 function spec(actor: ActorContext, developmentId: string) {
   const key = createHash('sha256').update(JSON.stringify([actor.organizationId, actor.principalId, developmentId])).digest('hex').slice(0, 40);
-  return defineDomain({ name: `workdsh_req_${key}`, version: 1, global: { schema: stateSchema, initial: { organizationId: actor.organizationId, principalId: actor.principalId, developmentId, revisions: [] } }, tables: {} });
+  return defineDomain({ name: `expertworkshop_req_${key}`, version: 1, global: { schema: stateSchema, initial: { organizationId: actor.organizationId, principalId: actor.principalId, developmentId, revisions: [] } }, tables: {} });
 }
 type RequirementsDomain = Domain<ReturnType<typeof spec>>;
 

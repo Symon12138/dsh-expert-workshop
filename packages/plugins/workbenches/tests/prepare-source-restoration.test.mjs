@@ -4,7 +4,7 @@ test('restoration candidate preserves verified bytes and refuses partial publica
  const root=await realpath(await mkdtemp(join(tmpdir(),'source-restore-')));
  try{
  const checkpoints=join(root,'checkpoints'),destination=join(root,'candidates'),bytes='old source',metadata=JSON.stringify({schemaVersion:1,files:[{path:'src/index.js',bytes:bytes.length,sha256:hash(bytes)}]}),sha=hash(metadata),backup=join(checkpoints,sha);
- await mkdir(join(backup,'src'),{recursive:true});await writeFile(join(backup,'.workdsh-checkpoint.json'),metadata);await writeFile(join(backup,'src/index.js'),bytes);
+ await mkdir(join(backup,'src'),{recursive:true});await writeFile(join(backup,'.expertworkshop-checkpoint.json'),metadata);await writeFile(join(backup,'src/index.js'),bytes);
  const candidate=await prepare(checkpoints,sha,destination,()=>{});assert.equal(await readFile(join(candidate.directory,'src/index.js'),'utf8'),bytes);assert.equal(candidate.verified,true);
  await writeFile(join(backup,'src/index.js'),'corrupt');await assert.rejects(prepare(checkpoints,sha,destination,()=>{}),/checkpoint-corrupt/);assert.deepEqual(await readdir(destination),[candidate.directory.split('/').at(-1)]);
  const controller=new AbortController();controller.abort();await assert.rejects(prepare(checkpoints,sha,destination,()=>{},controller.signal),/abort/i);
@@ -15,7 +15,7 @@ test('cancellation, revoked authority and modified staging never publish a candi
  const root=await realpath(await mkdtemp(join(tmpdir(),'source-restore-fault-')));
  try{
   const checkpoints=join(root,'checkpoints'),destination=join(root,'candidates'),bytes='original',metadata=JSON.stringify({schemaVersion:1,files:[{path:'index.js',bytes:8,sha256:hash(bytes)}]}),sha=hash(metadata),backup=join(checkpoints,sha);
-  await mkdir(backup,{recursive:true});await writeFile(join(backup,'.workdsh-checkpoint.json'),metadata);await writeFile(join(backup,'index.js'),bytes);
+  await mkdir(backup,{recursive:true});await writeFile(join(backup,'.expertworkshop-checkpoint.json'),metadata);await writeFile(join(backup,'index.js'),bytes);
   // Authority callbacks remain synchronous, as in the Host identity guard.
   const {existsSync,readdirSync,writeFileSync}=require('node:fs');
   for(const mode of ['cancel','revoke','corrupt']){

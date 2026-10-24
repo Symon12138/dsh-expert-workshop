@@ -6,7 +6,7 @@ import type {WorkbenchInstallationArchives} from './installation-archives.js';
 /** A local installer may seed archives for CLI-installed bundles. This is not
  * an RPC: every archive and installed byte is verified before registration. */
 export async function bootstrapInstalledWorkbenchArchives(root:string,archives:WorkbenchInstallationArchives,authorize:()=>void){
- const directory=join(root,'workdsh-bootstrap-archives'),index=join(directory,'index.json');
+ const directory=join(root,'expertworkshop-bootstrap-archives'),index=join(directory,'index.json');
  let bytes:Buffer;
  try{const stat=await lstat(index);if(!stat.isFile()||stat.isSymbolicLink()||stat.size>65536)throw Error('workbench/invalid-bootstrap-index');bytes=await readFile(index);}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return;throw error;}
  if(await realpath(directory)!==directory||bytes.length>65536)throw Error('workbench/invalid-bootstrap-index');

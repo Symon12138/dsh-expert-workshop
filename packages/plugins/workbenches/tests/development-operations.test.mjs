@@ -22,7 +22,7 @@ async function boot(root) { const ctx = new Context(); await ctx.plugin(Storage)
 const target = { hostId: 'host', installationId: 'desktop', profileId: 'default', harnessVersion: '0.2.0-rc.2' };
 const intent = { id: 'install-1', iterationId: 'iteration-1', kind: 'install', target, inputHash: 'a'.repeat(64), expectedInstalledHash: 'b'.repeat(64) };
 test('durable operation identity survives unknown results and rejects changed target or input on reuse', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-development-operations-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-development-operations-'));
   let ctx, journal;
   try {
     ctx = await boot(root);
@@ -51,7 +51,7 @@ test('durable operation identity survives unknown results and rejects changed ta
   } finally { await journal?.close(); await ctx?.fiber.dispose(); await rm(root, { recursive: true, force: true }); }
 });
 test('operation transitions enforce CAS, correct receipt kind, cancellation and durable shutdown', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-development-operation-conflicts-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-development-operation-conflicts-'));
   const ctx = await boot(root);
   const journal = await WorkbenchDevelopmentOperations.open(ctx.storageDomain, actor, 'dev-1');
   try {

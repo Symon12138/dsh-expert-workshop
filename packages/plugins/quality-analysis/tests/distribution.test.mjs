@@ -16,6 +16,6 @@ test('built quality Client uses platform managed registration and the declared i
  let platformModule;runInNewContext(await readFile(new URL('../../workbenches/dist/client.browser.js',import.meta.url),'utf8'),{window:{__ModuleLoader__:{load:entry=>{platformModule=entry.factory(nativeRequire);}}}});
  let module;const code=await readFile(new URL('../dist/client.browser.js',import.meta.url),'utf8');
  runInNewContext(code,{fetch:()=>{throw new Error('unexpected request');},window:{__ModuleLoader__:{load:entry=>{assert.equal(entry.id,'expert-workshop-plugin-quality-analysis');module=entry.factory(name=>name==='expert-workshop-plugin-workbenches/client'?platformModule:name==='expert-workshop-plugin-library/client'?{createLibraryClient(){},createLibraryOriginalPanelClient,createLibraryNativeFileClient(){return{open(){throw Error('registration must not navigate to a file');}};},LibraryAssetPicker(){}}:nativeRequire(name));}}}});
- let registered;const ctx={effect(){},get:name=>{assert.equal(name,'workdshWorkbenchClientRegistration');return {registerManaged:async(caller,descriptor,page)=>{assert.equal(caller,ctx);assert.equal(typeof page,'function');registered=descriptor;}};}};
- await module.apply(ctx);assert.equal(registered.id,'workdsh.quality-analysis');assert.ok(module.inject.includes('workdshWorkbenchClientRegistration'));
+ let registered;const ctx={effect(){},get:name=>{assert.equal(name,'expertworkshopWorkbenchClientRegistration');return {registerManaged:async(caller,descriptor,page)=>{assert.equal(caller,ctx);assert.equal(typeof page,'function');registered=descriptor;}};}};
+ await module.apply(ctx);assert.equal(registered.id,'expertworkshop.quality-analysis');assert.ok(module.inject.includes('expertworkshopWorkbenchClientRegistration'));
 });

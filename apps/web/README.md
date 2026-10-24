@@ -1,25 +1,25 @@
-<p align="center"><img src="assets/brand/workdsh-logo.svg" width="104" alt="WorkDSH"></p>
-<h1 align="center">WorkDSH</h1>
+<p align="center"><img src="assets/brand/expertworkshop-logo.svg" width="104" alt="Expert Workshop"></p>
+<h1 align="center">Expert Workshop</h1>
 <p align="center"><strong>Give AI a job. Watch it work. Open the result.</strong></p>
 <p align="center">English · <a href="README.zh-CN.md">简体中文</a></p>
 
-WorkDSH is an open-source AI workspace built on the official DeepSeek Harness. Organize conversations, material and capabilities in projects, reuse your local Library, and review editable deliverables alongside the task.
+Expert Workshop is an open-source AI workspace built on the official DeepSeek Harness. Organize conversations, material and capabilities in projects, reuse your local Library, and review editable deliverables alongside the task.
 
 **Desktop v2.0.6-alpha.1 · Web/plugins v0.1.0-alpha.14 · Alpha preview**
 
-[Desktop downloads](https://github.com/techflag/workdsh/releases/tag/desktop-v2.0.6-alpha.1) · [Web/plugin download](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.14) · [Release notes](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.14) · [Quick start](#quick-start) · [Website](https://techflag.github.io/workdsh/) · [Gitee mirror](https://gitee.com/techflag/workdsh)
+[Desktop downloads](https://github.com/techflag/expertworkshop/releases/tag/desktop-v2.0.6-alpha.1) · [Web/plugin download](https://github.com/techflag/expertworkshop/releases/tag/v0.1.0-alpha.14) · [Release notes](https://github.com/techflag/expertworkshop/releases/tag/v0.1.0-alpha.14) · [Quick start](#quick-start) · [Website](https://techflag.github.io/expertworkshop/) · [Gitee mirror](https://gitee.com/techflag/expertworkshop)
 
-## Download WorkDSH Desktop
+## Download Expert Workshop Desktop
 
 | System | Installer |
 | --- | --- |
-| Windows x64 | [Download Setup.exe](https://github.com/techflag/workdsh/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-windows-x64--WorkDSH-2.0.6-alpha.1-x64-Setup.exe) |
-| macOS Apple Silicon | [Download arm64 DMG](https://github.com/techflag/workdsh/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-macos-arm64--WorkDSH-2.0.6-alpha.1-arm64.dmg) |
-| macOS Intel | [Download x64 DMG](https://github.com/techflag/workdsh/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-macos-x64--WorkDSH-2.0.6-alpha.1-x64.dmg) |
+| Windows x64 | [Download Setup.exe](https://github.com/techflag/expertworkshop/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-windows-x64--Expert Workshop-2.0.6-alpha.1-x64-Setup.exe) |
+| macOS Apple Silicon | [Download arm64 DMG](https://github.com/techflag/expertworkshop/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-macos-arm64--Expert Workshop-2.0.6-alpha.1-arm64.dmg) |
+| macOS Intel | [Download x64 DMG](https://github.com/techflag/expertworkshop/releases/download/desktop-v2.0.6-alpha.1/dsh-plugin-desktop-macos-x64--Expert Workshop-2.0.6-alpha.1-x64.dmg) |
 
-These Alpha installers bundle WorkDSH v0.1.0-alpha.14 and the official Harness 0.1.7-rc.2 Profile, including Node and Python. The task browser reuses Electron; no second browser binary is bundled. macOS DMGs are unsigned previews; checksums are in the [Desktop release](https://github.com/techflag/workdsh/releases/tag/desktop-v2.0.6-alpha.1).
+These Alpha installers bundle Expert Workshop v0.1.0-alpha.14 and the official Harness 0.1.7-rc.2 Profile, including Node and Python. The task browser reuses Electron; no second browser binary is bundled. macOS DMGs are unsigned previews; checksums are in the [Desktop release](https://github.com/techflag/expertworkshop/releases/tag/desktop-v2.0.6-alpha.1).
 
-![WorkDSH project home — full application in dark mode](assets/screenshots/workdsh-projects-alpha8-dark.png)
+![Expert Workshop project home — full application in dark mode](assets/screenshots/expertworkshop-projects-alpha8-dark.png)
 
 ## What you can do
 
@@ -41,14 +41,14 @@ Full application captures from a local workspace; example projects, installed sk
 <details>
 <summary>Light theme — project home</summary>
 
-![WorkDSH project home — full application in light mode](assets/screenshots/workdsh-projects-alpha8-light.png)
+![Expert Workshop project home — full application in light mode](assets/screenshots/expertworkshop-projects-alpha8-light.png)
 
 </details>
 
 <details>
 <summary>Office example — conversation and HTML deliverable</summary>
 
-![Conversation with an HTML analysis dashboard](assets/screenshots/workdsh-html-dashboard-preview.png)
+![Conversation with an HTML analysis dashboard](assets/screenshots/expertworkshop-html-dashboard-preview.png)
 
 Earlier local preview showing the artifact workflow; it is not an alpha.8 acceptance result for every document format.
 
@@ -56,11 +56,11 @@ Earlier local preview showing the artifact workflow; it is not an alpha.8 accept
 
 ## Star history
 
-<a href="https://www.star-history.com/?repos=techflag%2Fworkdsh&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=techflag%2Fexpertworkshop&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=techflag/workdsh&type=date&theme=dark&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=techflag/workdsh&type=date&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=techflag/workdsh&type=date&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=techflag/expertworkshop&type=date&theme=dark&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=techflag/expertworkshop&type=date&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=techflag/expertworkshop&type=date&legend=top-left&sealed_token=BRTkOyC4czCEkIyFb5-QxrsC-kaDotBJ8tsjxrWs-UGfmBqfRCXSwieZPlVTCYOjJVEZ29uLvmBjAPREB524J5dPN1jk-UA7ajFdLdrbjumJqoOBeGWmig" />
  </picture>
 </a>
 
@@ -68,13 +68,13 @@ Earlier local preview showing the artifact workflow; it is not an alpha.8 accept
 
 Requirements: Node.js `^22.19.0 || >=24.0.0`, Corepack/pnpm and the official `dsh` CLI matching the downloaded release manifest’s `harness` field exactly. The source target version does not override a published release manifest.
 
-1. Download all 12 `.tgz` packages, `release-manifest.json`, `SHA256SUMS` and `install-workdsh.mjs` from the [alpha.14 release](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.14) into one directory.
+1. Download all 12 `.tgz` packages, `release-manifest.json`, `SHA256SUMS` and `install-expertworkshop.mjs` from the [alpha.14 release](https://github.com/techflag/expertworkshop/releases/tag/v0.1.0-alpha.14) into one directory.
 2. For an upgrade, stop the target Profile and keep a recoverable backup of its configuration and data.
 3. Run from the download directory:
 
 ```sh
-node install-workdsh.mjs --profile workdsh --dry-run
-node install-workdsh.mjs --profile workdsh
+node install-expertworkshop.mjs --profile expertworkshop --dry-run
+node install-expertworkshop.mjs --profile expertworkshop
 ```
 
 The installer verifies package checksums, pins the tested package manager and transitive Harness versions, and installs the matching official base, Web app and CLI into the Profile. **Start with the Profile-local CLI command printed by the installer.** This avoids mixing a global CLI with a different runtime installation. Use `--dsh /absolute/path/to/dsh` if the matching CLI is not on your PATH.
@@ -98,7 +98,7 @@ Preview startup uses the workspace-pinned pnpm for native plugin management as w
 
 ## Architecture and development
 
-WorkDSH extends the published Harness packages through plugins, services and UI slots. It does not maintain a modified upstream runtime. Business modules own their data; the bundle composes navigation and presentation.
+Expert Workshop extends the published Harness packages through plugins, services and UI slots. It does not maintain a modified upstream runtime. Business modules own their data; the bundle composes navigation and presentation.
 
 ```sh
 corepack pnpm typecheck
@@ -108,7 +108,7 @@ corepack pnpm test:library
 corepack pnpm check:versions
 ```
 
-[Release history](https://github.com/techflag/workdsh/releases) · [Project roadmap](https://github.com/techflag/workdsh/issues)
+[Release history](https://github.com/techflag/expertworkshop/releases) · [Project roadmap](https://github.com/techflag/expertworkshop/issues)
 
 This is an alpha preview. Cross-platform installation, long-running real-model teams, arbitrary Office fidelity and multi-user governance are not fully accepted. Harness upgrades require compatibility checks for the native UI adapters. See the release notes for the exact validation scope.
 
@@ -116,7 +116,7 @@ This is an alpha preview. Cross-platform installation, long-running real-model t
 
 Thank you to these projects and their maintainers. This list covers major direct dependencies; package manifests, the lockfile and generated license inventories describe the full dependency set.
 
-| Project | Use in WorkDSH | License |
+| Project | Use in Expert Workshop | License |
 | --- | --- | --- |
 | [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) / Cordis | Native tasks, model execution, skills, Loader, Profile, services and UI extension APIs | MIT |
 | [React](https://github.com/facebook/react) | Feature pages and editor UI | MIT |
@@ -130,9 +130,9 @@ Thank you to these projects and their maintainers. This list covers major direct
 | [Noto Sans SC](https://github.com/google/fonts/tree/main/ofl/notosanssc) | Bundled static Chinese font; license and derivation metadata retained | SIL Open Font License 1.1 |
 | [i18next](https://github.com/i18next/i18next) / [react-i18next](https://github.com/i18next/react-i18next) | Chinese localization for the PPT editor | MIT |
 | [Lucide](https://github.com/lucide-icons/lucide) | PPT toolbar icons | ISC |
-| [dsh-cost-meter](https://github.com/Han-1413141/dsh-cost-meter) | Separately installed spending plugin in the local preview Profile; not bundled in WorkDSH releases | See the independent project's license |
+| [dsh-cost-meter](https://github.com/Han-1413141/dsh-cost-meter) | Separately installed spending plugin in the local preview Profile; not bundled in Expert Workshop releases | See the independent project's license |
 
-WorkDSH explicitly takes **WorkBuddy / CodeBuddy** as a product-experience reference: a real task should expose its process and end in an editable artifact. Skill-market organization, grouped toolbars, and PPT design guidance also draw on those experiences. WorkDSH is an independent open-source implementation for DeepSeek Harness; it does not reuse WorkBuddy branding or claim an official partnership, endorsement, or Tencent PPT engine integration.
+Expert Workshop explicitly takes **WorkBuddy / CodeBuddy** as a product-experience reference: a real task should expose its process and end in an editable artifact. Skill-market organization, grouped toolbars, and PPT design guidance also draw on those experiences. Expert Workshop is an independent open-source implementation for DeepSeek Harness; it does not reuse WorkBuddy branding or claim an official partnership, endorsement, or Tencent PPT engine integration.
 
 Third-party skills and materials retain their providers' terms. Generated archives retain copyright and license texts for dependencies actually bundled; see [Office third-party notices](../../packages/plugins/office/THIRD-PARTY-NOTICES.md).
 
@@ -162,6 +162,6 @@ The current build inventory additionally includes the following package versions
 
 This checkout does not include the older `deploy/docker` recipe. For your own container deployment, persist all of `DSH_HOME` and set `DSH_AGENTS_HOME` to an `agents` directory on the same persistent volume. The experts service also defaults to `$DSH_HOME/agents` when no explicit agents directory is configured.
 
-`SANDBOX_UNAVAILABLE` means the host has no usable isolation backend. Check container and host support first. Unrestricted execution requires an explicit choice in native permission settings; WorkDSH does not silently fall back to it. Environment variables mentioned by an older recipe do not replace checking the current official runtime settings.
+`SANDBOX_UNAVAILABLE` means the host has no usable isolation backend. Check container and host support first. Unrestricted execution requires an explicit choice in native permission settings; Expert Workshop does not silently fall back to it. Environment variables mentioned by an older recipe do not replace checking the current official runtime settings.
 
 Personal Web is a single-user local runtime. Sharing one Profile does not isolate users’ data. Enterprise features do not constitute a multi-tenant Web Host.

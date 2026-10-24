@@ -1,7 +1,7 @@
 import { readWorkbenchRequestBody } from './request-body.js';
 import type { WorkbenchRequirementsService } from './requirements-service.js';
 
-export const workbenchRequirementsPath = '/api/workdsh-workbench-requirements';
+export const workbenchRequirementsPath = '/api/expertworkshop-workbench-requirements';
 const record = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
 const fail = (code: string, message: string, status: number) => Response.json({ ok: false, error: { code, message, details: {} } }, { status });
 /** Official connection adapter delegates here; identity resolution stays entirely in the service. */

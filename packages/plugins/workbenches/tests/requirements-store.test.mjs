@@ -24,7 +24,7 @@ const draft = { title: '质量分析', scenario: '质量问题', users: '工程�
 async function boot(root) { const ctx = new Context(); await ctx.plugin(Storage); await ctx.plugin(JsonStorage, { root }); await ctx.plugin(StorageDomain, { backend: 'json' }); return ctx; }
 
 test('official storage restores requirement history and rejects concurrent stale revisions', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-requirements-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-requirements-'));
   let ctx, store;
   try {
     ctx = await boot(root);
@@ -63,7 +63,7 @@ test('official storage restores requirement history and rejects concurrent stale
 
 
 test('Host service resolves identity, isolates account switches and rejects suspended membership', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-requirements-service-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-requirements-service-'));
   const ctx = await boot(root);
   let selected = actor, active = true;
   const identity = {
@@ -89,10 +89,10 @@ test('Host service resolves identity, isolates account switches and rejects susp
 
 
 test('Cordis Host mount registers streaming RPC and disposes route and persistent service together', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-requirements-host-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-requirements-host-'));
   const ctx = await boot(root);
   let route, service, plugin;
-  ctx.provide('workdshIdentity', { id: 'trusted-fixture', async resolve() { return actor; }, profile() { return { principalId: actor.principalId, organization: { id: actor.organizationId }, resolvedBy: actor.resolvedBy }; }, membership() { return { state: 'active' }; } });
+  ctx.provide('expertworkshopIdentity', { id: 'trusted-fixture', async resolve() { return actor; }, profile() { return { principalId: actor.principalId, organization: { id: actor.organizationId }, resolvedBy: actor.resolvedBy }; }, membership() { return { state: 'active' }; } });
   // Connection admission is outside this test; this fixture observes route ownership.
   ctx.provide('connection', { fetch: { register(value) { route = value; return () => { route = undefined; }; } } });
   try {
@@ -109,7 +109,7 @@ test('Cordis Host mount registers streaming RPC and disposes route and persisten
 });
 
 test('multi-module system survives official storage cold reopen without rewriting prior requirements', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-system-requirements-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-system-requirements-'));
   let ctx, store;
   const system = { schemaVersion: '1', modules: [
     { id: 'data', title: '数据管理', pages: [{ id: 'sources', title: '数据来源' }], dependsOn: [] },

@@ -26,7 +26,7 @@ export function createWorkbenchImportOperationAdapter(input: ImportInput & {
   const inspect = async (operation: WorkbenchDevelopmentOperation, signal?: AbortSignal) => {
     check(operation, signal);
     const root = await realpath(input.installationRoot);
-    const archive = join(root, '.workdsh-workbench-archives', `${expected.sha256}.tgz`);
+    const archive = join(root, '.expertworkshop-workbench-archives', `${expected.sha256}.tgz`);
     const verified = await verifyInstalledWorkbenchArtifact(root, archive, expected, signal);
     check(operation, signal);
     await input.archives.retainVerified({ ...expected, path: archive }, input.authorize, signal);

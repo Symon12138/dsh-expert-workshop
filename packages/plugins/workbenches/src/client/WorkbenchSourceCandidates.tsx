@@ -17,7 +17,7 @@ export function WorkbenchSourceCandidates(props:{developmentId:string;onClose:()
   if(request.current)return;const controller=new AbortController();request.current=controller;setBusy(true);setError(undefined);setRows(undefined);setDevelopment(undefined);
   try{
    const baseline=await readWorkbenchCandidateDevelopment(developmentClient,props.developmentId,undefined,controller.signal);
-   const response=await fetch('/api/workdsh-workbench-source-candidates',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({developmentId:props.developmentId}),signal:AbortSignal.any([controller.signal,AbortSignal.timeout(60000)])});
+   const response=await fetch('/api/expertworkshop-workbench-source-candidates',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({developmentId:props.developmentId}),signal:AbortSignal.any([controller.signal,AbortSignal.timeout(60000)])});
    const envelope=await response.json();controller.signal.throwIfAborted();
    if(!response.ok||envelope.ok!==true)throw Error(envelope.error?.code??'workbench/candidate-check-failed');
    if(!Array.isArray(envelope.value)||envelope.value.length>12)throw Error('invalid');

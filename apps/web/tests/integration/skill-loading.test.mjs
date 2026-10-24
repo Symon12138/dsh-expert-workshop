@@ -9,7 +9,7 @@ import * as filesystem from '@deepseek-ai/dsh-skill-filesystem';
 import { createScope } from '@deepseek-ai/dsh-scope';
 
 test('published filesystem provider loads bodies on demand without changing prior results', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-skill-body-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-skill-body-'));
   const ctx = new Context();
   const directory = join(root, 'skills', 'sample');
   const file = join(directory, 'SKILL.md');
@@ -42,7 +42,7 @@ test('published filesystem provider loads bodies on demand without changing prio
 });
 
 test('official scopes keep same-named file skill bodies separate through disposal', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-skill-scopes-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-skill-scopes-'));
   const ctx = new Context();
   const keyA = {}, keyB = {};
   let a, b;

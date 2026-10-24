@@ -15,7 +15,7 @@ export function createWorkbenchCatalogClient(transport: typeof fetch = fetch) {
   return async (signal?: AbortSignal): Promise<readonly WorkbenchCatalogEntry[]> => {
     const lifetime = AbortSignal.any([AbortSignal.timeout(30_000), ...(signal ? [signal] : [])]);
     lifetime.throwIfAborted();
-    const response = await transport('/api/workdsh-workbench-catalog', { method: 'POST', credentials: 'same-origin',
+    const response = await transport('/api/expertworkshop-workbench-catalog', { method: 'POST', credentials: 'same-origin',
       headers: { 'content-type': 'application/json' }, body: '{}', signal: lifetime });
     const result = await response.json(); lifetime.throwIfAborted();
     if (!response.ok || result?.ok !== true || !Array.isArray(result.value) || result.value.length > 1000) throw new Error('workbench/catalog-unavailable');

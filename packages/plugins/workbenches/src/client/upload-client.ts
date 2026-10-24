@@ -17,8 +17,8 @@ export function createWorkbenchUploadClient(transport: typeof fetch = fetch) {
     lifetime.throwIfAborted();
     let response: Response;
     try {
-      response = await transport('/api/workdsh-workbench-upload', { method: 'POST', credentials: 'same-origin',
-        headers: { 'content-type': 'application/octet-stream', 'x-workdsh-upload': JSON.stringify(metadata) }, body: file, signal: lifetime });
+      response = await transport('/api/expertworkshop-workbench-upload', { method: 'POST', credentials: 'same-origin',
+        headers: { 'content-type': 'application/octet-stream', 'x-expertworkshop-upload': JSON.stringify(metadata) }, body: file, signal: lifetime });
     } catch (cause) {
       lifetime.throwIfAborted();
       throw new Error('workbench/upload-interrupted', { cause });

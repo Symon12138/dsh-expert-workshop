@@ -6,7 +6,7 @@ const require = createRequire(new URL('../../../../apps/web/package.json', impor
 const { build } = require('esbuild');
 const built = await build({ entryPoints: [fileURLToPath(new URL('../src/runtime/requirements-rpc.ts', import.meta.url))], bundle: true, platform: 'node', format: 'esm', write: false });
 const { handleWorkbenchRequirementsRequest } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
-const request = body => new Request('http://localhost/api/workdsh-workbench-requirements', { method: 'POST', body: JSON.stringify(body) });
+const request = body => new Request('http://localhost/api/expertworkshop-workbench-requirements', { method: 'POST', body: JSON.stringify(body) });
 test('RPC rejects identity claims and excessive payloads before domain calls', async () => {
   let calls = 0;
   const service = { async history() { calls++; return []; }, async append() { calls++; return {}; } };

@@ -12,8 +12,8 @@ const quality=JSON.parse(await readFile(new URL('../package.json',import.meta.ur
 const platform=JSON.parse(await readFile(new URL('../../workbenches/package.json',import.meta.url),'utf8'));
 test('published native module system resolves actual quality/library bundles in declared dependency order',async()=>{
  assert.equal(platform.dsh.client.platform,'web');assert.ok(quality.dsh.client.external.includes('expert-workshop-plugin-library/client'));
- assert.equal(quality.workdsh.workbench.hostCompatibility.harness,upstream.version);
- assert.deepEqual((await import(new URL('../dist/index.js',import.meta.url))).descriptor,quality.workdsh.workbench,'the built Host declaration must match its installation manifest');
+ assert.equal(quality.expertworkshop.workbench.hostCompatibility.harness,upstream.version);
+ assert.deepEqual((await import(new URL('../dist/index.js',import.meta.url))).descriptor,quality.expertworkshop.workbench,'the built Host declaration must match its installation manifest');
  let api;runInNewContext(kernel,{window:{__ModuleLoader__:{load:entry=>api=entry.factory(()=>{throw new Error('unexpected kernel dependency');})}}});
  const facade={mode:'queue',pendingQueue:[]};const arrivals=[];
  const context={window:{__ModuleLoader__:facade},document:{querySelectorAll:()=>[]},fetch:()=>{throw new Error('unexpected network');}};
@@ -23,7 +23,7 @@ test('published native module system resolves actual quality/library bundles in 
  const system=api.createClientModuleSystem(facade,{id:'@deepseek-ai/dsh-client-modules',exports:api},{boot:{rev:'1',entries,batches:entries.map(row=>({phase:'application',url:row.url,rev:'1',entries:[row.id]}))},staticModules,loadBundle:async url=>{
    arrivals.push(url);const path=url==='platform'?new URL('../../workbenches/dist/client.browser.js',import.meta.url):url==='quality'?new URL('../dist/client.browser.js',import.meta.url):new URL('../../library/dist/client.browser.js',import.meta.url);runInNewContext(await readFile(path,'utf8'),context);
  }});
- const module=await system.import(quality.name+'/client');assert.equal(module.name,'workdsh-quality-analysis-client');assert.equal(typeof module.apply,'function');
+ const module=await system.import(quality.name+'/client');assert.equal(module.name,'expertworkshop-quality-analysis-client');assert.equal(typeof module.apply,'function');
  assert.equal(typeof (await system.import('expert-workshop-plugin-workbenches/client')).handoffNativeWorkbenchDraft,'function');
  assert.ok(arrivals.indexOf('platform')<arrivals.indexOf('quality'));
  assert.ok(arrivals.indexOf('library')<arrivals.indexOf('quality'));

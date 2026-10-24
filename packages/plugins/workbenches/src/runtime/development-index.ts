@@ -17,7 +17,7 @@ const entrySchema = z.object({ title: z.string().min(1).max(80), development: re
 const stateSchema = z.object({ organizationId: z.string(), principalId: z.string(), entries: z.array(entrySchema) });
 function spec(actor: ActorContext) {
   const key = createHash('sha256').update(JSON.stringify([actor.organizationId, actor.principalId])).digest('hex').slice(0, 40);
-  return defineDomain({ name: `workdsh_dev_index_${key}`, version: 1, global: { schema: stateSchema,
+  return defineDomain({ name: `expertworkshop_dev_index_${key}`, version: 1, global: { schema: stateSchema,
     initial: { organizationId: actor.organizationId, principalId: actor.principalId, entries: [] } }, tables: {} });
 }
 type IndexDomain = Domain<ReturnType<typeof spec>>;

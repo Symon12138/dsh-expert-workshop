@@ -9,7 +9,7 @@ const input={developmentId:'dev',packageName:'quality-plugin',version:'2.0.0',wo
 const receipt={packageName:input.packageName,version:input.version,sha256:input.sha256};
 test('preparation confirms uploaded generation and reads update baseline without sending paths',async()=>{
  const prepare=createWorkbenchImportPreparationClient(async(path,options)=>{
-  assert.equal(path,'/api/workdsh-workbench-import-prepare');assert.deepEqual(JSON.parse(options.body),input);
+  assert.equal(path,'/api/expertworkshop-workbench-import-prepare');assert.deepEqual(JSON.parse(options.body),input);
   return Response.json({ok:true,value:{kind:'update',package:receipt,installedVersion:'1.0.0',expectedInstalledHash:'b'.repeat(64),path:'/private'}});
  });
  const result=await prepare({...input,path:'/never-send'});assert.equal(result.path,undefined);assert.equal(result.expectedInstalledHash,'b'.repeat(64));assert.ok(Object.isFrozen(result.package));
@@ -24,7 +24,7 @@ const {createWorkbenchOfflinePreparationClient}=await import(`data:text/javascri
 test('offline preparation obtains Host reference without sending fictional development identity',async()=>{
  const {developmentId:unused,...offline}=input;
  const result=await createWorkbenchOfflinePreparationClient(async(path,options)=>{
-  assert.equal(path,'/api/workdsh-workbench-offline-prepare');assert.deepEqual(JSON.parse(options.body),offline);
+  assert.equal(path,'/api/expertworkshop-workbench-offline-prepare');assert.deepEqual(JSON.parse(options.body),offline);
   return Response.json({ok:true,value:{kind:'install',package:receipt,importId:'import:host-reference',path:'/private'}});
  })(offline);
  assert.equal(result.importId,'import:host-reference');assert.equal(result.path,undefined);assert.ok(Object.isFrozen(result));

@@ -1,6 +1,6 @@
 # 默认组合包
 
-> GitHub 模块制品与兼容矩阵：[发布说明](https://github.com/techflag/workdsh/releases)。当前验证 Harness **0.1.6-alpha.2 Web**；内置 **0.1.2-rc.1** 的旧桌面入口缺失尚未修复，本包不包含该兼容修复。
+> GitHub 模块制品与兼容矩阵：[发布说明](https://github.com/techflag/expertworkshop/releases)。当前验证 Harness **0.1.6-alpha.2 Web**；内置 **0.1.2-rc.1** 的旧桌面入口缺失尚未修复，本包不包含该兼容修复。
 
 状态：**P0 实现中，含 P1 展示切片**。当前包含安装/生命周期探针、公共侧栏、全局技能目录和真实新任务入口；完整产品组合尚未实现。
 
@@ -25,4 +25,4 @@ Skill 已拆为 `expert-workshop-plugin-skills@0.1.0-alpha.30` 的独立 Host/Cl
 
 Workbench alpha.11 仍随展示产物编译，但通过 `ctx.plugin(workbench)` 建立正式子插件生命周期。它尚无独立安装制品，本轮不宣称所有规划模块均可独立分发。技能页面和侧栏能力中心入口归 Skill Client 所有。初始 URL 在官方 Client 组合完成后解析，缺失页面回到原生 Conversation，避免先选择尚未注册的面板。
 
-浏览器验收：根目录先 build，再运行 corepack pnpm probe:browser。`workdsh-view=home` 为旧地址兼容并归一化到原生 `conversation`；接入诊断必须显式使用 `diagnostics=1&workdsh-view=diagnostics`，普通产品 URL 不注册诊断页面或导航。新任务使用 Harness 原生空会话编辑器。无需模型 API Key。
+浏览器验收：根目录先 build，再运行 corepack pnpm probe:browser。`expertworkshop-view=home` 为旧地址兼容并归一化到原生 `conversation`；接入诊断必须显式使用 `diagnostics=1&expertworkshop-view=diagnostics`，普通产品 URL 不注册诊断页面或导航。新任务使用 Harness 原生空会话编辑器。无需模型 API Key。

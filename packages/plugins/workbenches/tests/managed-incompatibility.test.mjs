@@ -32,20 +32,20 @@ const {HostWorkbenchRegistration,ClientWorkbenchRegistration,createWorkbenchRegi
   InstalledWorkbenchManifestReader,createWorkbenchInstallationVerifier,catalogStatus}=await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
 
 test('official Cordis Host and Client graphs survive a verified old managed workbench without enabling its page',async()=>{
- const directory=await mkdtemp(join(tmpdir(),'workdsh-managed-upgrade-'));
+ const directory=await mkdtemp(join(tmpdir(),'expertworkshop-managed-upgrade-'));
  const host=new Context(),client=new Context();let registration,clientRegistration;
  try{
-  const name='workdsh-old-upgrade-probe',installed=join(directory,'node_modules',name),packed=join(directory,'packed');
+  const name='expertworkshop-old-upgrade-probe',installed=join(directory,'node_modules',name),packed=join(directory,'packed');
   await mkdir(installed,{recursive:true});await mkdir(packed);
   await writeFile(join(directory,'package.json'),'{"private":true,"type":"module"}');
-  const descriptor={id:'workdsh.upgrade-probe',title:'旧版本业务',description:'',protocolVersion:'1.0',layout:'full-page',
+  const descriptor={id:'expertworkshop.upgrade-probe',title:'旧版本业务',description:'',protocolVersion:'1.0',layout:'full-page',
    hostCompatibility:{sdk:'^1.0.0',harness:'0.2.1-rc.1'},capabilities:[]};
   const manifest={name,version:'0.1.0',type:'module',files:['index.js','client.js','index.d.ts','client.d.ts','cordis.patch.yml'],
    exports:{'.':{default:'./index.js',types:'./index.d.ts'},'./client':{default:'./client.js',types:'./client.d.ts'}},
-   workdsh:{workbench:descriptor},dsh:{bundle:{patch:'./cordis.patch.yml'},client:{platform:'web'}}};
+   expertworkshop:{workbench:descriptor},dsh:{bundle:{patch:'./cordis.patch.yml'},client:{platform:'web'}}};
   await writeFile(join(installed,'package.json'),JSON.stringify(manifest));
-  await writeFile(join(installed,'index.js'),`export const inject=['workdshWorkbenchRegistration'];export async function apply(ctx){await ctx.get('workdshWorkbenchRegistration').registerManaged(ctx,${JSON.stringify(descriptor)},'old-page');ctx.get('probe').ready(ctx);}`);
-  await writeFile(join(installed,'client.js'),`export const inject=['workdshWorkbenchClientRegistration'];export async function apply(ctx){await ctx.get('workdshWorkbenchClientRegistration').registerManaged(ctx,${JSON.stringify(descriptor)},()=>null);ctx.get('probe').ready(ctx);}`);
+  await writeFile(join(installed,'index.js'),`export const inject=['expertworkshopWorkbenchRegistration'];export async function apply(ctx){await ctx.get('expertworkshopWorkbenchRegistration').registerManaged(ctx,${JSON.stringify(descriptor)},'old-page');ctx.get('probe').ready(ctx);}`);
+  await writeFile(join(installed,'client.js'),`export const inject=['expertworkshopWorkbenchClientRegistration'];export async function apply(ctx){await ctx.get('expertworkshopWorkbenchClientRegistration').registerManaged(ctx,${JSON.stringify(descriptor)},()=>null);ctx.get('probe').ready(ctx);}`);
   for(const file of ['index.d.ts','client.d.ts'])await writeFile(join(installed,file),'export {};');
   await writeFile(join(installed,'cordis.patch.yml'),'- insert: []\n');
   const pnpm=join(root,'apps/web/node_modules/pnpm/bin/pnpm.cjs');
@@ -58,7 +58,7 @@ test('official Cordis Host and Client graphs survive a verified old managed work
    value=>semver.satisfies('0.2.1-rc.2',value.hostCompatibility.harness,{includePrerelease:true}));
   await host.plugin(Loader,{baseUrl:pathToFileURL(directory+'/').href});
   registration=new HostWorkbenchRegistration(host.loader,new InstalledWorkbenchManifestReader(directory),verify);
-  host.provide('workdshWorkbenchRegistration',registration);
+  host.provide('expertworkshopWorkbenchRegistration',registration);
   let hostCaller,clientCaller;host.provide('probe',{ready(ctx){hostCaller=ctx;}});
   const hostEntry=await host.loader.create({name});
   await host.loader.await();
@@ -70,11 +70,11 @@ test('official Cordis Host and Client graphs survive a verified old managed work
   assert.equal(catalogStatus({compatible:false}).label,'版本不兼容');
   await client.plugin(Loader,{baseUrl:pathToFileURL(directory+'/').href});
   let pages=0;
-  const transport=async(_url,options)=>handleWorkbenchRegistrationRequest(new Request('http://localhost/api/workdsh-workbench-registration',options),registration,async()=>()=>{});
+  const transport=async(_url,options)=>handleWorkbenchRegistrationRequest(new Request('http://localhost/api/expertworkshop-workbench-registration',options),registration,async()=>()=>{});
   clientRegistration=new ClientWorkbenchRegistration(client.loader,createWorkbenchRegistrationClient(transport),{
    mountPage(){pages++;return()=>pages--;},selectedPanel(){},openManager(){},
   });
-  client.provide('workdshWorkbenchClientRegistration',clientRegistration);client.provide('probe',{ready(ctx){clientCaller=ctx;}});
+  client.provide('expertworkshopWorkbenchClientRegistration',clientRegistration);client.provide('probe',{ready(ctx){clientCaller=ctx;}});
   const clientEntry=await client.loader.create({name:name+'/client'});
   await client.loader.await();
   await client.loader.resolve(clientEntry).fiber?.await();

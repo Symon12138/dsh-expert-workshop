@@ -24,7 +24,7 @@ export class WorkbenchPageLifecycle<Page> {
     const descriptor = parseWorkbenchDescriptor(declaration);
     if (this.active.has(descriptor.id)) throw new Error('workbench/registration-conflict');
     const lifetime = new AbortController();
-    const mount = Object.freeze({ descriptor, panelKey: `workdsh-workbench:${descriptor.id}`, signal: lifetime.signal });
+    const mount = Object.freeze({ descriptor, panelKey: `expertworkshop-workbench:${descriptor.id}`, signal: lifetime.signal });
     const disposers: (() => void)[] = [];
     let disposed = false;
     const dispose = () => {

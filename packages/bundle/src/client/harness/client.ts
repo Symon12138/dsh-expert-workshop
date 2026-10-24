@@ -21,15 +21,15 @@ declare module '@deepseek-ai/cordis' {
 }
 
 declare module '@deepseek-ai/dsh-client-ui-sidebar-right/client' {
-  interface SidebarRightTabParamsMap { 'workdsh-agent-browser': Record<string, never>; }
+  interface SidebarRightTabParamsMap { 'expertworkshop-agent-browser': Record<string, never>; }
 }
 
-export const name = 'workdsh-client';
+export const name = 'expertworkshop-client';
 export const inject = ['slots', 'layout', 'remote', 'remote.pluginInventory', 'sessions', 'sidebarRight', 'sidebarRightTabs'];
 
 const productViews: Readonly<Record<string, string>> = {
-  experts: 'workdsh-experts', skills: 'workdsh-skills', assistant: 'workdsh-assistant', projects: 'workdsh-projects', 'project-detail': 'workdsh-project-detail',
-  library: 'workdsh-library', automation: 'workdsh-automation', more: 'workdsh-more',
+  experts: 'expertworkshop-experts', skills: 'expertworkshop-skills', assistant: 'expertworkshop-assistant', projects: 'expertworkshop-projects', 'project-detail': 'expertworkshop-project-detail',
+  library: 'expertworkshop-library', automation: 'expertworkshop-automation', more: 'expertworkshop-more',
 };
 
 export function apply(ctx: Context): void {
@@ -37,9 +37,9 @@ export function apply(ctx: Context): void {
   ctx.inject(['market'], scope => {
     if (scope.market.version !== 1) return;
     scope.market.setSettingsVisible(false);
-    scope.effect(() => () => scope.market.setSettingsVisible(true), 'workdsh.community-market.settings-visibility');
+    scope.effect(() => () => scope.market.setSettingsVisible(true), 'expertworkshop.community-market.settings-visibility');
     scope.slots.inject('plugins.item', () => scope.slots.register({
-      name: 'plugins.item', id: 'workdsh-community-market', order: -100,
+      name: 'plugins.item', id: 'expertworkshop-community-market', order: -100,
       label: '发现社区插件',
     }, communityMarketView(scope.market)));
   });
@@ -63,7 +63,7 @@ export function apply(ctx: Context): void {
       if (!provider?.enabled) registerLegacy();
     }).catch(() => { /* Unknown inventory is not evidence that a provider is absent. */ });
     return () => { disposed = true; unregister?.(); };
-  }, 'workdsh.agent-browser.tab');
+  }, 'expertworkshop.agent-browser.tab');
   ctx.slots.inject('sidebar.right.pane.tab', () => ctx.slots.register({ name: 'sidebar.right.pane.tab', key: agentBrowserKind }, AgentBrowserPage));
   ctx.effect(() => {
     const sessions = ctx.sessions as unknown as ISessions;
@@ -103,10 +103,10 @@ export function apply(ctx: Context): void {
     };
     const timer = window.setInterval(() => { void poll(); }, 900);
     return () => { disposed = true; unsubscribe(); window.clearInterval(timer); };
-  }, 'workdsh.agent-browser.auto-open');
-  ctx.slots.inject('shell.overlay', () => ctx.slots.register({ name: 'shell.overlay', id: 'workdsh-shell-appearance' }, ShellAppearance));
+  }, 'expertworkshop.agent-browser.auto-open');
+  ctx.slots.inject('shell.overlay', () => ctx.slots.register({ name: 'shell.overlay', id: 'expertworkshop-shell-appearance' }, ShellAppearance));
   const diagnostics = new URL(window.location.href).searchParams.get('diagnostics') === '1';
-  const viewToPanel = diagnostics ? { ...productViews, diagnostics: 'workdsh-probe' } : productViews;
+  const viewToPanel = diagnostics ? { ...productViews, diagnostics: 'expertworkshop-probe' } : productViews;
   const panelToView = Object.fromEntries(Object.entries(viewToPanel).map(([view, panel]) => [panel, view]));
   const selectView = (view: string | null) => {
     const target = view === 'projects' && new URL(window.location.href).searchParams.has('project') ? 'project-detail' : view;
@@ -123,17 +123,17 @@ export function apply(ctx: Context): void {
   ctx.slots.inject('sidebar.brand.name', () => ctx.slots.register({ name: 'sidebar.brand.name', priority: -10 }, BrandName));
   ctx.slots.inject('sidebar.brand.mark', () => ctx.slots.register({ name: 'sidebar.brand.mark', priority: -10 }, BrandMark));
   ctx.slots.inject('shell.overlay', () => ctx.slots.register({
-    name: 'shell.overlay', id: 'workdsh-location', inject: () => ({ panelToView, selectView }),
+    name: 'shell.overlay', id: 'expertworkshop-location', inject: () => ({ panelToView, selectView }),
   }, NavigationLocation));
 
   ctx.slots.inject('main', () => {
     const dispose = diagnostics ? ctx.slots.register({
-      name: 'main', key: 'workdsh-probe', inject: () => ({
+      name: 'main', key: 'expertworkshop-probe', inject: () => ({
         inspect: async (): Promise<Inventory> => {
           const response = await ctx.remote.pluginInventory.list();
           if (!response.ok) throw new Error(response.error.code);
           return { total: response.value.entries.length, modules: response.value.entries
-            .filter(row => row.moduleName.startsWith('workdsh-'))
+            .filter(row => row.moduleName.startsWith('expertworkshop-'))
             .map(row => ({ module: row.moduleName, phase: row.fiberPhase })) };
         },
         returnToConversation: () => ctx.layout.selectPanel(null),
@@ -142,6 +142,6 @@ export function apply(ctx: Context): void {
     return dispose;
   });
   if (diagnostics) ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
-    name: 'sidebar.panellist', id: 'workdsh-probe', label: 'Expert Workshop 接入验证', order: 90,
+    name: 'sidebar.panellist', id: 'expertworkshop-probe', label: 'Expert Workshop 接入验证', order: 90,
   }, DiagnosticsMark));
 }

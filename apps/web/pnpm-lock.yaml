@@ -978,7 +978,7 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-tabular:
+      expertworkshop-tabular:
         specifier: workspace:*
         version: link:../../tabular
 
@@ -1138,7 +1138,7 @@ importers:
       expert-workshop-contracts:
         specifier: workspace:*
         version: link:../../contracts
-      workdsh-tabular:
+      expertworkshop-tabular:
         specifier: workspace:*
         version: link:../../tabular
 
@@ -1293,7 +1293,7 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-tabular:
+      expertworkshop-tabular:
         specifier: workspace:*
         version: link:../../tabular
 

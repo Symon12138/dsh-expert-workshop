@@ -48,7 +48,7 @@
   let source = 'github';
   wireTabs($('.source-tabs'), tab => {
     source = tab.dataset.source;
-    $('[data-repo-url]').textContent = `https://${source}.com/techflag/workdsh.git`;
+    $('[data-repo-url]').textContent = `https://${source}.com/techflag/expertworkshop.git`;
     $('#source-code').setAttribute('aria-labelledby', tab.id);
   });
   let toastTimer;
@@ -60,7 +60,7 @@
   }
   $('[data-copy]').addEventListener('click', async event => {
     const button = event.currentTarget;
-    const commands = `git clone https://${source}.com/techflag/workdsh.git\ncd workdsh\ncorepack pnpm install --frozen-lockfile\ncorepack pnpm build\ncorepack pnpm preview:install\ncorepack pnpm preview`;
+    const commands = `git clone https://${source}.com/techflag/expertworkshop.git\ncd expertworkshop\ncorepack pnpm install --frozen-lockfile\ncorepack pnpm build\ncorepack pnpm preview:install\ncorepack pnpm preview`;
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(commands);

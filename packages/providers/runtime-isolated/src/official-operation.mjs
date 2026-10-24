@@ -45,7 +45,7 @@ export async function executeOfflineOperation(ctx,exec,registration,input){
  if(bundle.manifest.contractVersion===2&&(typeof runtime.pythonPackages!=='string'||!isAbsolute(runtime.pythonPackages)||runtime.pythonDistributions?.numpy!=='2.3.5'))throw Error('HOST_DEPENDENCY_UNAVAILABLE');
  const encoded=encodeOperationInput({manifest:bundle.manifest,directory:bundle.directory,input,hostPackages:runtime.pythonPackages});
  const script64=Buffer.from(script).toString('base64');
- const bootstrap=`import base64;exec(compile(base64.b64decode('${script64}'),'<workdsh-offline-operation>','exec'))`;
+ const bootstrap=`import base64;exec(compile(base64.b64decode('${script64}'),'<expertworkshop-offline-operation>','exec'))`;
  let staged;
  let value;
  try{

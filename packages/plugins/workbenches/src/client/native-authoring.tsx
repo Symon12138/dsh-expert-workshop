@@ -4,7 +4,7 @@ import type { MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client';
 import { WorkbenchAuthoringPanel, type WorkbenchAuthoringPanelProps } from './WorkbenchAuthoringPanel.js';
 import { WORKBENCH_MANAGER_PANEL } from './native-page.js';
 
-export const WORKBENCH_AUTHORING_PANEL = 'workdsh-workbench-authoring';
+export const WORKBENCH_AUTHORING_PANEL = 'expertworkshop-workbench-authoring';
 type NativeContext = Pick<Context, 'slots' | 'layout' | 'sessions' | 'conversation' | 'uiWorkspace'>;
 
 /** The enclosing Client owner supplies the current non-secret identity scope and

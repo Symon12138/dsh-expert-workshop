@@ -63,16 +63,16 @@ test('Desktop identity installs a verified fixed member and rejects expiry, role
   ctx.provide('connection', { fetch: { register(route) { routes.set(route.path, route); return () => routes.delete(route.path); } } });
   try {
     await ctx.plugin(Identity, f.config);
-    assert.equal(ctx.workdshIdentity.id, 'workdsh-enterprise-desktop');
-    assert.equal((await ctx.workdshIdentity.resolve({ sessionId: 'session-a' })).principalId, 'member-a');
-    assert.equal(ctx.workdshIdentity.profile().organization.kind, 'team');
+    assert.equal(ctx.expertworkshopIdentity.id, 'expertworkshop-enterprise-desktop');
+    assert.equal((await ctx.expertworkshopIdentity.resolve({ sessionId: 'session-a' })).principalId, 'member-a');
+    assert.equal(ctx.expertworkshopIdentity.profile().organization.kind, 'team');
     const route = routes.get('/api/auth/me');
     const response = await route.fetch(new Request('http://local/api/auth/me'));
     const body = await response.json(); assert.equal(body.desktop, true); assert.equal(body.displayName, 'Member A');
     assert.equal('unexpected' in body, false); assert.equal('authorityKey' in body, false);
     f.state.member = 'member-b';
-    await assert.rejects(ctx.workdshIdentity.resolve(), /member changed|expired/);
-    assert.throws(() => ctx.workdshIdentity.profile(), /expired/);
+    await assert.rejects(ctx.expertworkshopIdentity.resolve(), /member changed|expired/);
+    assert.throws(() => ctx.expertworkshopIdentity.profile(), /expired/);
     assert.equal((await route.fetch(new Request('http://local/api/auth/me'))).status, 401);
     const logout = await routes.get('/api/auth/logout').fetch(new Request('http://local/api/auth/logout', { method: 'POST' }));
     assert.deepEqual(await logout.json(), { local: true }); assert.equal(f.state.loggedOut, true);
@@ -195,8 +195,8 @@ test('fixed Desktop identity rejects a live role change and a denied backend wit
     const f = await fixture(); const ctx = new Context();
     ctx.provide('connection', { fetch: { register() { return () => {}; } } });
     try {
-      await ctx.plugin(Identity, f.config); await ctx.workdshIdentity.resolve(); mutation(f.state);
-      await assert.rejects(ctx.workdshIdentity.resolve()); assert.throws(() => ctx.workdshIdentity.profile(), /expired/);
+      await ctx.plugin(Identity, f.config); await ctx.expertworkshopIdentity.resolve(); mutation(f.state);
+      await assert.rejects(ctx.expertworkshopIdentity.resolve()); assert.throws(() => ctx.expertworkshopIdentity.profile(), /expired/);
     } finally { await ctx.fiber.dispose(); await f.close(); }
   }
 });
@@ -220,14 +220,14 @@ test('independent plugin injects public enterprise service without accessing cre
   try {
     await ctx.plugin(Identity, f.config);
     let result;
-    await ctx.plugin({inject: ['workdshEnterprise'], async apply(consumer) {
-      assert.deepEqual(await consumer.workdshEnterprise.identity(), {memberId: 'member-a', organizationId: 'org-a'});
-      result = await consumer.workdshEnterprise.request({plugin: 'reports', operation: 'list', method: 'GET'});
-      await assert.rejects(consumer.workdshEnterprise.request({plugin: '../auth', operation: 'me', method: 'GET'}));
-      await assert.rejects(consumer.workdshEnterprise.request({plugin: 'reports', operation: 'list', method: 'GET', body: {}}));
+    await ctx.plugin({inject: ['expertworkshopEnterprise'], async apply(consumer) {
+      assert.deepEqual(await consumer.expertworkshopEnterprise.identity(), {memberId: 'member-a', organizationId: 'org-a'});
+      result = await consumer.expertworkshopEnterprise.request({plugin: 'reports', operation: 'list', method: 'GET'});
+      await assert.rejects(consumer.expertworkshopEnterprise.request({plugin: '../auth', operation: 'me', method: 'GET'}));
+      await assert.rejects(consumer.expertworkshopEnterprise.request({plugin: 'reports', operation: 'list', method: 'GET', body: {}}));
     }});
     assert.deepEqual(result, {reports: ['demo']});
     f.state.active = false;
-    await assert.rejects(ctx.workdshEnterprise.request({plugin: 'reports', operation: 'list', method: 'GET'}));
+    await assert.rejects(ctx.expertworkshopEnterprise.request({plugin: 'reports', operation: 'list', method: 'GET'}));
   } finally { await ctx.fiber.dispose(); await f.close(); }
 });

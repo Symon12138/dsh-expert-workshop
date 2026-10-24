@@ -6,7 +6,7 @@ export function createWorkbenchPackagePreviewClient(transport: typeof fetch = fe
     if (!file.size || file.size > 8 * 1024 * 1024) throw new Error('workbench/package-archive-size-limit');
     const lifetime = AbortSignal.any([AbortSignal.timeout(60_000), ...(signal ? [signal] : [])]);
     lifetime.throwIfAborted();
-    const response = await transport('/api/workdsh-workbench-package-preview', { method: 'POST', credentials: 'same-origin',
+    const response = await transport('/api/expertworkshop-workbench-package-preview', { method: 'POST', credentials: 'same-origin',
       headers: { 'content-type': 'application/octet-stream' }, body: file, signal: lifetime });
     const result = await response.json(); lifetime.throwIfAborted();
     if (!response.ok || result?.ok !== true) throw new Error(['workbench/package-macos-metadata','workbench/package-unsupported-entry','workbench/tool-optional-required-false','workbench/tool-schema-invalid','workbench/package-kernel-version-mismatch','workbench/package-cordis-version-mismatch','workbench/package-missing-export','workbench/package-missing-entry'].includes(result?.error?.code) ? result.error.code : 'workbench/package-preview-failed');

@@ -4,7 +4,7 @@ export function createWorkbenchNativeInstallationClient(transport: typeof fetch 
     const lifetime = AbortSignal.any([AbortSignal.timeout(60_000), ...(signal ? [signal] : [])]);
     const { developmentId, expectedRevision, version, sha256 } = selection;
     lifetime.throwIfAborted();
-    const response = await transport('/api/workdsh-workbench-native-installation', { method: 'POST', credentials: 'same-origin',
+    const response = await transport('/api/expertworkshop-workbench-native-installation', { method: 'POST', credentials: 'same-origin',
       headers: { 'content-type': 'application/json' }, body: JSON.stringify({ developmentId, expectedRevision, version, sha256 }), signal: lifetime });
     const envelope = await response.json(); lifetime.throwIfAborted();
     if (!response.ok || envelope?.ok !== true) throw new Error(typeof envelope?.error?.code === 'string' && /^workbench\/[a-z-]+$/.test(envelope.error.code) ? envelope.error.code : 'workbench/native-installation-unconfirmed');

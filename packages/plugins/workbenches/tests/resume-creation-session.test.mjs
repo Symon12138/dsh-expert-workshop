@@ -10,7 +10,7 @@ const built=await web('esbuild').build({entryPoints:[fileURLToPath(new URL('../s
 const {resumeWorkbenchCreationSession:resume}=await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
 const actor={principalId:'member',organizationId:'personal',resolvedBy:'fixture'};
 test('a started native Session resumes by authorized cold reads and never invokes new-conversation create',async()=>{
- const directory=await realpath(await mkdtemp(join(tmpdir(),'workdsh-native-resume-')));
+ const directory=await realpath(await mkdtemp(join(tmpdir(),'expertworkshop-native-resume-')));
  try{for(const createBehavior of ['mint-new-id','reject-existing']){
   const calls=[];
   const native={create:async()=>{calls.push('create');if(createBehavior==='reject-existing')throw Error('already-exists');return {sessionId:'another-new-blank',agentPreset:'cordis'};},inspect:async id=>{calls.push('inspect');assert.equal(id,'started-original');return {meta:{id,cwd:directory,agentPreset:'cordis'},events:[{type:'turn/start',seq:1}]};},projections:async()=>{calls.push('projections');return {kind:'sequenced',asOfSeq:1,values:{agentPreset:'cordis'}};}};
@@ -19,7 +19,7 @@ test('a started native Session resumes by authorized cold reads and never invoke
  }}finally{await rm(directory,{recursive:true,force:true});}
 });
 test('resume preserves identity, ownership, workspace and current preset fences; failed reads never create a substitute',async()=>{
- const directory=await realpath(await mkdtemp(join(tmpdir(),'workdsh-native-resume-fences-')));
+ const directory=await realpath(await mkdtemp(join(tmpdir(),'expertworkshop-native-resume-fences-')));
  try{
   const expected='original';let creates=0;
   const normal={authorize:async()=>{},inspect:async()=>({meta:{id:expected,cwd:directory},events:[]}),projections:async()=>({kind:'sequenced',asOfSeq:0,values:{agentPreset:'cordis'}}),create:async()=>{creates++;}};

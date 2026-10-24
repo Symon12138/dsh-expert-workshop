@@ -57,11 +57,11 @@ export function registerLibraryContextInjection(ctx: Context): void {
     const sessionId = context.agent ? String(context.agent.id) : undefined;
     if (!sessionId) return resolved;
 
-    const actor = await ctx.workdshIdentity.resolve({ sessionId }, context.signal);
-    const text = await buildLibrarySelectionContext(ctx.workdshLibrary, actor, sessionId, context.signal);
+    const actor = await ctx.expertworkshopIdentity.resolve({ sessionId }, context.signal);
+    const text = await buildLibrarySelectionContext(ctx.expertworkshopLibrary, actor, sessionId, context.signal);
     if (!text) return resolved;
     resolved.contexts.push({
-      name: 'workdsh:library-selection',
+      name: 'expertworkshop:library-selection',
       text,
     });
     return resolved;

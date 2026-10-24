@@ -74,7 +74,7 @@ function parseExpertSources(value:unknown,recordId:string,runId:string,contentHa
 export function createQualityRecordClient(transport:typeof fetch=fetch){
   async function invoke<T>(endpoint:string,payload:unknown,parse:(value:unknown)=>T|Promise<T>,signal?:AbortSignal):Promise<T>{
     const requestSignal=AbortSignal.any([AbortSignal.timeout(30_000),...(signal?[signal]:[])]);requestSignal.throwIfAborted();
-    const response=await transport('/api/workdsh-quality-records',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({endpoint,payload}),signal:requestSignal});requestSignal.throwIfAborted();
+    const response=await transport('/api/expertworkshop-quality-records',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({endpoint,payload}),signal:requestSignal});requestSignal.throwIfAborted();
     let result:unknown;try{result=await response.json();}catch{requestSignal.throwIfAborted();throw new QualityRecordRequestError('quality/response/invalid',response.status);}
     requestSignal.throwIfAborted();
     if(!result||typeof result!=='object'||Array.isArray(result))throw new QualityRecordRequestError('quality/response/invalid',response.status);

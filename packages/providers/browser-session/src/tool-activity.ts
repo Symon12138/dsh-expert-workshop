@@ -1,6 +1,6 @@
 /** Page use is distinct from browser cleanup and read-only diagnostics. */
 export type BrowserToolActivity = 'page' | 'closed' | 'unchanged';
-const PREFIX = 'mcp__workdsh-playwright__';
+const PREFIX = 'mcp__expertworkshop-playwright__';
 const PAGE_TOOLS = new Set([
   'browser_open', 'browser_navigate', 'browser_navigate_back', 'browser_snapshot', 'browser_take_screenshot',
   'browser_click', 'browser_drag', 'browser_drop', 'browser_hover', 'browser_select_option', 'browser_fill_form',

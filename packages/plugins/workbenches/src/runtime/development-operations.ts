@@ -15,7 +15,7 @@ const operationSchema = z.object({ id: text, revision: text, inputHash: hash, de
 const stateSchema = z.object({ organizationId: text, principalId: text, developmentId: text, operations: z.array(operationSchema) });
 function spec(actor: ActorContext, developmentId: string) {
   const key = createHash('sha256').update(JSON.stringify([actor.organizationId, actor.principalId, developmentId])).digest('hex').slice(0, 40);
-  return defineDomain({ name: `workdsh_dev_ops_${key}`, version: 1, global: { schema: stateSchema,
+  return defineDomain({ name: `expertworkshop_dev_ops_${key}`, version: 1, global: { schema: stateSchema,
     initial: { organizationId: actor.organizationId, principalId: actor.principalId, developmentId, operations: [] } }, tables: {} });
 }
 type OperationsDomain = Domain<ReturnType<typeof spec>>;

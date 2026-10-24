@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://techflag.github.io/workdsh/sitemap.xml
+Sitemap: https://techflag.github.io/expertworkshop/sitemap.xml

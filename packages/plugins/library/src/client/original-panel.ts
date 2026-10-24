@@ -21,7 +21,7 @@ const pause=(signal:AbortSignal)=>new Promise<void>((resolve,reject)=>{
 export function createLibraryOriginalPanelClient(ctx:Context):LibraryOriginalPanelClient {
  const lifetime=new AbortController();
  let pending:AbortController|undefined;
- ctx.effect(()=>()=>{lifetime.abort();pending?.abort();},'workdsh.library.originalPanel');
+ ctx.effect(()=>()=>{lifetime.abort();pending?.abort();},'expertworkshop.library.originalPanel');
  const registered=(id:string)=>ctx.slots.entriesOfSlot('main').some(entry=>entry.options.key===id);
  return {async open(input:LibraryOriginalPanelInput,external?:AbortSignal){
   if(!input.assetId||!input.revisionId||!input.name||!knownKinds.has(input.kind))throw new Error('资料引用不完整，请重新选择文件。');
@@ -50,7 +50,7 @@ export function createLibraryOriginalPanelClient(ctx:Context):LibraryOriginalPan
    const mounted=ctx.sidebarRight.mounted.getSnapshot();
    if(mounted&&mounted!==sessionId)throw new Error('已切换会话，请重新打开源文件。');
    if(mounted===sessionId){
-    try{ctx.sidebarRight.openTab('workdsh-library-preview',{params});return;}
+    try{ctx.sidebarRight.openTab('expertworkshop-library-preview',{params});return;}
     catch{ /* The official seat may not have minted its store until the next render. */ }
    }
    await pause(signal);
@@ -69,7 +69,7 @@ export function createLibraryNativeFileClient(ctx:Context){
  const management=createLibraryClient(ctx),lifetime=new AbortController();
  const returns=new Map<string,{id:string;label:string}>();
  ctx.effect(()=>()=>lifetime.abort());
- ctx.slots.inject('sidebar.right.tab.document.actions',()=>ctx.slots.register({name:'sidebar.right.tab.document.actions',id:'workdsh-library-return'},({absolutePath}:{absolutePath:string})=>{
+ ctx.slots.inject('sidebar.right.tab.document.actions',()=>ctx.slots.register({name:'sidebar.right.tab.document.actions',id:'expertworkshop-library-return'},({absolutePath}:{absolutePath:string})=>{
   const target=returns.get(absolutePath);return target ? React.createElement('button',{onClick:()=>returnToLibraryPanel(ctx,target.id)},target.label):null;
  }));
  return {async open(input:{assetId:string;revisionId:string;sessionId?:string;returnPanel:{id:string;label:string}},external?:AbortSignal){

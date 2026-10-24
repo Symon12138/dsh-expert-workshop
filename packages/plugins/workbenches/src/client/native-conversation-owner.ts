@@ -4,7 +4,7 @@ import type { SessionReference, SessionBinding } from '@deepseek-ai/dsh-api-sess
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client';
 
 declare module '@deepseek-ai/dsh-api-session-controller/client' {
-  interface SessionReferenceSourceMap { workdshWorkbenchConversation: unknown }
+  interface SessionReferenceSourceMap { expertworkshopWorkbenchConversation: unknown }
 }
 
 export interface NativeWorkbenchToolSettled {
@@ -48,7 +48,7 @@ export class NativeWorkbenchConversationOwner {
     if (this.roster.has(sessionId)) throw new Error('workbench/conversation-already-mounted');
     this.roster.set(sessionId, this);
     try {
-      this.reference = native.sessions.retain(sessionId as SessionReference['sessionId'], { source: 'workdshWorkbenchConversation', signal: this.signal });
+      this.reference = native.sessions.retain(sessionId as SessionReference['sessionId'], { source: 'expertworkshopWorkbenchConversation', signal: this.signal });
     } catch (error) { this.roster.delete(sessionId); throw error; }
     this.ready = this.reference.ready.then(binding => {
       this.assertCurrent();

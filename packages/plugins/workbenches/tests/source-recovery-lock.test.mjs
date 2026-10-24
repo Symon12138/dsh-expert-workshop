@@ -8,7 +8,7 @@ test('concurrent recoveries are excluded and rejected operations release their o
   const first=locked(source,()=>{},async()=>{started();await gate;return 'done';});await ready;
   await assert.rejects(locked(source,()=>{},async()=>{throw Error('must-not-run');}),/source-recovery-busy/);release();assert.equal(await first,'done');
   await assert.rejects(locked(source,()=>{},async()=>{throw Error('operation-failed');}),/operation-failed/);assert.deepEqual(await readdir(root),['source']);
-  await mkdir(join(root,'.source.workdsh-recovery-lock'));await assert.rejects(locked(source,()=>{},async()=>{}),/source-recovery-busy/);assert.deepEqual((await readdir(root)).sort(),['.source.workdsh-recovery-lock','source']);
+  await mkdir(join(root,'.source.expertworkshop-recovery-lock'));await assert.rejects(locked(source,()=>{},async()=>{}),/source-recovery-busy/);assert.deepEqual((await readdir(root)).sort(),['.source.expertworkshop-recovery-lock','source']);
  }finally{await rm(root,{recursive:true,force:true});}
 });
 
@@ -31,6 +31,6 @@ await withSourceRecoveryLock(process.argv[2],()=>{},async()=>{
   assert.equal(await locked(source,()=>{},async()=> 'available'),'available');
   owner=await start();const crashed=once(owner,'exit');owner.kill('SIGKILL');const [,signal]=await crashed;assert.equal(signal,'SIGKILL');child=undefined;
   await assert.rejects(locked(source,()=>{},async()=>{}),/source-recovery-busy/);
-  assert.ok((await readdir(root)).includes('.source.workdsh-recovery-lock'));
+  assert.ok((await readdir(root)).includes('.source.expertworkshop-recovery-lock'));
  }finally{if(child){const exited=once(child,'exit');child.kill('SIGKILL');await exited;}await rm(root,{recursive:true,force:true});}
 });

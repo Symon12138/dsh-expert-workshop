@@ -22,9 +22,9 @@ export async function verifyQualityExpertAssociation(
   verifyRun: () => Promise<unknown>,
   signal?: AbortSignal,
 ): Promise<Readonly<QualityExpertAssociation>> {
-  const identity = ctx.get('workdshIdentity') as IdentityService | undefined;
-  const access = ctx.get('workdshAccess') as RuntimeBindingService | undefined;
-  const experts = ctx.get('workdshExperts') as Pick<ExpertsService, 'verifyBinding'> | undefined;
+  const identity = ctx.get('expertworkshopIdentity') as IdentityService | undefined;
+  const access = ctx.get('expertworkshopAccess') as RuntimeBindingService | undefined;
+  const experts = ctx.get('expertworkshopExperts') as Pick<ExpertsService, 'verifyBinding'> | undefined;
   if (!identity || !access || !experts) throw Error('quality/service/expert-unavailable');
   if (!view.recordId.trim() || view.recordId.length > 128 || !view.runId.trim() || view.runId.length > 128 || !/^[a-f0-9]{64}$/.test(view.contentHash)) throw Error('quality/request/invalid');
   const actor = await identity.resolve(undefined, signal);
@@ -49,8 +49,8 @@ export async function readQualityExpertInterpretation(
   verifyRun: () => Promise<unknown>,
   signal?: AbortSignal,
 ) {
-  const identity = ctx.get('workdshIdentity') as IdentityService | undefined;
-  const experts = ctx.get('workdshExperts') as Pick<ExpertsService, 'verifyBinding'> | undefined;
+  const identity = ctx.get('expertworkshopIdentity') as IdentityService | undefined;
+  const experts = ctx.get('expertworkshopExperts') as Pick<ExpertsService, 'verifyBinding'> | undefined;
   if (!identity || !experts) throw Error('quality/service/expert-unavailable');
   const actor = await identity.resolve(undefined, signal);
   const binding = await experts.verifyBinding(actor, association.sessionId, signal);
@@ -58,7 +58,7 @@ export async function readQualityExpertInterpretation(
   const creation = { sessionId: association.sessionId, binding, handoffId: '' };
   await verifyQualityExpertAssociation(ctx, association, creation, verifyRun, signal);
   type Inspector = { inspect(sessionId: string, signal?: AbortSignal): Promise<{ events: readonly unknown[] }> };
-  const protectedSessions = ctx.get('workdshSessionAccess') as Inspector | undefined;
+  const protectedSessions = ctx.get('expertworkshopSessionAccess') as Inspector | undefined;
   const native = ctx.get('sessionController') as Inspector | undefined;
   if (!native || (identity.profile().organization.kind !== 'personal' && !protectedSessions)) throw Error('quality/service/session-unavailable');
   const inspected = await (protectedSessions ?? native).inspect(association.sessionId, signal);

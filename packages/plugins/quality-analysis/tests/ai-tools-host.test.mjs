@@ -19,7 +19,7 @@ const actor={principalId:'member.a',organizationId:'org',requestId:'quality-ai-t
 const compiled=await build({stdin:{contents:"export * from './ai-tools';export * from './run-service';export * from './analysis-run';export * from './analysis-executor';export * from './record-rpc';export {LibraryManager} from '../../../library/src/services/library-manager';",resolveDir:fileURLToPath(new URL('../src/runtime/',import.meta.url)),loader:'ts'},bundle:true,platform:'node',format:'esm',write:false,
  alias:{'expert-workshop-contracts':fileURLToPath(new URL('../../../contracts/src/index.ts',import.meta.url))},plugins:[{name:'shared-published-runtime',setup(b){
   b.onResolve({filter:/^(?:@deepseek-ai\/cordis|@deepseek-ai\/dsh-storage-domain|zod)$/},a=>({path:pathToFileURL(runtime.resolve(a.path)).href,external:true}));
-  b.onResolve({filter:/^(?:@deepseek-ai\/dsh-tools|workdsh-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},a=>({path:pathToFileURL(libraryRequire.resolve(a.path)).href,external:true}));
+  b.onResolve({filter:/^(?:@deepseek-ai\/dsh-tools|expertworkshop-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},a=>({path:pathToFileURL(libraryRequire.resolve(a.path)).href,external:true}));
  }}]});
 function proxy(object,overrides){return new Proxy(object,{get(target,key){if(Object.hasOwn(overrides,key))return overrides[key];const value=Reflect.get(target,key,target);return typeof value==='function'?value.bind(target):value;}});}
 
@@ -29,15 +29,15 @@ async function fixture(t,{rows,fault,filter,decisions,actualWorker=false,nativeA
  const identity={async resolve(input){return {...state.actor,...(input?.sessionId?{sessionId:input.sessionId}:{})};},profile(){return {principalId:state.actor.principalId,organization:{id:state.actor.organizationId},resolvedBy:state.actor.resolvedBy};},membership(){return {state:state.active?'active':'suspended'};}};
  const f={root,state,snapshots,...source,sessionId:'session-quality-ai-fixed-run'};
  async function open(){
-  f.ctx=new Context();await f.ctx.plugin(Storage);await f.ctx.plugin(JsonStorage,{root:join(root,'storage')});await f.ctx.plugin(StorageDomain,{backend:'json'});await f.ctx.plugin(source.LibraryManager,{root:join(root,'library')});f.library=f.ctx.workdshLibrary;
-  f.ctx.provide('workdshAccess',{sessionOwner(){return state.owner;}});
+  f.ctx=new Context();await f.ctx.plugin(Storage);await f.ctx.plugin(JsonStorage,{root:join(root,'storage')});await f.ctx.plugin(StorageDomain,{backend:'json'});await f.ctx.plugin(source.LibraryManager,{root:join(root,'library')});f.library=f.ctx.expertworkshopLibrary;
+  f.ctx.provide('expertworkshopAccess',{sessionOwner(){return state.owner;}});
   if(nativeAgent){
    for(const module of [SystemPrompt,Tools,Llm,Sessions,Agents,Projections])await f.ctx.plugin(module.default);
    await f.ctx.plugin(AgentLoop.default,{agents:[]});
    f.agentHandle=await f.ctx.agents.create({sessionId:Sessions.SessionId(f.sessionId),meta:{cwd:root}});f.agent=f.agentHandle.agent;
   }
   const storage=proxy(f.ctx.storageDomain,{open:async spec=>{
-   const domain=await f.ctx.storageDomain.open(spec);if(!spec.name.startsWith('workdsh_quality_ai_'))return domain;
+   const domain=await f.ctx.storageDomain.open(spec);if(!spec.name.startsWith('expertworkshop_quality_ai_'))return domain;
    return proxy(domain,{global:proxy(domain.global,{set:async value=>{snapshots.push(structuredClone(value));if(fault?.armed&&value.operations.length){fault.armed=false;if(fault.afterCommit)await domain.global.set(value);throw Error('fixture/context-response-lost');}return domain.global.set(value);}})});
   }});
   f.service=new source.QualityAnalysisRunService(storage,identity);
@@ -242,7 +242,7 @@ test('revocation and cancellation after actual calculation do not append a run o
 
 test('ai-context RPC requires exact record/session input and returns its authorized current references',async t=>{
  const f=await fixture(t);await f.bind();
- const rpc=async payload=>f.handleQualityRecordsRequest(new Request('http://local/api/workdsh-quality-records',{method:'POST',body:JSON.stringify({endpoint:'ai-context',payload})}),f.service,undefined,undefined,undefined,undefined,undefined,undefined,undefined,(recordId,sessionId,signal)=>f.api.readContext(recordId,sessionId,signal));
+ const rpc=async payload=>f.handleQualityRecordsRequest(new Request('http://local/api/expertworkshop-quality-records',{method:'POST',body:JSON.stringify({endpoint:'ai-context',payload})}),f.service,undefined,undefined,undefined,undefined,undefined,undefined,undefined,(recordId,sessionId,signal)=>f.api.readContext(recordId,sessionId,signal));
  const response=await rpc({recordId:f.record.id,sessionId:f.sessionId});assert.equal(response.status,200);assert.deepEqual((await response.json()).value,await f.context());
  assert.equal((await rpc({recordId:f.record.id,sessionId:f.sessionId,runId:'guessed'})).status,400);assert.equal((await rpc({recordId:'guessed',sessionId:f.sessionId})).status,403);
 });
@@ -251,7 +251,7 @@ test('ai-session RPC accepts only a validated optional report target and leaves 
  const f=await fixture(t,{nativeAgent:true});await f.bind();const view={recordId:f.record.id,runId:'r1',contentHash:f.run.contentHash},fields={title:'报告',analysis:'分析',conclusion:'结论',recommendations:'建议'};
  const report=await f.service.saveReportDocument(view.recordId,view.runId,view.contentHash,{operationId:'rpc-report',fields},f.library);
  const target={reportId:report.reportId,revisionId:report.revisionId};let selectionCalls=0;
- const rpc=async(payload,endpoint='ai-session')=>f.handleQualityRecordsRequest(new Request('http://local/api/workdsh-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})}),f.service,undefined,undefined,undefined,undefined,async(request,signal)=>{
+ const rpc=async(payload,endpoint='ai-session')=>f.handleQualityRecordsRequest(new Request('http://local/api/expertworkshop-quality-records',{method:'POST',body:JSON.stringify({endpoint,payload})}),f.service,undefined,undefined,undefined,undefined,async(request,signal)=>{
   if(request.reportTarget!==undefined){selectionCalls++;await f.api.selectReport(request,f.sessionId,request.reportTarget,signal);}
   return {recordId:request.recordId,runId:request.runId,contentHash:request.contentHash,sessionId:f.sessionId};
  });

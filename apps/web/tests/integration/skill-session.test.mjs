@@ -25,7 +25,7 @@ class RepeatingSkillRequestAdapter extends SkillRequestAdapter {
 
 for (const allowed of [true, false]) {
 test(`official Session skill consumption: model invocation ${allowed ? 'allowed' : 'denied'}`, { timeout: 15000 }, async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-session-skill-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-session-skill-'));
   const ctx = new Context();
   let handle;
   try {
@@ -33,10 +33,10 @@ test(`official Session skill consumption: model invocation ${allowed ? 'allowed'
     await writeFile(join(root, 'sample/SKILL.md'), `---\nname: sample\ndescription: Session skill fixture\ndisable-model-invocation: ${!allowed}\n---\nSESSION_BODY_SENTINEL\n`);
     for (const plugin of [LocalFileSystem, WorkingDirectory, Sessions, Projections, SystemPrompt, Tools, Llm, Agents, Skills, AgentLoop]) await ctx.plugin(plugin);
     const adapter = new SkillRequestAdapter();
-    ctx.llm.registerAdapter(['workdsh-test'], adapter);
+    ctx.llm.registerAdapter(['expertworkshop-test'], adapter);
     handle = await ctx.agents.create({
       sessionId: randomUUID(),
-      agentOptions: { provider: 'workdsh-test', model: 'fixed', cwd: root },
+      agentOptions: { provider: 'expertworkshop-test', model: 'fixed', cwd: root },
       setup: async agentCtx => {
         await agentCtx.plugin(filesystem, { includeDefaultRoots: false, customSkillDirs: [root], watch: false });
         await agentCtx.plugin(skillTool);
@@ -78,7 +78,7 @@ test(`official Session skill consumption: model invocation ${allowed ? 'allowed'
 }
 
 test('live Agent Sessions isolate same-named skill calls through peer disposal', { timeout: 15000 }, async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-session-skill-isolation-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-session-skill-isolation-'));
   const ctx = new Context();
   const handles = [];
   try {
@@ -89,13 +89,13 @@ test('live Agent Sessions isolate same-named skill calls through peer disposal',
     }
     for (const plugin of [LocalFileSystem, WorkingDirectory, Sessions, Projections, SystemPrompt, Tools, Llm, Agents, Skills, AgentLoop]) await ctx.plugin(plugin);
     const adapters = { a: new RepeatingSkillRequestAdapter(), b: new RepeatingSkillRequestAdapter() };
-    ctx.llm.registerAdapter(['workdsh-scope-a'], adapters.a);
-    ctx.llm.registerAdapter(['workdsh-scope-b'], adapters.b);
+    ctx.llm.registerAdapter(['expertworkshop-scope-a'], adapters.a);
+    ctx.llm.registerAdapter(['expertworkshop-scope-b'], adapters.b);
 
     for (const name of ['a', 'b']) {
       handles.push(await ctx.agents.create({
         sessionId: randomUUID(),
-        agentOptions: { provider: `workdsh-scope-${name}`, model: 'fixed', cwd: join(root, name) },
+        agentOptions: { provider: `expertworkshop-scope-${name}`, model: 'fixed', cwd: join(root, name) },
         setup: async agentCtx => {
           await agentCtx.plugin(filesystem, { includeDefaultRoots: false, customSkillDirs: [join(root, name)], watch: false });
           await agentCtx.plugin(skillTool);

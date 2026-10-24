@@ -6,10 +6,10 @@ import { createWorkbenchDevelopmentSessionVerifier } from './development-session
 /** Native Host adaptation. Session creation/access binding is owned by the
  * existing platform; this adapter cannot adopt someone else's or unowned Session. */
 export function createNativeWorkbenchDevelopmentSessionVerifier(ctx: Context, sessionId: string) {
-  const identity = ctx.get('workdshIdentity') as IdentityService | undefined;
-  const access = ctx.get('workdshAccess') as RuntimeBindingService | undefined;
+  const identity = ctx.get('expertworkshopIdentity') as IdentityService | undefined;
+  const access = ctx.get('expertworkshopAccess') as RuntimeBindingService | undefined;
   const native = ctx.get('sessionController') as Context['sessionController'] | undefined;
-  const protectedSessions = ctx.get('workdshSessionAccess') as Pick<Context['sessionController'], 'inspect'> | undefined;
+  const protectedSessions = ctx.get('expertworkshopSessionAccess') as Pick<Context['sessionController'], 'inspect'> | undefined;
   if (!identity || !access || !native) throw new Error('workbench/session-authority-unavailable');
   const authorize = async (actor: ActorContext, id: string, signal?: AbortSignal) => {
     signal?.throwIfAborted();

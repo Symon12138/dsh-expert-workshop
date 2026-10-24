@@ -7,7 +7,7 @@ export function createWorkbenchDevelopmentClient(transport: typeof fetch = fetch
   async function invoke<T>(endpoint: string, payload: unknown, parse: (value: unknown) => T, signal?: AbortSignal): Promise<T> {
     const requestSignal = AbortSignal.any([AbortSignal.timeout(30_000), ...(signal ? [signal] : [])]);
     requestSignal.throwIfAborted();
-    const response = await transport('/api/workdsh-workbench-development', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: requestSignal });
+    const response = await transport('/api/expertworkshop-workbench-development', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }), signal: requestSignal });
     requestSignal.throwIfAborted();
     let value: unknown;
     try { value = await response.json(); } catch { throw new WorkbenchDevelopmentRequestError('workbench/invalid-response', response.status); }

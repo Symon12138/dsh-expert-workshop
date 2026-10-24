@@ -22,7 +22,7 @@ async function boot(root) { const ctx = new Context(); await ctx.plugin(Storage)
 const target = { hostId: 'host', installationId: 'desktop', profileId: 'default', harnessVersion: '0.2.0-rc.2' };
 
 test('offline import ownership survives cold restart without inventing requirements or installation',async()=>{
- const root=await mkdtemp(join(tmpdir(),'workdsh-import-owner-'));let ctx,store;
+ const root=await mkdtemp(join(tmpdir(),'expertworkshop-import-owner-'));let ctx,store;
  try{ctx=await boot(root);store=await openWorkbenchImportAssociations(ctx.storageDomain,actor);
  const input={workbenchId:'company.quality',packageName:'quality-plugin',target};
  const first=await store.bind(input,()=>{});assert.equal(first.requirements,undefined);assert.equal(first.installed,undefined);

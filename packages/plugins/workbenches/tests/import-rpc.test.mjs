@@ -6,7 +6,7 @@ const {build}=createRequire(new URL('../../../../apps/web/package.json',import.m
 const built=await build({entryPoints:[fileURLToPath(new URL('../src/runtime/import-rpc.ts',import.meta.url))],bundle:true,platform:'node',format:'esm',write:false});
 const {handleWorkbenchImportRequest}=await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
 const input={developmentId:'dev',operationId:'op',iterationId:'iteration',packageName:'quality-plugin',version:'1.0.0',workbenchId:'company.quality',sha256:'a'.repeat(64),kind:'install',recover:false};
-const request=value=>new Request('https://workdsh.invalid/api/workdsh-workbench-import',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(value)});
+const request=value=>new Request('https://expertworkshop.invalid/api/expertworkshop-workbench-import',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(value)});
 test('import endpoint rejects path, actor and target claims before invoking owner',async()=>{
  let calls=0;const execute=async()=>{calls++;};
  for(const extra of [{path:'/private'},{actor:{principalId:'admin'}},{target:{profileId:'other'}}])assert.equal((await handleWorkbenchImportRequest(request({...input,...extra}),execute)).status,400);

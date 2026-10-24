@@ -12,12 +12,12 @@ const nativeBuilt = await build({ entryPoints: [fileURLToPath(new URL('../src/ru
 const { createNativeWorkbenchDevelopmentSessionVerifier: nativeVerifier } = await import(`data:text/javascript;base64,${Buffer.from(nativeBuilt.outputFiles[0].text).toString('base64')}`);
 const actor = { principalId: 'member', organizationId: 'org', requestId: 'test', resolvedBy: 'fixture' };
 test('native adapter uses established ownership and enterprise protected cold reads', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-native-session-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-native-session-'));
   try {
     let kind = 'personal', owner = { ownerPrincipalId: 'member', organizationId: 'org' }, nativeReads = 0, protectedReads = 0;
     const services = {
-      workdshIdentity: { resolve: async () => actor, profile: () => ({ principalId: 'member', organization: { id: 'org', kind } }), membership: () => ({ state: 'active' }) },
-      workdshAccess: { sessionOwner: () => owner },
+      expertworkshopIdentity: { resolve: async () => actor, profile: () => ({ principalId: 'member', organization: { id: 'org', kind } }), membership: () => ({ state: 'active' }) },
+      expertworkshopAccess: { sessionOwner: () => owner },
       sessionController: { inspect: async () => { nativeReads++; return { meta: { cwd: root } }; } },
     };
     const ctx = { get: name => services[name] };
@@ -31,14 +31,14 @@ test('native adapter uses established ownership and enterprise protected cold re
     await assert.rejects(nativeVerifier(ctx, 'session-1')(actor, development), /access-denied/);
     owner = { ownerPrincipalId: 'member', organizationId: 'org' }; kind = 'enterprise';
     await assert.rejects(nativeVerifier(ctx, 'session-1')(actor, development), /access-denied/);
-    services.workdshSessionAccess = { inspect: async () => { protectedReads++; return { meta: { cwd: root } }; } };
+    services.expertworkshopSessionAccess = { inspect: async () => { protectedReads++; return { meta: { cwd: root } }; } };
     await nativeVerifier(ctx, 'session-1')(actor, development);
     assert.equal(protectedReads, 1);
     assert.equal(nativeReads, 1, 'enterprise binding never falls back to unprotected inspection');
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 test('cold metadata must resolve to the source directory and pass access checks on both sides', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'workdsh-session-workspace-'));
+  const root = await mkdtemp(join(tmpdir(), 'expertworkshop-session-workspace-'));
   try {
     const source = join(root, 'source'), alias = join(root, 'alias'), other = join(root, 'other');
     await Promise.all([mkdir(source), mkdir(other)]); await symlink(source, alias, 'dir');

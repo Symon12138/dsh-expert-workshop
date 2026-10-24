@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 const require=createRequire(new URL('../../../../apps/web/package.json',import.meta.url));
 const built=await require('esbuild').build({stdin:{contents:"export {handleWorkbenchCreationRequest} from './creation-rpc.ts';export {WorkbenchCreationPreparationError} from './creation-development.ts';",resolveDir:fileURLToPath(new URL('../src/runtime',import.meta.url))},bundle:true,platform:'node',format:'esm',write:false});
 const {handleWorkbenchCreationRequest,WorkbenchCreationPreparationError}=await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
-const request=body=>new Request('http://localhost/api/workdsh-workbench-creation',{method:'POST',body:JSON.stringify(body)});
+const request=body=>new Request('http://localhost/api/expertworkshop-workbench-creation',{method:'POST',body:JSON.stringify(body)});
 test('creation RPC never accepts caller Session, source, owner or confirmation authority',async()=>{
  let opens=0,confirms=0;
  const service={open:async(id,idea)=>{opens++;return {id,idea};},confirm:async()=>{confirms++;return {};}};
@@ -33,6 +33,6 @@ test('creation errors distinguish stale summaries and access denial without expo
 test('cancelled intake request never reaches a service',async()=>{
  const controller=new AbortController();let called=false,cancelled=false;
  const stream=new ReadableStream({cancel(){cancelled=true;}});
- const pending=handleWorkbenchCreationRequest(new Request('http://localhost/api/workdsh-workbench-creation',{method:'POST',body:stream,duplex:'half',signal:controller.signal}),{list:async()=>{called=true;}});
+ const pending=handleWorkbenchCreationRequest(new Request('http://localhost/api/expertworkshop-workbench-creation',{method:'POST',body:stream,duplex:'half',signal:controller.signal}),{list:async()=>{called=true;}});
  controller.abort();assert.equal((await pending).status,408);assert.equal(called,false);assert.equal(cancelled,true);
 });

@@ -6,7 +6,7 @@ const require = createRequire(new URL('../../../../apps/web/package.json', impor
 const { build } = require('esbuild');
 const built = await build({ entryPoints: [fileURLToPath(new URL('../src/runtime/development-rpc.ts', import.meta.url))], bundle: true, platform: 'node', format: 'esm', write: false });
 const { handleWorkbenchDevelopmentRequest } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
-const request = payload => new Request('http://localhost/api/workdsh-workbench-development', { method: 'POST', body: JSON.stringify(payload) });
+const request = payload => new Request('http://localhost/api/expertworkshop-workbench-development', { method: 'POST', body: JSON.stringify(payload) });
 test('Session creation RPC accepts revision guards but cannot accept Session identity or source paths', async () => {
   let calls = 0;
   const service = { ensureSession: async (id, revision) => { calls++; assert.equal(id, 'dev'); assert.equal(revision, 'rev'); return { development: { id } }; } };
@@ -45,7 +45,7 @@ test('cancelled streaming request stops waiting for bytes and never calls a deve
   const controller = new AbortController();
   let cancelled = false, called = false;
   const stream = new ReadableStream({ cancel() { cancelled = true; } });
-  const pending = handleWorkbenchDevelopmentRequest(new Request('http://localhost/api/workdsh-workbench-development', { method: 'POST', body: stream, duplex: 'half', signal: controller.signal }), { async list() { called = true; } });
+  const pending = handleWorkbenchDevelopmentRequest(new Request('http://localhost/api/expertworkshop-workbench-development', { method: 'POST', body: stream, duplex: 'half', signal: controller.signal }), { async list() { called = true; } });
   controller.abort();
   assert.equal((await pending).status, 408);
   assert.equal(cancelled, true);

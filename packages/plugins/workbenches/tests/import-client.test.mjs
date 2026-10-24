@@ -10,7 +10,7 @@ const status={id:'op',developmentId:'dev',iterationId:'iteration',kind:'install'
 test('interrupted import is submitted once; explicit recovery preserves the same operation',async()=>{
  let calls=0;
  await assert.rejects(createWorkbenchImportClient(async()=>{calls++;throw new Error('network');})(selection,false),/import-unconfirmed/);assert.equal(calls,1);
- const result=await createWorkbenchImportClient(async(path,options)=>{assert.equal(path,'/api/workdsh-workbench-import');assert.deepEqual(JSON.parse(options.body),{...selection,recover:true});return Response.json({ok:true,value:{...status,target:'/private'}});})(selection,true);
+ const result=await createWorkbenchImportClient(async(path,options)=>{assert.equal(path,'/api/expertworkshop-workbench-import');assert.deepEqual(JSON.parse(options.body),{...selection,recover:true});return Response.json({ok:true,value:{...status,target:'/private'}});})(selection,true);
  assert.equal(result.state,'unknown');assert.equal(result.target,undefined);
 });
 test('a successful state requires the exact package receipt; cancellation rejects late status',async()=>{

@@ -35,7 +35,7 @@ async function readEndpoint(profileDir: string, signal?: AbortSignal): Promise<s
 export async function launchManagedChromium(executablePath: string, signal?: AbortSignal): Promise<ManagedChromium> {
   if (!executablePath.trim()) throw new Error('a bundled Chromium executable is required');
   signal?.throwIfAborted();
-  const profileDir = await mkdtemp(join(tmpdir(), 'workdsh-browser-'));
+  const profileDir = await mkdtemp(join(tmpdir(), 'expertworkshop-browser-'));
   let context: BrowserContext | undefined;
   try {
     context = await chromium.launchPersistentContext(profileDir, {

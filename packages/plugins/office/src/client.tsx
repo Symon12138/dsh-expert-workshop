@@ -30,15 +30,15 @@ import {
 } from "./live/model.js";
 declare module "@deepseek-ai/dsh-client-ui-sidebar-right/client" {
   interface SidebarRightTabParamsMap {
-    "workdsh-office-live": { documentId?: string; requestId?: string };
+    "expertworkshop-office-live": { documentId?: string; requestId?: string };
   }
 }
-declare module "@deepseek-ai/cordis" { interface Context { workdshLibraryPreview: LibraryOriginalPreviewRegistry; } }
-export const name = "workdsh-office-client";
-declare const __WORKDSH_WORD_ONLY__: boolean;
+declare module "@deepseek-ai/cordis" { interface Context { expertworkshopLibraryPreview: LibraryOriginalPreviewRegistry; } }
+export const name = "expertworkshop-office-client";
+declare const __EXPERTWORKSHOP_WORD_ONLY__: boolean;
 // Word-only releases claim DOCX only (dist/release-scope.json); every Client
 // registration below must stay inside that scope.
-const wordOnlyRelease = typeof __WORKDSH_WORD_ONLY__ !== "undefined" && __WORKDSH_WORD_ONLY__;
+const wordOnlyRelease = typeof __EXPERTWORKSHOP_WORD_ONLY__ !== "undefined" && __EXPERTWORKSHOP_WORD_ONLY__;
 export const inject = [
   "slots",
   "documentPreviews",
@@ -49,7 +49,7 @@ export const inject = [
   "inputTriggers",
 ];
 export function apply(ctx: Context): void {
-  ctx.inject(["workdshLibraryPreview"], scope => scope.effect(() => scope.workdshLibraryPreview.register(wordOnlyRelease ? ["docx"] : ["docx", "pptx", "xlsx"], async (target, input) => {
+  ctx.inject(["expertworkshopLibraryPreview"], scope => scope.effect(() => scope.expertworkshopLibraryPreview.register(wordOnlyRelease ? ["docx"] : ["docx", "pptx", "xlsx"], async (target, input) => {
     target.replaceChildren();
     if (input.kind === "xlsx") {
       const frame = document.createElement("iframe");
@@ -60,7 +60,7 @@ export function apply(ctx: Context): void {
       const channel=typeof saveOriginal==='function'?createOfficeOriginalSaveChannel(()=>frame.contentWindow,saveOriginal,value=>frame.contentWindow?.postMessage(value,'*')):undefined;
       const ready = (event: MessageEvent) => {
         if (!active||event.source!==frame.contentWindow) return;
-        if(event.data?.type==='workdsh-office-ready')frame.contentWindow?.postMessage({type:'workdsh-office-open',extension:'xlsx',bytes:input.bytes.slice(),saveToOwner:!!channel},'*');
+        if(event.data?.type==='expertworkshop-office-ready')frame.contentWindow?.postMessage({type:'expertworkshop-office-open',extension:'xlsx',bytes:input.bytes.slice(),saveToOwner:!!channel},'*');
         void channel?.handle(event.source,event.data);
       };
       window.addEventListener("message", ready); frame.srcdoc = editorHtml; target.append(frame);
@@ -74,13 +74,13 @@ export function apply(ctx: Context): void {
       return () => target.replaceChildren();
     }
     const style = document.createElement("style"); style.textContent = nativeCss + ribbonCss; target.append(style);
-    const host = document.createElement("div"); host.className = "workdsh-ppt-editor"; host.style.cssText = "height:100%;overflow:hidden"; target.append(host);
+    const host = document.createElement("div"); host.className = "expertworkshop-ppt-editor"; host.style.cssText = "height:100%;overflow:hidden"; target.append(host);
     const editor = await mountPptx(host, input.bytes, input.name, () => undefined, () => undefined);
     return () => { editor.dispose(); target.replaceChildren(); };
   })));
   ctx.effect(() =>
     ctx.documentPreviews.register({
-      id: "workdsh-office",
+      id: "expertworkshop-office",
       extensions: wordOnlyRelease ? ["docx"] : ["docx", "pptx"],
       title: () => "Office 浏览器编辑",
       binaryExtensions: wordOnlyRelease ? ["docx"] : ["docx", "pptx"],
@@ -90,7 +90,7 @@ export function apply(ctx: Context): void {
   );
   ctx.slots.inject("sidebar.right.tab.document", () =>
     ctx.slots.register(
-      { name: "sidebar.right.tab.document", key: "workdsh-office", inject: () => ({office}) },
+      { name: "sidebar.right.tab.document", key: "expertworkshop-office", inject: () => ({office}) },
       OfficeDocument,
     ),
   );
@@ -100,7 +100,7 @@ export function apply(ctx: Context): void {
     request: unknown,
     signal?: AbortSignal,
   ): Promise<T> => {
-    const response = await fetch("/api/workdsh-office", {
+    const response = await fetch("/api/expertworkshop-office", {
       method: "POST",
       credentials: "same-origin",
       headers: { "content-type": "application/json" },
@@ -138,7 +138,7 @@ export function apply(ctx: Context): void {
         else throw new Error("请在 PPT 编辑器中下载此演示文稿。");
       }
     },
-    open: (sessionId, documentId) => ctx.sidebarRight.openTabIn(sessionId as never, "workdsh-office-live", {params: {documentId}}),
+    open: (sessionId, documentId) => ctx.sidebarRight.openTabIn(sessionId as never, "expertworkshop-office-live", {params: {documentId}}),
     createDocument: (options) => {
       const model = createDocumentModel(options, rpc), key = options.sessionId + ":" + options.documentId;
       return {...model, attach: element => {
@@ -154,12 +154,12 @@ export function apply(ctx: Context): void {
   },!wordOnlyRelease,!wordOnlyRelease)) ctx.effect(() => ctx.inputTriggers.registerSource(source));
   ctx.effect(() =>
     ctx.sidebarRightTabs.register({
-      id: "workdsh-office-live",
-      kind: "workdsh-office-live",
+      id: "expertworkshop-office-live",
+      kind: "expertworkshop-office-live",
       title: () => "文档 · 实时编辑",
       guide: [
         {
-          id: "workdsh-office-live",
+          id: "expertworkshop-office-live",
           order: 45,
           title: () => "文档",
           description: () => "查看并编辑 AI 正在编写的工作副本",
@@ -171,7 +171,7 @@ export function apply(ctx: Context): void {
     ctx.slots.register(
       {
         name: "sidebar.right.pane.tab",
-        key: "workdsh-office-live",
+        key: "expertworkshop-office-live",
         inject: () => ({ office }),
       },
       DocumentPage,
@@ -194,7 +194,7 @@ export function apply(ctx: Context): void {
             return;
           for (const request of requests)
             if (!seen.has(request.requestId)) {
-              await ctx.sidebarRight.openTabIn(sessionId, "workdsh-office-live", {
+              await ctx.sidebarRight.openTabIn(sessionId, "expertworkshop-office-live", {
                 params: {
                   documentId: request.documentId,
                   requestId: request.requestId,

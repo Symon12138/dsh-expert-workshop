@@ -8,7 +8,7 @@ const {createWorkbenchCatalogClient}=await import(`data:text/javascript;base64,$
 const descriptor={id:'company.quality',title:'质量分析',description:'',protocolVersion:'1.0',layout:'full-page',hostCompatibility:{sdk:'^1.0.0',harness:'0.2.1-rc.1'},capabilities:[]};
 const row={packageName:'quality-plugin',selected:false,descriptor,version:'1.0.0',compatible:true,registered:false,installed:{packageName:'quality-plugin',version:'1.0.0',sha256:'a'.repeat(64)}};
 test('catalog retains disabled installed workbenches and discards private facts',async()=>{
- const result=await createWorkbenchCatalogClient(async(path,options)=>{assert.equal(path,'/api/workdsh-workbench-catalog');assert.equal(options.body,'{}');return Response.json({ok:true,value:[{...row,path:'/private'}]});})();
+ const result=await createWorkbenchCatalogClient(async(path,options)=>{assert.equal(path,'/api/expertworkshop-workbench-catalog');assert.equal(options.body,'{}');return Response.json({ok:true,value:[{...row,path:'/private'}]});})();
  assert.equal(result[0].selected,false);assert.equal(result[0].installed.sha256,row.installed.sha256);assert.equal(result[0].path,undefined);assert.ok(Object.isFrozen(result[0].installed));
 });
 test('catalog rejects contradictory registration and mismatched package generations',async()=>{

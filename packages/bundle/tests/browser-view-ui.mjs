@@ -5,7 +5,7 @@ import { once } from 'node:events';
 import { join } from 'node:path';
 import { test } from 'node:test';
 
-const profile = process.env.WORKDSH_PREVIEW_HOME;
+const profile = process.env.EXPERTWORKSHOP_PREVIEW_HOME;
 const executable = process.env.DSH_BROWSER_EXECUTABLE;
 const onePixelPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WlPLgAAAABJRU5ErkJggg==';
 
@@ -15,7 +15,7 @@ test('Web client opens the Agent browser tab and sends image clicks to its Sessi
   const root = new URL('../../../apps/web', import.meta.url).pathname;
   const port = String(19000 + Math.floor(Math.random() * 1000));
   const server = spawn(process.execPath, [join(root, 'scripts/start-preview.mjs')], {
-    cwd: root, env: { ...process.env, WORKDSH_PREVIEW_PORT: port, WORKDSH_PREVIEW_HOME: profile },
+    cwd: root, env: { ...process.env, EXPERTWORKSHOP_PREVIEW_PORT: port, EXPERTWORKSHOP_PREVIEW_HOME: profile },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let browser;
@@ -33,7 +33,7 @@ test('Web client opens the Agent browser tab and sends image clicks to its Sessi
     browser = await chromium.launch({ executablePath: executable, headless: true });
     const page = await browser.newPage();
     const actions = [];
-    await page.route('**/api/workdsh-agent-browser', async route => {
+    await page.route('**/api/expertworkshop-agent-browser', async route => {
       const body = route.request().postDataJSON();
       if (body.action) actions.push(body.action);
       const frame = { sessionId: body.sessionId, revision: 1, url: 'https://example.test/', image: `data:image/png;base64,${onePixelPng}` };

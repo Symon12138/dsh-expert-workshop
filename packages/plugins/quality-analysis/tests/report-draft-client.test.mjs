@@ -19,7 +19,7 @@ test('draft lists contain pointers only and reject duplicate identities',()=>{
 });
 test('client captures the draft save intent and rejects unrelated save readback',async()=>{
  let submitted;let release;const deferred=new Promise(resolve=>release=resolve);
- const client=createQualityRecordClient(async(path,init)=>{assert.equal(path,'/api/workdsh-quality-records');assert.equal(init.credentials,'same-origin');submitted=JSON.parse(init.body);await deferred;return Response.json({ok:true,value:draft});});
+ const client=createQualityRecordClient(async(path,init)=>{assert.equal(path,'/api/expertworkshop-quality-records');assert.equal(init.credentials,'same-origin');submitted=JSON.parse(init.body);await deferred;return Response.json({ok:true,value:draft});});
  const input={operationId:'intent-1',fields:structuredClone(fields)},pending=client.saveReportDraft(source.recordId,source.runId,source.contentHash,input);input.fields.analysis='mutated';release();
  assert.equal((await pending).fields.analysis,fields.analysis);assert.equal(submitted.endpoint,'save-report-draft');assert.equal(submitted.payload.fields.analysis,fields.analysis);
  for(const wrong of [{...draft,fields:{...fields,analysis:'unrelated'}},{...draft,status:'archived'},{...draft,reportId:'other',baseRevisionId:'other-version'}]){

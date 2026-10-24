@@ -11,7 +11,7 @@ function fixture({draft='',attachmentIds=[],occurrences=[],phase='plain',running
  const binding={sessionId:'native-owned',ctx:{},session:{getSnapshot:()=>({running}),subscribe:()=>()=>{}}};
  const setBlock=value=>{block=value;for(const listener of blockListeners)listener();};
  const blocks={storeFor:()=>({getSnapshot:()=>block,subscribe:subscribe(blockListeners)}),set:(_id,value)=>setBlock(value)};
- const native={sessions:{retain(id,options){assert.equal(id,'native-owned');assert.equal(options.source,'workdshWorkbenchConversation');retained++;return{ready:readyError?Promise.reject(readyError):Promise.resolve(binding),release(){released++;}};}},conversation:{blocks,input:{for(ctx){assert.equal(ctx,binding.ctx);return{state:{getSnapshot:()=>input,subscribe:subscribe(inputListeners)}};}}}};
+ const native={sessions:{retain(id,options){assert.equal(id,'native-owned');assert.equal(options.source,'expertworkshopWorkbenchConversation');retained++;return{ready:readyError?Promise.reject(readyError):Promise.resolve(binding),release(){released++;}};}},conversation:{blocks,input:{for(ctx){assert.equal(ctx,binding.ctx);return{state:{getSnapshot:()=>input,subscribe:subscribe(inputListeners)}};}}}};
  return{native,input,counts:()=>({released,retained}),block:()=>block,setBlock,publish(patch){Object.assign(input,patch);for(const listener of inputListeners)listener();},listeners:()=>inputListeners.size+blockListeners.size};
 }
 test('preflight reads native text and references without replacing or submitting them',async()=>{

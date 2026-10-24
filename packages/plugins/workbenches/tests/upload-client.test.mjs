@@ -9,8 +9,8 @@ const metadata={developmentId:'dev',packageName:'quality-plugin',version:'1.0.0'
 test('upload sends binary data and fixed metadata, validates receipt and drops paths',async()=>{
  const file=new Blob(['tgz-fixture']);
  const upload=createWorkbenchUploadClient(async(path,options)=>{
-  assert.equal(path,'/api/workdsh-workbench-upload');assert.equal(options.body,file);
-  assert.deepEqual(JSON.parse(options.headers['x-workdsh-upload']),metadata);
+  assert.equal(path,'/api/expertworkshop-workbench-upload');assert.equal(options.body,file);
+  assert.deepEqual(JSON.parse(options.headers['x-expertworkshop-upload']),metadata);
   return Response.json({ok:true,value:{...metadata,sha256:'a'.repeat(64),path:'/private/path'}});
  });
  const receipt=await upload({...metadata,path:'/never-send'},file);

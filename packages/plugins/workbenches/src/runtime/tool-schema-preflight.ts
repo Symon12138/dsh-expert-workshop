@@ -50,7 +50,7 @@ export function checkWorkbenchToolSchemas(sources: Readonly<Record<string, strin
         try { data = literal(parameters.initializer); } catch { unresolved++; return; }
         // Pass only parsed data to the official schema compiler. No candidate
         // function, name, output renderer, import or initializer is executed.
-        try { defineTool({ name: 'workdsh_preflight', description: 'schema validation', parameters: data as never,
+        try { defineTool({ name: 'expertworkshop_preflight', description: 'schema validation', parameters: data as never,
           output: { schema: { type: 'json' }, render: () => [] }, execute: async () => ({}) }); checked++; }
         catch {
           const optionalFalse = JSON.stringify(data).includes('"required":false');

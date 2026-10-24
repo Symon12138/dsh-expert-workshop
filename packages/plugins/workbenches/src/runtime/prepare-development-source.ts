@@ -7,7 +7,7 @@ import { parseWorkbenchSystemDefinition, type WorkbenchSystemDefinition, parseWo
 
 /** Publish complete bytes without replacing a developer-owned destination. */
 async function writeNewSourceFile(directory:string,name:string,content:string,check:()=>void){
-  const temporary=join(directory,`.workdsh-new-${randomUUID()}`);
+  const temporary=join(directory,`.expertworkshop-new-${randomUUID()}`);
   try{
     check();await writeFile(temporary,content,{flag:'wx',mode:0o600});check();
     try{await link(temporary,join(directory,name));}
@@ -77,7 +77,7 @@ export async function prepareWorkbenchDevelopmentSource(root: string, developmen
   } finally { await handle.close(); }
   let current;
   try { current = JSON.parse(bytes.toString('utf8')); } catch { throw new Error('workbench/source-package-invalid'); }
-  if (current?.name !== development.packageName || current?.workdsh?.workbench?.id !== descriptor.id) throw new Error('workbench/source-identity-mismatch');
+  if (current?.name !== development.packageName || current?.expertworkshop?.workbench?.id !== descriptor.id) throw new Error('workbench/source-identity-mismatch');
   signal?.throwIfAborted(); authorize();
   return Object.freeze({ directory, metadataSha256: createHash('sha256').update(bytes).digest('hex') });
 }

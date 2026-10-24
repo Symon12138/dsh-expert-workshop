@@ -57,7 +57,7 @@ function Panel(props: WorkbenchAuthoringPanelProps) {
     setFailedDraft(undefined);setDraft(undefined);setGoal(undefined);setResumeNotice(undefined);setChecking(false);
     request.current?.abort(); request.current = undefined;
     const id = crypto.randomUUID();
-    setSelection({ developmentId: id, workbenchId: `workdsh.user-${id}`, packageName: `workdsh-workbench-${id}` });
+    setSelection({ developmentId: id, workbenchId: `expertworkshop.user-${id}`, packageName: `expertworkshop-workbench-${id}` });
     setCreating(false);setEditing(true);
     setOpening(false); setError(undefined); setSection('development');
   }
