@@ -28,7 +28,7 @@ async function loadOwned(relative) {
   const output = await build({
     entryPoints: [join(repository, 'packages/plugins/workbenches/src/runtime', relative)],
     bundle: true, platform: 'node', format: 'esm', write: false,
-    alias: { 'workdsh-contracts': join(repository, 'packages/contracts/src/index.ts') },
+    alias: { 'symon-studio-contracts': join(repository, 'packages/contracts/src/index.ts') },
     plugins: [{ name: 'published-storage', setup(builder) {
       builder.onResolve({ filter: /^(?:@deepseek-ai\/dsh-storage-domain|@deepseek-ai\/dsh-app-boot|zod)$/ },
         args => ({ path: pathToFileURL(officialRequire.resolve(args.path)).href, external: true }));

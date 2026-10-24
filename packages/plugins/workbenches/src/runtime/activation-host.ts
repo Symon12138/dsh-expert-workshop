@@ -1,8 +1,8 @@
 import { createWorkbenchActivationAccess } from './activation-access.js';
 import type { Context } from '@deepseek-ai/cordis';
 import type { HostConnectionHandle } from '@deepseek-ai/dsh-client-connection';
-import type { ActorContext, IdentityService, WorkbenchDescriptor } from 'workdsh-contracts';
-import { assertActorContext } from 'workdsh-contracts';
+import type { ActorContext, IdentityService, WorkbenchDescriptor } from 'symon-studio-contracts';
+import { assertActorContext } from 'symon-studio-contracts';
 import { setWorkbenchBundleEnabled, type WorkbenchBundleManager } from './activation-owner.js';
 import { readWorkbenchRequestBody } from './request-body.js';
 import type { WorkbenchDevelopmentService } from './development-service.js';

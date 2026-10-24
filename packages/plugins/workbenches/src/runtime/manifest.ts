@@ -1,4 +1,4 @@
-import { parseWorkbenchDescriptor, type WorkbenchDescriptor } from 'workdsh-contracts';
+import { parseWorkbenchDescriptor, type WorkbenchDescriptor } from 'symon-studio-contracts';
 
 export interface InstalledWorkbenchManifest {
   readonly packageName: string;

@@ -13,7 +13,7 @@ export * from './shared.js';
 export { registerSkillManagementConnection } from './services/connection-api.js';
 export { registerSkillLifecycleTools } from './services/lifecycle-tools.js';
 
-export const name = 'workdsh-plugin-skills';
+export const name = 'symon-studio-plugin-skills';
 export const inject = ['skills', 'connection', 'tools'];
 
 export { skillCreatorContent } from './authoring/professional.js';

@@ -1,4 +1,4 @@
-import type { WorkbenchDescriptor } from 'workdsh-contracts';
+import type { WorkbenchDescriptor } from 'symon-studio-contracts';
 import { inspectWorkbenchPackageArtifact } from './package-artifact.js';
 import { validateWorkbenchPackageLayout } from './package-layout.js';
 import { retainWorkbenchArtifact } from './retain-artifact.js';

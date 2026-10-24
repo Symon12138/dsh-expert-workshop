@@ -1,1 +1,1 @@
-export type * from 'workdsh-contracts/skills';
+export type * from 'symon-studio-contracts/skills';

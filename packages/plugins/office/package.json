@@ -1,5 +1,5 @@
 {
-  "name": "workdsh-plugin-office",
+  "name": "symon-studio-plugin-office",
   "version": "0.1.0-alpha.10",
   "private": true,
   "type": "module",
@@ -99,7 +99,7 @@
     "@univerjs/preset-docs-core": "0.25.1",
     "@univerjs/slides": "0.25.1",
     "@univerjs/slides-ui": "0.25.1",
-    "workdsh-contracts": "workspace:*",
+    "symon-studio-contracts": "workspace:*",
     "@deepseek-ai/dsh-fs": "0.2.1-rc.2",
     "workdsh-tabular": "workspace:*"
   },
@@ -117,5 +117,5 @@
       "optional": true
     }
   },
-  "description": "Creates and edits document working copies in WorkDSH."
+  "description": "Creates and edits document working copies in Symon Studio."
 }

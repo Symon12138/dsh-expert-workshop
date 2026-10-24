@@ -1,4 +1,4 @@
-import type { WorkbenchDescriptor } from 'workdsh-contracts';
+import type { WorkbenchDescriptor } from 'symon-studio-contracts';
 import type { VerifyWorkbenchInstallation } from './host-registration.js';
 import { verifyInstalledWorkbenchArtifact } from './installed-artifact.js';
 

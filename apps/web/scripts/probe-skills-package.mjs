@@ -27,7 +27,7 @@ const fixture = 'standalone-skill';
 const skillFile = join(home, 'agents/skills', fixture, 'SKILL.md');
 await mkdir(dirname(skillFile), { recursive: true });
 await writeFile(skillFile, `---\nname: ${fixture}\ndescription: Standalone package fixture\n---\nORIGINAL\n`);
-// WorkDSH-owned local catalog: metadata plus inert payload, installed through
+// Symon Studio-owned local catalog: metadata plus inert payload, installed through
 // the same managed import path the browser upload uses.
 const catalogSkill = 'catalog-fixture';
 const catalogRoot = join(home, 'selected-catalog');
@@ -92,17 +92,17 @@ async function api(host, endpoint, payload = {}) {
   return response.json();
 }
 try {
-  await command(pnpm, ['--filter', 'workdsh-plugin-skills', 'pack', '--pack-destination', artifacts], root);
+  await command(pnpm, ['--filter', 'symon-studio-plugin-skills', 'pack', '--pack-destination', artifacts], root);
   await cli('--profile', 'skills', '--from-default-profile', 'web', '--dump-config');
   await cli('plugin', '--profile', 'skills', 'add', tarball, '--offline');
   const config = await cli('--profile', 'skills', '--dump-config');
   assert.equal(config.split('id: workdsh-skills').length - 1, 1);
   assert.ok(!config.includes('workdsh-bundle'));
-  const installedRoot = join(home, 'profiles/skills/node_modules/workdsh-plugin-skills');
+  const installedRoot = join(home, 'profiles/skills/node_modules/symon-studio-plugin-skills');
   const installed = JSON.parse(await readFile(join(installedRoot, 'package.json'), 'utf8'));
   assert.equal(installed.version, manifest.version);
   assert.ok(installed.dsh.bundle && installed.dsh.client);
-  assert.ok(!(await readFile(join(installedRoot, 'dist/shared.d.ts'), 'utf8')).includes('workdsh-contracts/'));
+  assert.ok(!(await readFile(join(installedRoot, 'dist/shared.d.ts'), 'utf8')).includes('symon-studio-contracts/'));
   pass('Skill tarball installed outside checkout; one independent Profile layer; no product bundle');
   browser = await chromium.launch({ headless: true });
   let host = await start();
@@ -146,7 +146,7 @@ try {
   const catalogInstall = page.getByRole('button', { name: '安装技能 目录样例技能', exact: true });
   await expect(catalogInstall).toBeVisible();
   await expect(page.getByRole('button', { name: '安装技能 超限样例技能', exact: true })).toBeDisabled();
-  // The catalog preview rides the shared Modal shell (workdsh-ui) while plugin
+  // The catalog preview rides the shared Modal shell (symon-studio-ui) while plugin
   // classes keep it compact: narrow width, 48px mark and calm 20px title.
   await page.getByRole('button', { name: `查看技能 ${catalogSkill}`, exact: true }).click();
   const previewDialog = page.locator('.wd-dialog.catalog-dialog');
@@ -201,7 +201,7 @@ try {
   await expect(page.getByRole('heading', { name: '技能市场', exact: true })).toBeVisible();
   await expect(installedEntry).toBeFocused();
   pass('Installed skills open a dedicated page with back link, count heading, in-page search and shared batch management');
-  // Bundled skills keep the WorkDSH prefix so the unprefixed `skill-creator`
+  // Bundled skills keep the Symon Studio prefix so the unprefixed `skill-creator`
   // name stays available to the user's own skills; each registers exactly once.
   const bundledSkills = (await api(host, 'list')).value;
   for (const name of ['workdsh-skill-creator', 'workdsh-ppt-design', 'workdsh-word-design', 'workdsh-excel-design', 'workdsh-web-design']) {

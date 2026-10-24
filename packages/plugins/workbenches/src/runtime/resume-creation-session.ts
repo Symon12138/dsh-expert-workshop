@@ -1,7 +1,7 @@
 import {realpath} from 'node:fs/promises';
 import type {Context} from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-api-session-controller';
-import type {ActorContext} from 'workdsh-contracts';
+import type {ActorContext} from 'symon-studio-contracts';
 
 /** create() is a new-conversation command: a named started Session causes the
  * official controller to mint another identity. Resume must use cold reads. */

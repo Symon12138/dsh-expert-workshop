@@ -67,13 +67,13 @@ test('an absent explicitly optional peer does not fail an otherwise complete Hos
 });
 
 async function anchoredCandidate(body,change={}){
- const fixture=await candidate(body,{peerDependencies:{'@deepseek-ai/cordis':'4.0.5','workdsh-plugin-workbenches':'^3.0.0-alpha.7'},...change});
+ const fixture=await candidate(body,{peerDependencies:{'@deepseek-ai/cordis':'4.0.5','symon-studio-plugin-workbenches':'^3.0.0-alpha.7'},...change});
  const installation=await mkdtemp(join(tmpdir(),'workdsh-startup-installation-'));
  await rm(join(fixture.directory,'node_modules'));
  const sdk=fileURLToPath(new URL('..',import.meta.url)),require=createRequire(join(sdk,'package.json'));
  await writeFile(join(installation,'package.json'),'{}');
- for(const name of ['workdsh-plugin-workbenches','@deepseek-ai/cordis','zod']){
-  const target=name==='workdsh-plugin-workbenches'?sdk:dirname(require.resolve(name+'/package.json'));
+ for(const name of ['symon-studio-plugin-workbenches','@deepseek-ai/cordis','zod']){
+  const target=name==='symon-studio-plugin-workbenches'?sdk:dirname(require.resolve(name+'/package.json'));
   const link=join(installation,'node_modules',name);await mkdir(dirname(link),{recursive:true});await symlink(target,link,process.platform==='win32'?'junction':'dir');
  }
  await writeFile(join(fixture.directory,'.workdsh-runtime.json'),JSON.stringify({schemaVersion:1,installationAnchor:join(installation,'package.json')}));

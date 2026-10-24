@@ -2,7 +2,7 @@ import type {SessionCreateRequest,SessionCreateValue} from '@deepseek-ai/dsh-api
 import {createHash} from 'node:crypto';
 import {realpath} from 'node:fs/promises';
 import type {Context} from '@deepseek-ai/cordis';
-import type {IdentityService,RuntimeBindingService} from 'workdsh-contracts';
+import type {IdentityService,RuntimeBindingService} from 'symon-studio-contracts';
 import type {QualityAiTools} from './ai-tools.js';
 import type {QualityAiReportTarget} from './ai-session-store.js';
 import {attachQualitySession,createQualityWorkspace,qualityWorkspacePorts,registerQualityWorkspace} from './session-workspace.js';

@@ -1,4 +1,4 @@
-import type { ProjectCapabilityKind, ProjectCapabilityRef } from 'workdsh-contracts/projects';
+import type { ProjectCapabilityKind, ProjectCapabilityRef } from 'symon-studio-contracts/projects';
 
 export interface CapabilityChoice {
   readonly id: string;

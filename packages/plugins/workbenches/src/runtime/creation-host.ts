@@ -5,7 +5,7 @@ import type {Context} from '@deepseek-ai/cordis';
 import type {ProfileContext} from '@deepseek-ai/dsh-app-boot';
 import type {DomainFacility} from '@deepseek-ai/dsh-storage-domain';
 import type {HostConnectionHandle} from '@deepseek-ai/dsh-client-connection';
-import type {IdentityService,RuntimeBindingService} from 'workdsh-contracts';
+import type {IdentityService,RuntimeBindingService} from 'symon-studio-contracts';
 import type {} from '@deepseek-ai/dsh-api-session-controller';
 import type {} from '@deepseek-ai/dsh-api-workspace-controller';
 import {WorkbenchCreationService} from './creation-service.js';
@@ -29,7 +29,7 @@ export async function mountWorkbenchCreationHost(ctx:Context,authoring:Awaited<R
   const target=await createProfileWorkbenchTarget(ctx);
   const source=createProfileWorkbenchDevelopmentSourceVerifier(ctx);
   const protectedSessions=ctx.get('workdshSessionAccess') as {create(request:Parameters<Context['sessionController']['create']>[0],signal?:AbortSignal):ReturnType<Context['sessionController']['create']>;inspect:Context['sessionController']['inspect']}|undefined;
-  const sessionAuthority=async(actor:import('workdsh-contracts').ActorContext,id:string,signal?:AbortSignal)=>{
+  const sessionAuthority=async(actor:import('symon-studio-contracts').ActorContext,id:string,signal?:AbortSignal)=>{
     signal?.throwIfAborted();ctx.fiber.assertActive();
     const actual=await identity.resolve({sessionId:id},signal),owner=access.sessionOwner(id);
     if(actual.principalId!==actor.principalId||actual.organizationId!==actor.organizationId||!owner||owner.ownerPrincipalId!==actor.principalId||owner.organizationId!==actor.organizationId)throw Error('workbench/creation-access-denied');

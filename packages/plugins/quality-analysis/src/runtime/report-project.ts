@@ -1,4 +1,4 @@
-import type {ActorContext,LibraryService,ProjectService} from 'workdsh-contracts';
+import type {ActorContext,LibraryService,ProjectService} from 'symon-studio-contracts';
 import type {QualityReportReceipt} from './run-store';
 import {createHash} from 'node:crypto';
 

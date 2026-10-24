@@ -1,6 +1,6 @@
 import type {} from "@deepseek-ai/dsh-fs";
 import { renderStylePreview } from "../presentation/style-preview.js";
-import type { OfficeContentSnapshot } from "workdsh-contracts/office";
+import type { OfficeContentSnapshot } from "symon-studio-contracts/office";
 import type { Context } from "@deepseek-ai/cordis";
 import { defineTool, type ToolRunContext } from "@deepseek-ai/dsh-tools";
 import { capabilities, openInput, contentOpenInput, parse, ensure } from "./model.js";

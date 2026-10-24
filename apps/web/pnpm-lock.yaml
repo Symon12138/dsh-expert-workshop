@@ -523,10 +523,10 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-plugin-workbench:
+      symon-studio-plugin-workbench:
         specifier: workspace:*
         version: link:../plugins/workbench
-      workdsh-ui:
+      symon-studio-ui:
         specifier: workspace:*
         version: link:../ui
 
@@ -560,7 +560,7 @@ importers:
       '@types/node':
         specifier: 22.19.0
         version: 22.19.0
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
 
@@ -596,7 +596,7 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
 
@@ -615,7 +615,7 @@ importers:
       '@types/node':
         specifier: 22.19.0
         version: 22.19.0
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
 
@@ -675,10 +675,10 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
-      workdsh-ui:
+      symon-studio-ui:
         specifier: workspace:*
         version: link:../../ui
       zod:
@@ -763,7 +763,7 @@ importers:
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
 
@@ -869,10 +869,10 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
-      workdsh-ui:
+      symon-studio-ui:
         specifier: workspace:*
         version: link:../../ui
 
@@ -972,15 +972,15 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
+      symon-studio-ui:
+        specifier: workspace:*
+        version: link:../../ui
       workdsh-tabular:
         specifier: workspace:*
         version: link:../../tabular
-      workdsh-ui:
-        specifier: workspace:*
-        version: link:../../ui
 
   ../../packages/plugins/office:
     dependencies:
@@ -1135,7 +1135,7 @@ importers:
       '@univerjs/slides-ui':
         specifier: 0.25.1
         version: 0.25.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(rxjs@7.8.2)
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
       workdsh-tabular:
@@ -1229,10 +1229,10 @@ importers:
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
-      workdsh-ui:
+      symon-studio-ui:
         specifier: workspace:*
         version: link:../../ui
 
@@ -1284,13 +1284,13 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
-      workdsh-plugin-library:
+      symon-studio-plugin-library:
         specifier: workspace:*
         version: link:../library
-      workdsh-plugin-workbenches:
+      symon-studio-plugin-workbenches:
         specifier: workspace:*
         version: link:../workbenches
       workdsh-tabular:
@@ -1360,10 +1360,10 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
-      workdsh-ui:
+      symon-studio-ui:
         specifier: workspace:*
         version: link:../../ui
 
@@ -1414,7 +1414,7 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-ui:
+      symon-studio-ui:
         specifier: workspace:*
         version: link:../../ui
 
@@ -1499,7 +1499,7 @@ importers:
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
 
@@ -1566,12 +1566,12 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
+      symon-studio-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
       typescript:
         specifier: 5.9.3
         version: 5.9.3
-      workdsh-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
 
   ../../packages/providers/identity-enterprise:
     dependencies:
@@ -1621,7 +1621,7 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
 
@@ -1643,7 +1643,7 @@ importers:
       '@types/node':
         specifier: 22.19.0
         version: 22.19.0
-      workdsh-contracts:
+      symon-studio-contracts:
         specifier: workspace:*
         version: link:../../contracts
 

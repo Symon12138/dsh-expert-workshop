@@ -19,7 +19,7 @@ const {build:esbuildBuild} =createRequire(join(rootPath,'apps/web/package.json')
 const build=options=>esbuildBuild({...options,plugins:[preflightExternals,...(options.plugins??[])]});
 async function loadOwned(relative) {
  const built=await build({entryPoints:[join(rootPath,'packages/plugins/workbenches/src/runtime',relative)],bundle:true,platform:'node',format:'esm',write:false,
-  alias:{'workdsh-contracts':join(rootPath,'packages/contracts/src/index.ts')},
+  alias:{'symon-studio-contracts':join(rootPath,'packages/contracts/src/index.ts')},
   plugins:[{name:'published-storage',setup(builder){builder.onResolve({filter:/^(?:@deepseek-ai\/dsh-storage-domain|@deepseek-ai\/dsh-app-boot|zod)$/},args=>({path:pathToFileURL(officialRequire.resolve(args.path)).href,external:true}));}}]});
  return import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
 }

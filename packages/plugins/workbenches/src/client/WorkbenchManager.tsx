@@ -1,6 +1,6 @@
 import {workbenchSurfaceStyles} from './surface-styles.js';
 import React, { useRef, useState } from 'react';
-import type { WorkbenchInventoryEntry } from 'workdsh-contracts';
+import type { WorkbenchInventoryEntry } from 'symon-studio-contracts';
 
 export interface WorkbenchManagerProps {
   readonly entries: readonly WorkbenchInventoryEntry[];

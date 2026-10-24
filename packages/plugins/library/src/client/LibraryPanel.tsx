@@ -1,9 +1,9 @@
-import { Button, Textarea, Input, Select } from 'workdsh-ui';
+import { Button, Textarea, Input, Select } from 'symon-studio-ui';
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots';
-import type { LibraryAsset, LibraryAssetKind, LibraryDraft, LibraryOriginalPreviewInput, LibraryOriginalPreviewRegistry, LibrarySearchHit, LibraryTreeEntry } from 'workdsh-contracts/library';
-import { Modal } from 'workdsh-ui';
+import type { LibraryAsset, LibraryAssetKind, LibraryDraft, LibraryOriginalPreviewInput, LibraryOriginalPreviewRegistry, LibrarySearchHit, LibraryTreeEntry } from 'symon-studio-contracts/library';
+import { Modal } from 'symon-studio-ui';
 import type { LibraryClient } from './management.js';
 import { libraryCss } from './styles.js';
 

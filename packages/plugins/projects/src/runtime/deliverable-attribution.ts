@@ -5,7 +5,7 @@ import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-fs';
 import type {} from '@deepseek-ai/dsh-session';
 import type { PresentedFile } from '@deepseek-ai/dsh-tool-present/types';
-import type { ActorContext, IdentityService, LibraryService, LibraryTreeEntry, ProjectService } from 'workdsh-contracts';
+import type { ActorContext, IdentityService, LibraryService, LibraryTreeEntry, ProjectService } from 'symon-studio-contracts';
 declare module '@deepseek-ai/cordis' { interface Context { workdshLibrary: LibraryService; } }
 
 /**
@@ -13,7 +13,7 @@ declare module '@deepseek-ai/cordis' { interface Context { workdshLibrary: Libra
  * `present` tool inside a project task session are registered in the owning Library
  * (source=task, sourceTaskId=session) and linked to the project as asset references.
  * The Harness session log stays the execution truth; this listener only mirrors the
- * official delivery signal into WorkDSH's object/relation data.
+ * official delivery signal into Symon Studio's object/relation data.
  */
 
 /** Import nothing larger than the Library's own upload limit; oversized deliveries are skipped. */

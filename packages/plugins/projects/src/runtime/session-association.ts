@@ -1,8 +1,8 @@
 import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-api-session-controller';
-import { assertActorContext } from 'workdsh-contracts';
-import type { ActorContext, IdentityService, RuntimeBindingService, SessionOwnerBinding } from 'workdsh-contracts';
-import type { ProjectTaskLink } from 'workdsh-contracts/projects';
+import { assertActorContext } from 'symon-studio-contracts';
+import type { ActorContext, IdentityService, RuntimeBindingService, SessionOwnerBinding } from 'symon-studio-contracts';
+import type { ProjectTaskLink } from 'symon-studio-contracts/projects';
 
 const ownedBy = (owner: SessionOwnerBinding, actor: ActorContext): boolean =>
   owner.organizationId === actor.organizationId && owner.ownerPrincipalId === actor.principalId;

@@ -119,7 +119,7 @@ export interface TrashedSkillSummary {
 }
 
 /**
- * One entry of the WorkDSH-owned local skill catalog. Metadata and an inert
+ * One entry of the Symon Studio-owned local skill catalog. Metadata and an inert
  * payload copy live under the shared Agents home; installation goes through the
  * existing import path, so the official provider stays the execution owner.
  */

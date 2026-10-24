@@ -66,7 +66,7 @@ for (const directory of packageDirectories) {
 packages.sort((left, right) => left.name.localeCompare(right.name));
 await writeFile(join(destination, 'SHA256SUMS'), packages.map(item => `${item.sha256}  ${item.filename}`).join('\n') + '\n');
 await writeFile(join(destination, 'release-manifest.json'), JSON.stringify({
-  project: 'WorkDSH',
+  project: 'Symon Studio',
   version: project.version,
   tag,
   channel: 'github-release',
@@ -78,8 +78,8 @@ await writeFile(join(destination, 'release-manifest.json'), JSON.stringify({
   runtimeOverrides: Object.fromEntries(Object.entries(project.pnpm.overrides).filter(([name]) => name.startsWith('@deepseek-ai/'))),
   packages,
   installation: {
-    defaultPackages: ['workdsh-provider-identity-local','workdsh-provider-browser-session','workdsh-plugin-audit','workdsh-plugin-access','workdsh-plugin-skills','workdsh-plugin-experts','workdsh-plugin-connectors','workdsh-plugin-library','workdsh-plugin-workbenches','workdsh-bundle'],
-    optionalPackages: ['workdsh-plugin-office','workdsh-plugin-projects','workdsh-plugin-activity','workdsh-plugin-quality-analysis'],
+    defaultPackages: ['symon-studio-provider-identity-local','symon-studio-provider-browser-session','symon-studio-plugin-audit','symon-studio-plugin-access','symon-studio-plugin-skills','symon-studio-plugin-experts','symon-studio-plugin-connectors','symon-studio-plugin-library','symon-studio-plugin-workbenches','workdsh-bundle'],
+    optionalPackages: ['symon-studio-plugin-office','symon-studio-plugin-projects','symon-studio-plugin-activity','symon-studio-plugin-quality-analysis'],
     enterprisePackages: 'Separate artifacts; not included in this personal collection',
     preservesPreviouslyInstalledOptionalPackages: true,
   },

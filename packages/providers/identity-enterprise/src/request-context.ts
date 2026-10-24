@@ -1,4 +1,4 @@
-import type { MembershipRole } from 'workdsh-contracts';
+import type { MembershipRole } from 'symon-studio-contracts';
 
 /** Member information verified by the configured authentication backend. */
 export interface VerifiedMember {

@@ -4,7 +4,7 @@ import type {
   DomainIssue,
   ExpertDefinition,
   ExpertExport,
-} from 'workdsh-contracts';
+} from 'symon-studio-contracts';
 import { ExpertsError } from '../domain/values.js';
 import { byteLength, digestOf, sha256Bytes } from '../domain/digest.js';
 import { normalizeDefinition, validateDefinition } from '../domain/definition.js';
@@ -13,7 +13,7 @@ import { authoringDocuments, definitionFromDocuments } from '../authoring/docume
 /**
  * Local expert package portability (EP-06, CONTRACTS §6, AT-21).
  *
- * Format `workdsh-expert` schemaVersion 1 — a WorkDSH product format, never the
+ * Format `workdsh-expert` schemaVersion 1 — a Symon Studio product format, never the
  * official Harness skill format. A package carries `manifest.json` + `expert.json`
  * (the definition + source attribution) and nothing that auto-installs: no owner,
  * internal preset id, granted permission, session id, credential, executable

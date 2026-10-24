@@ -45,7 +45,7 @@ CSV/XLSX 可上传、按类型检索并引用到任务；原始文件按字节�
 
 ## 公开资料选择组件
 
-客户端公开入口 `workdsh-plugin-library/client` 导出 `LibraryAssetPicker`、`LibraryAssetPickerProps`、`createLibraryClient` 与 `LibraryClient`。工作台可复用目录浏览和资料管理入口，无需创建对话或伪造sessionId。组件接收 `management.list`、`openLibrary` 和同步 `onSelect(entry)`；返回true关闭选择面板，返回false保留面板并提示重试。调用方保留选中资产及精确修订ID，再通过Host领域服务读取原件；选择组件不授予读取权限。通用组件不响应对话输入框的资料选择事件，原 `LibraryPicker` 继续承担对话引用插入。客户端的lifetime信号由所在插件拥有，卸载时取消。
+客户端公开入口 `symon-studio-plugin-library/client` 导出 `LibraryAssetPicker`、`LibraryAssetPickerProps`、`createLibraryClient` 与 `LibraryClient`。工作台可复用目录浏览和资料管理入口，无需创建对话或伪造sessionId。组件接收 `management.list`、`openLibrary` 和同步 `onSelect(entry)`；返回true关闭选择面板，返回false保留面板并提示重试。调用方保留选中资产及精确修订ID，再通过Host领域服务读取原件；选择组件不授予读取权限。通用组件不响应对话输入框的资料选择事件，原 `LibraryPicker` 继续承担对话引用插入。客户端的lifetime信号由所在插件拥有，卸载时取消。
 
 
 ### 工作台编辑原件并保存新修订

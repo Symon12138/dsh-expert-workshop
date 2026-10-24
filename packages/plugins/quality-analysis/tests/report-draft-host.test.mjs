@@ -16,7 +16,7 @@ const JsonStorage=await load('@deepseek-ai/dsh-storage-json');const StorageDomai
 const actor={principalId:'member.a',organizationId:'org',requestId:'draft-host',resolvedBy:'trusted-fixture'};
 const fields={title:'',analysis:'  草稿正文只保存在资料库。\n\n第二段保留空行。  ',conclusion:'尚待核对',recommendations:''};
 const compiled=await build({stdin:{contents:"export * from './run-service';export * from './analysis-run';export * from './report-drafts';export {LibraryManager} from '../../../library/src/services/library-manager';",resolveDir:fileURLToPath(new URL('../src/runtime/',import.meta.url)),loader:'ts'},bundle:true,platform:'node',format:'esm',write:false,
-  alias:{'workdsh-contracts':fileURLToPath(new URL('../../../contracts/src/index.ts',import.meta.url))},plugins:[{name:'shared-published-runtime',setup(b){
+  alias:{'symon-studio-contracts':fileURLToPath(new URL('../../../contracts/src/index.ts',import.meta.url))},plugins:[{name:'shared-published-runtime',setup(b){
     b.onResolve({filter:/^(?:@deepseek-ai\/cordis|@deepseek-ai\/dsh-storage-domain|zod)$/},a=>({path:pathToFileURL(runtime.resolve(a.path)).href,external:true}));
     b.onResolve({filter:/^(?:workdsh-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},a=>({path:pathToFileURL(libraryRequire.resolve(a.path)).href,external:true}));
   }}]});

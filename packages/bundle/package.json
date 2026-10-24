@@ -3,7 +3,7 @@
   "version": "0.1.0-alpha.53",
   "private": true,
   "type": "module",
-  "description": "Composes the WorkDSH workspace, capabilities and default DSH plugins.",
+  "description": "Composes the Symon Studio workspace, capabilities and default DSH plugins.",
   "exports": {
     "./probe": {
       "types": "./dist/probe.d.ts",
@@ -48,8 +48,8 @@
     }
   },
   "scripts": {
-    "build": "node ../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../apps/web --filter workdsh-ui build && node ../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../apps/web --filter workdsh-plugin-workbench build && tsc -p tsconfig.json && node ../../apps/web/scripts/build-client-probe.mjs",
-    "typecheck": "node ../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../apps/web --filter workdsh-ui build && node ../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../apps/web --filter workdsh-plugin-workbench typecheck && tsc -p tsconfig.json --noEmit"
+    "build": "node ../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../apps/web --filter symon-studio-ui build && node ../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../apps/web --filter symon-studio-plugin-workbench build && tsc -p tsconfig.json && node ../../apps/web/scripts/build-client-probe.mjs",
+    "typecheck": "node ../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../apps/web --filter symon-studio-ui build && node ../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../apps/web --filter symon-studio-plugin-workbench typecheck && tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "4.0.5"
@@ -75,8 +75,8 @@
     "@deepseek-ai/dsh-system-prompt": "0.2.1-rc.2",
     "@types/react": "19.2.14",
     "react": "19.2.4",
-    "workdsh-plugin-workbench": "workspace:*",
-    "workdsh-ui": "workspace:*",
+    "symon-studio-plugin-workbench": "workspace:*",
+    "symon-studio-ui": "workspace:*",
     "@types/node": "22.19.0",
     "@deepseek-ai/dsh-agent": "0.2.1-rc.2",
     "@deepseek-ai/dsh-client-ui-workspace": "0.2.1-rc.2"

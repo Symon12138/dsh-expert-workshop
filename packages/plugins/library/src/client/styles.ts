@@ -1,4 +1,4 @@
-import { controlsCss, modalCss } from 'workdsh-ui';
+import { controlsCss, modalCss } from 'symon-studio-ui';
 
 export const libraryCss = `${modalCss}
 ${controlsCss}

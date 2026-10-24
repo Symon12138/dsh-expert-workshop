@@ -1,9 +1,9 @@
 {
-  "name": "workdsh-plugin-workbenches",
+  "name": "symon-studio-plugin-workbenches",
   "version": "3.0.0-alpha.49",
   "private": true,
   "type": "module",
-  "description": "WorkDSH workbench platform Host services; Client management integration is in development.",
+  "description": "Symon Studio workbench platform Host services; Client management integration is in development.",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -90,6 +90,6 @@
     "@types/semver": "7.7.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "workdsh-contracts": "workspace:*"
+    "symon-studio-contracts": "workspace:*"
   }
 }

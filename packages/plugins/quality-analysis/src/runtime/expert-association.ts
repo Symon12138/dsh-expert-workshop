@@ -1,5 +1,5 @@
 import type { Context } from '@deepseek-ai/cordis';
-import type { ExpertsService, ExecutionCreation, IdentityService, RuntimeBindingService } from 'workdsh-contracts';
+import type { ExpertsService, ExecutionCreation, IdentityService, RuntimeBindingService } from 'symon-studio-contracts';
 
 export interface QualityExpertAssociation {
   readonly recordId: string;

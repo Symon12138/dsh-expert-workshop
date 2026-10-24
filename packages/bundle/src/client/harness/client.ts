@@ -10,7 +10,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client';
 import type {} from '@deepseek-ai/dsh-client-ui-session/client';
 import type {} from '@deepseek-ai/dsh-api-session-controller/client';
 import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client';
-import * as workbench from 'workdsh-plugin-workbench';
+import * as workbench from 'symon-studio-plugin-workbench';
 import { BrandMark, BrandName, DiagnosticsMark } from '../components/Brand.js';
 import { DiagnosticsPanel, type Inventory } from '../components/DiagnosticsPanel.js';
 import { NavigationLocation } from '../components/NavigationLocation.js';
@@ -59,7 +59,7 @@ export function apply(ctx: Context): void {
     // inventory rather than making a request to a route that may not exist.
     void ctx.remote.pluginInventory.list().then(response => {
       if (disposed || !response.ok) return;
-      const provider = response.value.entries.find(row => row.moduleName === 'workdsh-provider-browser-session');
+      const provider = response.value.entries.find(row => row.moduleName === 'symon-studio-provider-browser-session');
       if (!provider?.enabled) registerLegacy();
     }).catch(() => { /* Unknown inventory is not evidence that a provider is absent. */ });
     return () => { disposed = true; unregister?.(); };
@@ -142,6 +142,6 @@ export function apply(ctx: Context): void {
     return dispose;
   });
   if (diagnostics) ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
-    name: 'sidebar.panellist', id: 'workdsh-probe', label: 'WorkDSH 接入验证', order: 90,
+    name: 'sidebar.panellist', id: 'workdsh-probe', label: 'Symon Studio 接入验证', order: 90,
   }, DiagnosticsMark));
 }

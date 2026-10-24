@@ -1,5 +1,5 @@
 {
-  "name": "workdsh-plugin-library",
+  "name": "symon-studio-plugin-library",
   "version": "0.1.0-alpha.8",
   "private": false,
   "type": "module",
@@ -24,7 +24,7 @@
     "locale/*.json"
   ],
   "scripts": {
-    "build": "node ../../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../../apps/web --filter workdsh-contracts build && node ../../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../../apps/web --filter workdsh-ui build && tsc -p tsconfig.json && node ../../../apps/web/scripts/build-library.mjs",
+    "build": "node ../../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../../apps/web --filter symon-studio-contracts build && node ../../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../../apps/web --filter symon-studio-ui build && tsc -p tsconfig.json && node ../../../apps/web/scripts/build-library.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node ../../../apps/web/node_modules/pnpm/bin/pnpm.cjs --dir ../../../apps/web build && node --test tests/*.test.mjs"
   },
@@ -75,9 +75,9 @@
     "@types/react": "19.2.14",
     "pdf-lib": "1.17.1",
     "react": "19.2.4",
-    "workdsh-contracts": "workspace:*",
+    "symon-studio-contracts": "workspace:*",
     "workdsh-tabular": "workspace:*",
-    "workdsh-ui": "workspace:*",
+    "symon-studio-ui": "workspace:*",
     "@deepseek-ai/dsh-client-ui-sidebar-documentpreview": "0.2.1-rc.2"
   },
   "dependencies": {

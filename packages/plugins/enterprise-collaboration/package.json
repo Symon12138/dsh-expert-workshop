@@ -1,9 +1,9 @@
 {
-  "name": "workdsh-plugin-enterprise-collaboration",
+  "name": "symon-studio-plugin-enterprise-collaboration",
   "version": "0.1.0-alpha.1",
   "private": true,
   "type": "module",
-  "description": "Member handoffs across isolated WorkDSH instances",
+  "description": "Member handoffs across isolated Symon Studio instances",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -71,7 +71,7 @@
     "@types/react": "19.2.14",
     "react": "19.2.4",
     "@types/node": "22.19.0",
-    "workdsh-contracts": "workspace:*",
+    "symon-studio-contracts": "workspace:*",
     "react-dom": "19.2.4",
     "@types/react-dom": "19.2.3",
     "@deepseek-ai/dsh-api-session-controller": "0.2.1-rc.2",

@@ -1,22 +1,22 @@
-# WorkDSH SDK 核验
+# Symon Studio SDK 核验
 
 ## 区分目录、安装和运行
 
-官方 `cordis_inspect_query` 的 `Service.listService` 查询官方预生成的接口目录，并非任意第三方插件动态提供服务的全量清单。`workdshWorkbenchRegistration` 和 `workdshWorkbenchClientRegistration` 是 WorkDSH 扩展服务；返回 `no catalogued Service named ...` 只说明该目录没有收录，不能断言服务未运行，也不能反向当成服务可用的证明。这两个接口已知不在该目录内，不调用 `Service.listService` 查询它们，也不切换 Host/Client 重试。
+官方 `cordis_inspect_query` 的 `Service.listService` 查询官方预生成的接口目录，并非任意第三方插件动态提供服务的全量清单。`workdshWorkbenchRegistration` 和 `workdshWorkbenchClientRegistration` 是 Symon Studio 扩展服务；返回 `no catalogued Service named ...` 只说明该目录没有收录，不能断言服务未运行，也不能反向当成服务可用的证明。这两个接口已知不在该目录内，不调用 `Service.listService` 查询它们，也不切换 Host/Client 重试。
 
 官方 `Config.listConfigs` 的状态描述配置 Schema：`absent` 表示插件运行模块没有声明 Config，`schema` 表示可读取配置结构，`unsupported` 表示配置结构不能按该协议投影；`inactive` 表示条目禁用或没有活动 fiber。`absent` 不表示未安装。Client 查询超时也不单独证明服务不存在，应结合输出中的实际错误和活动状态核对。
 
 ## 正确的核验顺序
 
 1. 调用 `workbench_read_development_context`，核对本会话关联的需求、源码、插件身份和安装目标；它成功只证明该工具链可用，不证明全部业务接口都可用。
-2. 开发上下文的 `sdk.status=available` 时，优先使用其中已内联的 `quickstart` 与现有骨架；只在本轮确需额外接口时按 `readme`、`publicTypes.host/client` 读取对应公开契约，版本取 `sdk.version`；不再额外搜索安装目录或查询该 SDK 的 Service/Config 目录。只有 `sdk.status=unavailable` 或旧宿主未提供该字段时，才用 `Config.listConfigs` 查询插件名 `workdsh-plugin-workbenches`，再以实际条目 id 查询详情取得 `packageDir`。官方 Host/Client API、Slots 和生命周期仍按官方 Skill 核对本轮用到的接口。
+2. 开发上下文的 `sdk.status=available` 时，优先使用其中已内联的 `quickstart` 与现有骨架；只在本轮确需额外接口时按 `readme`、`publicTypes.host/client` 读取对应公开契约，版本取 `sdk.version`；不再额外搜索安装目录或查询该 SDK 的 Service/Config 目录。只有 `sdk.status=unavailable` 或旧宿主未提供该字段时，才用 `Config.listConfigs` 查询插件名 `symon-studio-plugin-workbenches`，再以实际条目 id 查询详情取得 `packageDir`。官方 Host/Client API、Slots 和生命周期仍按官方 Skill 核对本轮用到的接口。
 3. 只读实际解析包的 `package.json`、README 和 exports 指向的公开类型，确认已交付版本、Host/Client 注册签名、注入声明和生命周期。通过实际解析路径读取文档是允许的；不得把机器绝对路径硬编码进插件、复制产品私有源码，或将开发仓库当成目标宿主已安装版本。
 4. 区分可继续实施和可证明已运行：公开 SDK 已核对时可在关联源码中开发；交付前用官方 Cordis 生命周期在隔离存储中验证 Host 注入、注册、业务服务与释放。安装后核对真实字节、启用选择、Host/Client 注册和实际页面。静态目录、README、候选包和成功安装都不能替代运行验收。
 5. 若无法取得已解析包、公开签名不匹配，或真实加载、注册、路由调用出现失败，保留源码及具体错误，报告缺失证据；不能仅凭未收录目录或无 Config 阻断开发，也不能忽略真实运行异常。不要据此擅自安装、重装、停用 SDK、修改官方工具或更换插件身份。
 
 ## 本次典型误判
 
-- 错误：Service 目录里没有 WorkDSH 注册服务 → SDK 没安装。
+- 错误：Service 目录里没有 Symon Studio 注册服务 → SDK 没安装。
 - 正确：目录未收录 → 继续读取实际 SDK 的公开文档与类型，并通过实际加载验收确认。
 - 错误：Config 状态 absent → 插件未启用。
 - 正确：没有 Config Schema → 另行核对活动状态和实际注册结果。

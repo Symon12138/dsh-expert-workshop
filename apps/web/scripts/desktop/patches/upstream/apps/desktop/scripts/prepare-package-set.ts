@@ -27,15 +27,15 @@ import { resolveDesktopTargetBuildPaths } from './desktop-build-paths.mjs'
 
 const DSH_PACKAGE = '@deepseek-ai/dsh'
 const ROOT_PACKAGES = [DSH_PACKAGE, DESKTOP_HOST_PACKAGE] as const
-// WORKDSH TEST PATCH: preseed the WorkDSH profile layers beside the official roots.
+// WORKDSH TEST PATCH: preseed the Symon Studio profile layers beside the official roots.
 const WORKDSH_ROOT_PACKAGES = [
   'workdsh-bundle',
-  'workdsh-plugin-skills',
-  'workdsh-plugin-access',
-  'workdsh-plugin-audit',
-  'workdsh-plugin-experts',
-  'workdsh-provider-identity-local',
-  'workdsh-plugin-office',
+  'symon-studio-plugin-skills',
+  'symon-studio-plugin-access',
+  'symon-studio-plugin-audit',
+  'symon-studio-plugin-experts',
+  'symon-studio-provider-identity-local',
+  'symon-studio-plugin-office',
 ] as const
 const APP_ROOT = resolve(import.meta.dirname, '..')
 const REPOSITORY_ROOT = resolve(APP_ROOT, '..', '..')
@@ -60,7 +60,7 @@ function dependencyNames(manifest: Readonly<Record<string, unknown>>, section: s
 
 /**
  * Select the complete available first-party dependency closures rooted at dsh, its private Host,
- * and the WORKDSH TEST PATCH WorkDSH layers.
+ * and the WORKDSH TEST PATCH Symon Studio layers.
  * @param available - Packed packages indexed by package name.
  * @returns Selected packages sorted by name.
  */

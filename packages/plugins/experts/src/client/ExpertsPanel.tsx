@@ -1,11 +1,11 @@
-import { Button, Input } from 'workdsh-ui';
+import { Button, Input } from 'symon-studio-ui';
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 // The `main` slot PropsRuntime is augmented by the official layout client module;
 // without this side-effect type import the slot name resolves to `never`.
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client';
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots';
-import { Icon, Modal, type IconName } from 'workdsh-ui';
+import { Icon, Modal, type IconName } from 'symon-studio-ui';
 import type { ExpertAvailability, ExpertSort, ExpertSummary } from '../shared.js';
 import type { ExpertManagementClient } from './management.js';
 import { ExpertDetailModal } from './ExpertDetailModal.js';

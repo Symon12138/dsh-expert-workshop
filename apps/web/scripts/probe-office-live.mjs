@@ -507,7 +507,7 @@ export function apply(ctx){ctx.effect(()=>ctx.connection.fetch.register({path:'/
       await api(host,{action:"tool",sessionId:sid,name:"content_edit",args:{input:{documentId:doc.documentId,baseRevision:doc.revision,operationId:randomUUID(),operations:[{op:"document.replaceBlock",blockId:doc.state.blockIds[0],expectedText:"",block:{type:"paragraph",runs:[{text:savedText,marks:[]}]}}]}},callId:randomUUID()});
       await browser.close(); browser = undefined;
       await stop();
-      await cli("plugin", "--profile", "office", "remove", "workdsh-plugin-office");
+      await cli("plugin", "--profile", "office", "remove", "symon-studio-plugin-office");
       host = await start();
       const without = await api(host,{action:"visible-tools",sessionId:sid});
       assert.ok(!without.some(name=>name.startsWith("content_")));
@@ -515,7 +515,7 @@ export function apply(ctx){ctx.effect(()=>ctx.connection.fetch.register({path:'/
       const response = await fetch(host.address + "/api/workdsh-office", {method:"POST",headers:{cookie:host.cookie,"content-type":"application/json"},body:JSON.stringify({sessionId:sid,request:{endpoint:"list"}})});
       assert.equal(response.status,404);
       await stop();
-      const officeTarball = tarballs.find(path=>path.includes("workdsh-plugin-office-"));
+      const officeTarball = tarballs.find(path=>path.includes("symon-studio-plugin-office-"));
       await cli("plugin", "--profile", "office", "add", officeTarball, ...installFlags);
       host = await start();
       const tools = await api(host,{action:"visible-tools",sessionId:sid});

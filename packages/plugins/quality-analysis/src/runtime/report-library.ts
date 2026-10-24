@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto';
-import type {ActorContext,LibraryService} from 'workdsh-contracts';
+import type {ActorContext,LibraryService} from 'symon-studio-contracts';
 import type {CompleteQualityAnalysisRun} from './analysis-run';
 import {renderQualityMarkdownReport} from './report';
 import {exportQualityStatisticsCsv} from './statistics-export';

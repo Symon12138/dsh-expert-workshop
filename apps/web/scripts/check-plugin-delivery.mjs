@@ -10,8 +10,8 @@ const manifests=new Map();
 for(const directory of directories){try{const manifest=JSON.parse(await readFile(join(base,directory,'package.json'),'utf8'));manifests.set(manifest.name,{manifest,directory});}catch(error){if(error.code!=='ENOENT')throw error;}}
 return manifests;
 }
-export const defaults=['workdsh-provider-identity-local','workdsh-provider-browser-session','workdsh-plugin-audit','workdsh-plugin-access','workdsh-plugin-skills','workdsh-plugin-experts','workdsh-plugin-connectors','workdsh-plugin-library','workdsh-plugin-workbenches','workdsh-bundle'];
-const allowed=new Set([...defaults,'workdsh-contracts','workdsh-ui','workdsh-plugin-workbench','workdsh-tabular']);
+export const defaults=['symon-studio-provider-identity-local','symon-studio-provider-browser-session','symon-studio-plugin-audit','symon-studio-plugin-access','symon-studio-plugin-skills','symon-studio-plugin-experts','symon-studio-plugin-connectors','symon-studio-plugin-library','symon-studio-plugin-workbenches','workdsh-bundle'];
+const allowed=new Set([...defaults,'symon-studio-contracts','symon-studio-ui','symon-studio-plugin-workbench','workdsh-tabular']);
 export async function auditDefaultPluginDelivery(){
 const manifests=await readOwnedManifests();
 const installer=await readFile(join(root,'scripts/install-project-release.mjs'),'utf8');
@@ -23,7 +23,7 @@ assert.ok(packedDefaults,'Release packer must declare the default installation p
 assert.deepEqual([...packedDefaults[1].matchAll(/'([^']+)'/g)].map(match=>match[1]),defaults);
 const packedOptional=packer.match(/optionalPackages:\s*\[([^\]]+)\]/);
 assert.ok(packedOptional,'Release packer must declare optional packages');
-assert.deepEqual([...packedOptional[1].matchAll(/'([^']+)'/g)].map(match=>match[1]),['workdsh-plugin-office','workdsh-plugin-projects','workdsh-plugin-activity','workdsh-plugin-quality-analysis']);
+assert.deepEqual([...packedOptional[1].matchAll(/'([^']+)'/g)].map(match=>match[1]),['symon-studio-plugin-office','symon-studio-plugin-projects','symon-studio-plugin-activity','symon-studio-plugin-quality-analysis']);
 const {visited,edges}=assertDefaultOwnedClosure(manifests);
 const proof={scope:'Unreleased Web personal installer/source package closure; not Desktop or published artifacts',defaultPackages:defaults,
  ownedClosure:[...visited].sort(),edges,externalEnterprisePackagesAbsent:true,

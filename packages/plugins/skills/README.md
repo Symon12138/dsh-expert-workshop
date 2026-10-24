@@ -2,9 +2,9 @@
 
 > 当前源码精确锁定 Harness **0.2.0-rc.2 / Cordis 4.0.4**；实际构建、安装与运行范围见[验收要求](../../../apps/web/docs/ACCEPTANCE.md)。[历史发布说明](https://github.com/techflag/workdsh/releases)及旧探针不能证明本轮源码或 Desktop 安装包已验收。
 
-状态：**Skill 0.1 开发候选，已提供本地技能管理和独立插件入口**。当前构建、安装和运行验收以[验收要求](../../../apps/web/docs/ACCEPTANCE.md)为准。当前候选制品 `workdsh-plugin-skills@0.1.0-alpha.34`，尚未发布 npm。一个插件管理多个 Skill 业务对象；用户制作技能不需要发布 npm 包。
+状态：**Skill 0.1 开发候选，已提供本地技能管理和独立插件入口**。当前构建、安装和运行验收以[验收要求](../../../apps/web/docs/ACCEPTANCE.md)为准。当前候选制品 `symon-studio-plugin-skills@0.1.0-alpha.34`，尚未发布 npm。一个插件管理多个 Skill 业务对象；用户制作技能不需要发布 npm 包。
 
-本包提供标准 Host `apply/inject`、独立 Client `apply/inject`、`dsh.bundle` 配置 patch 和 `dsh.client` 浏览器产物。官方 Loader/Profile/Cordis 拥有加载及生命周期；不依赖 WorkDSH 总包或另一个插件框架。旧候选的独立安装、默认组合、移除与重装过程见[历史记录](../../../apps/web/docs/CONTRACTS.md)，不代替当前版本验收。
+本包提供标准 Host `apply/inject`、独立 Client `apply/inject`、`dsh.bundle` 配置 patch 和 `dsh.client` 浏览器产物。官方 Loader/Profile/Cordis 拥有加载及生命周期；不依赖 Symon Studio 总包或另一个插件框架。旧候选的独立安装、默认组合、移除与重装过程见[历史记录](../../../apps/web/docs/CONTRACTS.md)，不代替当前版本验收。
 
 - 模块版本线：**0.1**，Host、Client、资源和内置管理 Skill 共用版本。
 - 主任务：P1-03；任务编号用于开发追溯，不代表当前版本已经完成验收。
@@ -15,33 +15,33 @@
 当前源码基线：Node 22.19+、Harness `0.2.0-rc.2`、Cordis `4.0.4`。从已配置这些依赖的官方 Web Profile 安装同次构建的本地 tgz；将以下路径替换为实际制品绝对路径：
 
 ```sh
-dsh plugin --profile <你的 Web Profile> add /absolute/path/workdsh-plugin-skills-0.1.0-alpha.34.tgz
+dsh plugin --profile <你的 Web Profile> add /absolute/path/symon-studio-plugin-skills-0.1.0-alpha.34.tgz
 ```
 
-按官方流程停服修改组合，再重启该 Profile。卸载管理插件用官方 `dsh plugin --profile <Profile> remove workdsh-plugin-skills`；用户技能文件和管理数据保留，重装继续使用。插件移除与页面中“卸载某个技能对象”不同：后者进入可恢复回收站。当前未宣称完整运行中 CLI 热卸载。
+按官方流程停服修改组合，再重启该 Profile。卸载管理插件用官方 `dsh plugin --profile <Profile> remove symon-studio-plugin-skills`；用户技能文件和管理数据保留，重装继续使用。插件移除与页面中“卸载某个技能对象”不同：后者进入可恢复回收站。当前未宣称完整运行中 CLI 热卸载。
 
-仓库开发使用固定 pnpm；先 `corepack pnpm build`，再 `corepack pnpm preview:install`。安装脚本通过官方 CLI 将 Skill 和 WorkDSH 展示包作为两个独立 Profile 层安装；最后 `corepack pnpm preview`。现有预览应先停止，自动化测试使用隔离 Agents home，人工预览仍默认使用用户原有 `~/.agents`。
+仓库开发使用固定 pnpm；先 `corepack pnpm build`，再 `corepack pnpm preview:install`。安装脚本通过官方 CLI 将 Skill 和 Symon Studio 展示包作为两个独立 Profile 层安装；最后 `corepack pnpm preview`。现有预览应先停止，自动化测试使用隔离 Agents home，人工预览仍默认使用用户原有 `~/.agents`。
 
 可独立打包并验收：
 
 ```sh
-corepack pnpm --filter workdsh-plugin-skills build
-corepack pnpm --filter workdsh-plugin-skills pack --pack-destination .artifacts
+corepack pnpm --filter symon-studio-plugin-skills build
+corepack pnpm --filter symon-studio-plugin-skills pack --pack-destination .artifacts
 corepack pnpm probe:skills
 corepack pnpm probe:browser
 ```
 
-产物内含所需 UI 代码和本地 DTO 声明，不要求运行时存在 `workdsh-ui` 或开发 workspace。React 由官方 renderer 共享；依赖的 Harness 服务明确声明，不把框架复制进包。
+产物内含所需 UI 代码和本地 DTO 声明，不要求运行时存在 `symon-studio-ui` 或开发 workspace。React 由官方 renderer 共享；依赖的 Harness 服务明确声明，不把框架复制进包。
 
 技能页提供本地已安装技能管理和独立 SkillHub 浏览入口。目录浏览不自动安装技能；安装经过导入预检与用户确认。用户可显式选择已有的通用本地目录：个人运行设置 `WORKDSH_SKILL_CATALOG`，或由可信 Host 指定 `catalogRoot`。本地目录使用 `catalog.json`、`icons/` 与 `payloads/`；第三方内容的许可、依赖与兼容性由具体来源和安装校验决定。
 
 ## 公开服务与依赖
 
-Host 提供 `ctx.workdshSkills`，类型源为 `workdsh-contracts/skills` 的 `SkillManagementService`，`contractVersion` 为 `1`。这是受信本地 Host 管理契约，**不属于企业鉴权 API**。使用服务的插件显式注入 `workdshSkills`，只依赖公共类型，不导入本包内部 `SkillManager`：
+Host 提供 `ctx.workdshSkills`，类型源为 `symon-studio-contracts/skills` 的 `SkillManagementService`，`contractVersion` 为 `1`。这是受信本地 Host 管理契约，**不属于企业鉴权 API**。使用服务的插件显式注入 `workdshSkills`，只依赖公共类型，不导入本包内部 `SkillManager`：
 
 ```ts
 import type { Context } from '@deepseek-ai/cordis';
-import type { SkillManagementService } from 'workdsh-contracts/skills';
+import type { SkillManagementService } from 'symon-studio-contracts/skills';
 
 declare module '@deepseek-ai/cordis' {
   interface Context { workdshSkills: SkillManagementService; }
@@ -74,9 +74,9 @@ export function apply(ctx: Context) {
 
 ## 专业内容制作指南
 
-内置 `workdsh-ppt-design`、`workdsh-word-design`、`workdsh-excel-design`、`workdsh-web-design`，参考腾讯 / WorkBuddy 的产品化方法，由 WorkDSH 按当前工具重新编写。包含叙事、排版、公式审查、响应式与交付参考；不是腾讯 SDK、转换引擎或云服务。感谢相关产品提供的设计启发。指南不能扩充当前编辑器或工具能力，具体来源与边界见[适配说明](../../../apps/web/docs/CONTRACTS.md)。
+内置 `workdsh-ppt-design`、`workdsh-word-design`、`workdsh-excel-design`、`workdsh-web-design`，参考腾讯 / WorkBuddy 的产品化方法，由 Symon Studio 按当前工具重新编写。包含叙事、排版、公式审查、响应式与交付参考；不是腾讯 SDK、转换引擎或云服务。感谢相关产品提供的设计启发。指南不能扩充当前编辑器或工具能力，具体来源与边界见[适配说明](../../../apps/web/docs/CONTRACTS.md)。
 
-创建指南使用 WorkDSH 独立命令，保留用户同名原版技能。多阶段创建要求更新原生任务进度；中断恢复先核对已有草稿与成果。
+创建指南使用 Symon Studio 独立命令，保留用户同名原版技能。多阶段创建要求更新原生任务进度；中断恢复先核对已有草稿与成果。
 
 2026-09-14源码候选0.1.0-alpha.28：配合活动插件提供已有技能标题；通过公开展示契约协作，不复制执行或技能状态。
 

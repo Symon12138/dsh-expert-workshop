@@ -1,5 +1,5 @@
 import type { Context } from '@deepseek-ai/cordis';
-import type { WorkbenchDescriptor, LibraryService } from 'workdsh-contracts';
+import type { WorkbenchDescriptor, LibraryService } from 'symon-studio-contracts';
 import { mountQualityRecordsHost } from './runtime/records-host.js';
 import { QualityArtifactExecutor } from './runtime/artifact-executor.js';
 import { QualityAnalysisExecutor } from './runtime/analysis-executor.js';

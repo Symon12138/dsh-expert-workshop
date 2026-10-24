@@ -34,21 +34,21 @@ const groupVersion = manifest.runtimeOverrides?.['@deepseek-ai/cordis-plugin-gro
 if (typeof groupVersion !== 'string' || !/^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$/.test(groupVersion)) throw new Error('Release manifest must pin the exact official Cordis group version.');
 const packages = new Map(manifest.packages.map(item => [item.name, item]));
 const defaultInstallOrder = [
-  'workdsh-provider-identity-local',
-  'workdsh-provider-browser-session',
-  'workdsh-plugin-audit',
-  'workdsh-plugin-access',
-  'workdsh-plugin-skills',
+  'symon-studio-provider-identity-local',
+  'symon-studio-provider-browser-session',
+  'symon-studio-plugin-audit',
+  'symon-studio-plugin-access',
+  'symon-studio-plugin-skills',
   // The experts layer installs and activates the three official DSH Agent Team modules.
-  'workdsh-plugin-experts',
-  'workdsh-plugin-connectors',
-  'workdsh-plugin-library',
-  'workdsh-plugin-workbenches',
+  'symon-studio-plugin-experts',
+  'symon-studio-plugin-connectors',
+  'symon-studio-plugin-library',
+  'symon-studio-plugin-workbenches',
   'workdsh-bundle',
 ];
 
 const optionalFeatures = {
-  office:'workdsh-plugin-office',projects:'workdsh-plugin-projects',activity:'workdsh-plugin-activity','quality-analysis':'workdsh-plugin-quality-analysis',
+  office:'symon-studio-plugin-office',projects:'symon-studio-plugin-projects',activity:'symon-studio-plugin-activity','quality-analysis':'symon-studio-plugin-quality-analysis',
 };
 const requested = value('--with','');
 if (typeof requested !== 'string') throw new Error('--with requires comma-separated feature names');
@@ -105,7 +105,7 @@ const dshHome = resolve(process.env.DSH_HOME || join(homedir(), '.dsh'));
 const versionResult = execute(['--version'], { always: true, capture: true });
 const actualHarness = versionResult?.stdout?.trim();
 if (actualHarness !== expectedHarness) {
-  throw new Error(`WorkDSH ${manifest.version} requires dsh ${expectedHarness}; found ${actualHarness || 'unknown'}. Pass --dsh /absolute/path/to/a-compatible-dsh.`);
+  throw new Error(`Symon Studio ${manifest.version} requires dsh ${expectedHarness}; found ${actualHarness || 'unknown'}. Pass --dsh /absolute/path/to/a-compatible-dsh.`);
 }
 
 const profileManifest = join(dshHome, 'profiles', profile, 'package.json');
@@ -179,7 +179,7 @@ execute(['plugin', '--profile', profile, 'add', `@deepseek-ai/dsh-base@${expecte
 if (!dryRun) {
   const profilePackage = JSON.parse(readFileSync(profileManifest, 'utf8'));
   const bundles = profilePackage.dsh?.profile?.bundles ?? [];
-  for (const name of installOrder) if (name !== 'workdsh-provider-browser-session' && !bundles.includes(name)) bundles.push(name);
+  for (const name of installOrder) if (name !== 'symon-studio-provider-browser-session' && !bundles.includes(name)) bundles.push(name);
   profilePackage.dsh = { ...profilePackage.dsh, profile: { ...profilePackage.dsh?.profile, bundles } };
   writeFileSync(profileManifest, JSON.stringify(profilePackage, null, 2) + '\n');
 }
@@ -192,7 +192,7 @@ if (!dryRun) {
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
-// Profiles disable automatic peers, because WorkDSH's build-only workspace peers
+// Profiles disable automatic peers, because Symon Studio's build-only workspace peers
 // are bundled and not published to npm. Install the official runtime peer closure
 // explicitly so a clean Profile can boot without relying on the developer repo.
 if (!dryRun) {
@@ -219,5 +219,5 @@ if (!dryRun) {
 }
 if (!dryRun) await retainWorkbenchArchives(join(dshHome, 'profiles', profile), directory, installOrder.map(name => packages.get(name)));
 const profileCli = join(dshHome, 'profiles', profile, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js');
-console.log(`\nWorkDSH ${manifest.version} ${dryRun ? 'installation plan verified' : 'is installed'} in profile ${profile}.`);
+console.log(`\nSymon Studio ${manifest.version} ${dryRun ? 'installation plan verified' : 'is installed'} in profile ${profile}.`);
 console.log(`Start it with: node ${JSON.stringify(profileCli)} --profile ${JSON.stringify(profile)}`);

@@ -1,5 +1,5 @@
 {
-  "name": "workdsh-provider-runtime-isolated",
+  "name": "symon-studio-provider-runtime-isolated",
   "version": "0.1.0-alpha.10",
   "private": true,
   "type": "module",
