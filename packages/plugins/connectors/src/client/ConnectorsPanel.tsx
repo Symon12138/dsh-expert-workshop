@@ -6,6 +6,7 @@ import { Icon, Modal } from 'workdsh-ui';
 import type { ConnectorConfigView, ConnectorInput, ConnectorSummary } from '../shared.js';
 import type { ConnectorManagementClient } from './management.js';
 import { connectorCss } from './styles.js';
+import { RECOMMENDED_CONNECTORS, type RecommendedConnector } from './recommended.js';
 
 type Injected = { toggleNavigation: () => void; management: ConnectorManagementClient; openCapability: (key: string) => void; hasCapability: (key: string) => boolean };
 type Props = PropsRuntime<'main'> & InjectFace<Injected>;
@@ -31,17 +32,25 @@ export function ConnectorsPanel({ toggleNavigation, management, openCapability, 
   };
   const remove = async () => { if (!removeTarget) return; setBusy(true); setError(''); try { await management.remove(removeTarget.id); setRemoveTarget(undefined); await refresh(); } catch (cause) { setError(cause instanceof Error ? cause.message : '删除连接器失败。'); setBusy(false); } };
   const normalized = query.trim().toLowerCase(); const filtered = rows.filter(row => `${row.title} ${row.description} ${row.serverName} ${row.toolNames.join(' ')}`.toLowerCase().includes(normalized));
+  const recommended = RECOMMENDED_CONNECTORS.filter(entry => !rows.some(row => row.serverName === entry.name) && `${entry.name} ${entry.description} ${entry.category}`.toLowerCase().includes(normalized));
+  const addRecommended = (entry: RecommendedConnector) => setDraft({ id: undefined, title: entry.name, description: entry.description, serverName: entry.name, transport: entry.transport, command: entry.command, argsText: entry.args.join('\n'), url: '', authorizationToken: '', authorizationConfigured: false });
   const detail = rows.find(row => row.id === expanded);
   const capabilityTabs = [['experts', '专家'], ['skills', '技能'], ['connectors', '连接器']] as const;
   const capabilityKey: Record<string, string> = { experts: 'workdsh-experts', skills: 'workdsh-skills', connectors: 'workdsh-connectors' };
   return <section className="wd-connectors" data-testid="workdsh-connectors"><style>{connectorCss}</style>
     <header className="cap-header"><button className="nav-toggle" onClick={toggleNavigation} aria-label="切换导航">导航</button>
       {capabilityTabs.map(([key, label]) => { const active = key === 'connectors'; const target = capabilityKey[key]; const enabled = active || Boolean(target && hasCapability(target)); return <button key={key} className={`cap-tab ${active ? 'active' : ''}`} disabled={!enabled} aria-current={active ? 'page' : undefined} onClick={() => { if (!active && target) openCapability(target); }}><Icon name={key} />{label}</button>; })}
-      <Input className="search" aria-label="搜索 MCP" placeholder="搜索 MCP" value={query} onChange={event => setQuery(event.currentTarget.value)} />
+      <Input className="search" aria-label="搜索连接器" placeholder="搜索连接器" value={query} onChange={event => setQuery(event.currentTarget.value)} />
     </header>
-    <div className="connector-head"><span className="title-icon"><Icon name="connectors" /></span><div><h1>MCP 服务管理</h1><p>每个连接器都是独立 MCP 实例，由 DSH 官方客户端建立连接</p></div>
-      <div className="head-actions"><Button className="secondary" onClick={() => void refresh()} disabled={busy}>刷新状态</Button><Button variant="primary" className="primary" onClick={() => setDraft(blank())}>＋ 添加 MCP</Button></div></div>
-    <div className="list-meta"><strong>我的 MCP <span className="count">{rows.length}</span></strong><span className="muted">{rows.filter(row => row.enabled && row.state === 'ready').length} 已连接</span></div>
+    <div className="connector-head"><span className="title-icon"><Icon name="connectors" /></span><div><h1>连接器</h1><p>连接 MCP 服务，把外部工具接入 DSH 会话</p></div>
+      <div className="head-actions"><Button className="secondary" onClick={() => void refresh()} disabled={busy}>刷新状态</Button><Button variant="primary" className="primary" onClick={() => setDraft(blank())}>＋ 自定义连接器</Button></div></div>
+    {recommended.length ? <section className="recommend-section" aria-label="推荐连接器"><div className="list-meta"><strong>推荐连接器 <span className="count">{recommended.length}</span></strong><span className="muted">来自 MCP 市场目录，点击 ＋ 添加后保存并连接</span></div>
+      <div className="connector-grid recommend-grid">{recommended.map(entry => <article className="connector-card" key={entry.name}>
+        <div className="card-top"><button className="card-open" aria-label={`添加连接器 ${entry.name}`} onClick={() => addRecommended(entry)}><span className="connector-mark" aria-hidden>{entry.name.charAt(0).toUpperCase()}</span><span className="card-title"><strong>{entry.name}</strong><small>{entry.transport} · {entry.category}</small></span></button><Button className="recommend-add" aria-label={`添加 ${entry.name}`} onClick={() => addRecommended(entry)}>＋</Button></div>
+        <p className="recommend-desc">{entry.description}</p>
+      </article>)}</div>
+    </section> : null}
+    <div className="list-meta"><strong>我的连接器 <span className="count">{rows.length}</span></strong><span className="muted">{rows.filter(row => row.enabled && row.state === 'ready').length} 已连接</span></div>
     {error ? <p className="error" role="alert">{error}</p> : null}
     {!busy && !filtered.length ? <div className="empty">{rows.length ? '没有匹配的 MCP 服务。' : '尚未配置 MCP 服务，点击“添加 MCP”创建第一个连接。'}</div> : null}
     {filtered.length ? <div className="connector-grid">{filtered.map(row => <article key={row.id} className={`connector-card ${!row.enabled ? 'disabled' : ''}`}>

@@ -67,6 +67,8 @@ export function SkillsPanel({ toggleNavigation, management, startSkillTask, star
   const [confirmBatchUninstall, setConfirmBatchUninstall] = useState(false);
   const [view, setView] = useState<'market' | 'installed'>('market');
   const [marketSource, setMarketSource] = useState<'local' | 'skillhub'>('local');
+  const [marketSort, setMarketSort] = useState<'mix' | 'new'>('mix');
+  const [featuredOffset, setFeaturedOffset] = useState(0);
   const [installedQuery, setInstalledQuery] = useState('');
   const search = useRef<HTMLInputElement>(null);
   const addMenu = useRef<HTMLDivElement>(null);
@@ -214,9 +216,15 @@ export function SkillsPanel({ toggleNavigation, management, startSkillTask, star
   const categories = [...new Set([...matchingEntries, ...matchingSkills].flatMap(item => item.categories ?? []))].sort((a, b) => a.localeCompare(b, 'zh-CN'));
   const selectedCategory = categories.includes(category) ? category : ALL;
   const inCategory = (values?: readonly string[]) => selectedCategory === ALL || Boolean(values?.includes(selectedCategory));
-  const available = matchingEntries.filter(entry => inCategory(entry.categories));
-  const filtered = matchingSkills.filter(skill => inCategory(skill.categories));
-  const installedFiltered = skills.filter(skill => `${skill.name} ${skill.title ?? ''} ${skill.localizedDescription ?? skill.description} ${skill.whenToUse ?? ''}`.toLowerCase().includes(installedQuery.trim().toLowerCase()));
+  const byMarketSort = <T extends { name: string; title?: string; version?: string }>(rows: readonly T[]): readonly T[] => {
+    if (marketSort === 'mix') return rows;
+    return [...rows].sort((left, right) => (right.version ?? '').localeCompare(left.version ?? '', undefined, { numeric: true }) || (left.title ?? left.name).localeCompare(right.title ?? right.name, 'zh-CN'));
+  };
+  const available = byMarketSort(matchingEntries.filter(entry => inCategory(entry.categories)));
+  const filtered = byMarketSort(matchingSkills.filter(skill => inCategory(skill.categories)));
+  const installedFiltered = byMarketSort(skills.filter(skill => `${skill.name} ${skill.title ?? ''} ${skill.localizedDescription ?? skill.description} ${skill.whenToUse ?? ''}`.toLowerCase().includes(installedQuery.trim().toLowerCase())));
+  const featuredPool = matchingEntries.filter(entry => inCategory(entry.categories) && entry.installable);
+  const featured = featuredPool.length ? Array.from({ length: Math.min(4, featuredPool.length) }, (_, index) => featuredPool[(featuredOffset + index) % featuredPool.length]!) : [];
   const capabilityTabs = [['experts', '专家'], ['skills', '技能'], ['connectors', '连接器']] as const;
   const capabilityKey: Record<string, string> = { experts: 'workdsh-experts', skills: 'workdsh-skills', connectors: 'workdsh-connectors' };
   const countsLine = <div role="status" aria-live="polite" className={error ? 'error counts' : notice ? 'notice counts' : 'muted counts'}>{busy ? '正在读取…' : error || notice || `共 ${skills.length} 个已安装技能 · 当前显示 ${view === 'installed' ? installedFiltered.length : filtered.length} 个`}</div>;
@@ -225,7 +233,13 @@ export function SkillsPanel({ toggleNavigation, management, startSkillTask, star
     <div className="card-top">{batchMode && skill.manageable ? <button className="batch-check" role="checkbox" aria-checked={selectedNames.includes(skill.name)} aria-label={`选择技能 ${skill.name}`} onClick={() => toggleBatchSelection(skill.name)}>{selectedNames.includes(skill.name) ? '✓' : ''}</button> : null}<button className="card-open" aria-label={`查看技能 ${skill.name}`} onClick={() => batchMode && skill.manageable ? toggleBatchSelection(skill.name) : void openDetail(skill.name)}><SkillMark name={skill.name} title={skill.title} iconUrl={skill.iconUrl} /><span className="card-title"><strong title={skill.name}>{skill.title ?? skill.name}</strong>{skill.title && skill.title !== skill.name ? <small className="slug">{skill.name}</small> : null}</span></button>
       {!batchMode && skill.manageable && <div className="card-actions"><Button variant="ghost" size="sm" className="more-button" aria-label={`管理技能 ${skill.name}`} aria-haspopup="menu" aria-expanded={actionMenu === skill.name} onClick={() => setActionMenu(current => current === skill.name ? undefined : skill.name)}>•••</Button>{actionMenu === skill.name && <div className="card-menu" role="menu"><button role="menuitem" disabled={skill.state !== 'enabled'} onClick={() => void trial(skill.name)}>去试试</button><button role="menuitem" onClick={() => void openDetail(skill.name)}>编辑</button><button role="menuitem" onClick={() => void openDirectory(skill)}>打开文件夹</button><button className="danger" role="menuitem" onClick={() => void prepareUninstall(skill)}>卸载</button></div>}</div>}
       {!batchMode && <button className="switch" role="switch" disabled={!skill.manageable || skill.state === 'invalid'} aria-checked={skill.state === 'enabled'} aria-label={`${skill.state === 'enabled' ? '停用' : '启用'}技能 ${skill.name}`} onClick={() => void setEnabled(skill, skill.state !== 'enabled')} />}
-    </div><p className="muted">{skill.localizedDescription ?? skill.description}</p>{skill.state === 'invalid' && <small className="diagnostic">需要修复 · {skill.diagnostics?.[0]?.message}</small>}
+      </div><p className="muted">{skill.localizedDescription ?? skill.description}</p>{skill.categories?.length ? <div className="domain-tags">{skill.categories.slice(0, 3).map(label => <span key={label}>{label}</span>)}</div> : null}{skill.state === 'invalid' && <small className="diagnostic">需要修复 · {skill.diagnostics?.[0]?.message}</small>}
+  </article>;
+  const renderMarketCard = (entry: SkillCatalogEntry) => <article className="card market-card" key={entry.name}>
+    <div className="card-top"><button className="card-open" aria-label={`查看技能 ${entry.name}`} onClick={() => { setError(''); setPreview(entry); }}><SkillMark name={entry.name} title={entry.title} iconUrl={entry.iconUrl} /><span className="card-title"><strong title={entry.name}>{entry.title}</strong>{entry.categories.length ? <small>{entry.categories.slice(0, 2).join(' · ')}</small> : null}</span></button>
+      <Button className="install" disabled={!entry.installable || Boolean(installBusy)} aria-label={`安装技能 ${entry.title}`} title={entry.installable ? `安装 ${entry.title}` : `暂不可安装：${entry.installLimits?.join('；') ?? '超出安装限制'}`} onClick={() => void install(entry)}>{installBusy === entry.name ? '…' : '＋'}</Button>
+    </div><p className="muted">{entry.description}</p>
+    <div className="domain-tags">{entry.categories.slice(0, 3).map(label => <span key={label}>{label}</span>)}</div>
   </article>;
   return <section ref={panel} className="wd-skills" data-testid="workdsh-skills">
     <style>{skillsCss + skillsActionsCss + skillsMarketCss}</style>
@@ -262,19 +276,21 @@ export function SkillsPanel({ toggleNavigation, management, startSkillTask, star
       <Button className="trash-button" onClick={() => void openTrash()}>最近卸载</Button>
       <div className="add-menu-wrap" ref={addMenu}><Button variant="primary" className="add-skill" disabled={creating} aria-haspopup="menu" aria-expanded={addMenuOpen} onClick={() => setAddMenuOpen(open => !open)}>＋ 添加技能</Button>{addMenuOpen && <div className="add-menu" role="menu"><button role="menuitem" onClick={() => { setAddMenuOpen(false); search.current?.focus(); }}>查找技能</button><button role="menuitem" onClick={() => { setAddMenuOpen(false); setImportOpen(true); }}>上传技能</button><button role="menuitem" onClick={() => void beginSkillTask('create')}>创建技能</button></div>}</div>
     </header>
-    <div className="section-head"><h1>技能市场</h1><Button className="refresh" onClick={() => void refresh()} disabled={busy}>刷新</Button></div>
-    <nav className="skill-source-tabs" aria-label="技能来源"><button className={marketSource === 'local' ? 'active' : ''} aria-current={marketSource === 'local' ? 'page' : undefined} onClick={() => setMarketSource('local')}>本地技能</button><button className={marketSource === 'skillhub' ? 'active' : ''} aria-current={marketSource === 'skillhub' ? 'page' : undefined} onClick={() => setMarketSource('skillhub')}>SkillHub</button></nav>
+    <div className="section-head"><h1>技能市场</h1><div className="market-tools"><span className="sort-group" aria-label="技能排序"><button className={marketSort === 'mix' ? 'active' : ''} aria-pressed={marketSort === 'mix'} onClick={() => setMarketSort('mix')}>综合</button><button className={marketSort === 'new' ? 'active' : ''} aria-pressed={marketSort === 'new'} onClick={() => setMarketSort('new')}>最新</button></span><Button className="refresh" onClick={() => void refresh()} disabled={busy}>刷新</Button></div></div>
+    <nav className="skill-source-tabs" aria-label="技能来源"><button className={marketSource === 'local' ? 'active' : ''} aria-current={marketSource === 'local' ? 'page' : undefined} onClick={() => setMarketSource('local')}>推荐</button><button className={marketSource === 'skillhub' ? 'active' : ''} aria-current={marketSource === 'skillhub' ? 'page' : undefined} onClick={() => setMarketSource('skillhub')}>SkillHub</button></nav>
     {marketSource === 'skillhub' ? <SkillHubPanel query={query} onInstalled={refresh} onOpenInstalled={openInstalled} /> : <>
+    {(featured.length > 0 || skills.length > 0) && <section className="market-section featured-section" aria-label="精选技能"><div className="market-head"><h2>精选技能</h2><span className="muted">{featured.length ? '来自本地技能目录，点击 ＋ 直接安装' : '本机已安装技能'}</span>{featuredPool.length > 4 && <Button className="featured-refresh" onClick={() => setFeaturedOffset(value => (value + 4) % featuredPool.length)}>换一批</Button>}</div><div className="grid featured-grid">{featured.length ? featured.map(renderMarketCard) : skills.slice(0, 4).map(skill => <article className="card market-card" key={`featured-${skill.name}`}>
+      <div className="card-top"><button className="card-open" aria-label={`查看技能 ${skill.name}`} onClick={() => void openDetail(skill.name)}><SkillMark name={skill.name} title={skill.title} iconUrl={skill.iconUrl} /><span className="card-title"><strong title={skill.name}>{skill.title ?? skill.name}</strong>{skill.categories?.length ? <small>{skill.categories.slice(0, 2).join(' · ')}</small> : null}</span></button>
+        <Button className="install is-status is-installed" disabled aria-label={`已安装 ${skill.name}`}>已安装</Button>
+      </div><p className="muted">{skill.localizedDescription ?? skill.description}</p>
+      {skill.categories?.length ? <div className="domain-tags">{skill.categories.slice(0, 3).map(label => <span key={label}>{label}</span>)}</div> : null}
+    </article>)}</div></section>}
     <nav className="category-tabs" aria-label="技能分类"><button className={selectedCategory === ALL ? 'active' : ''} aria-current={selectedCategory === ALL ? 'page' : undefined} onClick={() => setCategory(ALL)}>全部</button>{categories.map(label => <button key={label} className={selectedCategory === label ? 'active' : ''} aria-current={selectedCategory === label ? 'page' : undefined} onClick={() => setCategory(current => current === label ? ALL : label)}>{label}</button>)}</nav>
     {catalog?.status === 'invalid' && <p className="catalog-note" role="note">技能目录暂时不可用，已安装的技能仍可使用。</p>}
     {batchMode && batchBar}
     {countsLine}
     {!busy && available.length ? <section className="market-section" aria-label="可安装技能"><div className="market-head"><h2>可安装 <span className="market-count">{available.length}</span></h2><span className="muted">来自本地技能目录，点击 ＋ 直接安装</span></div>
-      <div className="grid">{available.map(entry => <article className="card market-card" key={entry.name}>
-        <div className="card-top"><button className="card-open" aria-label={`查看技能 ${entry.name}`} onClick={() => { setError(''); setPreview(entry); }}><SkillMark name={entry.name} title={entry.title} iconUrl={entry.iconUrl} /><span className="card-title"><strong title={entry.name}>{entry.title}</strong>{entry.categories.length ? <small>{entry.categories.slice(0, 2).join(' · ')}</small> : null}</span></button>
-          <Button className="install" disabled={!entry.installable || Boolean(installBusy)} aria-label={`安装技能 ${entry.title}`} title={entry.installable ? `安装 ${entry.title}` : `暂不可安装：${entry.installLimits?.join('；') ?? '超出安装限制'}`} onClick={() => void install(entry)}>{installBusy === entry.name ? '…' : '＋'}</Button>
-        </div><p className="muted">{entry.description}</p>
-      </article>)}</div>
+      <div className="grid">{available.map(renderMarketCard)}</div>
     </section> : null}
     {!busy && !filtered.length ? <div className="empty"><strong>{skills.length ? '没有匹配的技能' : '尚未发现已安装技能'}</strong><span className="muted">可用上方「＋ 添加技能」上传，或从下方目录安装。</span></div> : null}
     {filtered.length ? <section className="market-section" aria-label="已安装技能">{available.length ? <div className="market-head"><h2>已安装 <span className="market-count">{filtered.length}</span></h2></div> : null}
