@@ -1,6 +1,6 @@
 {
   "name": "workdsh-plugin-connectors",
-  "version": "0.1.0-alpha.9",
+  "version": "0.1.0-alpha.10",
   "private": false,
   "type": "module",
   "description": "Manages MCP connectors and per-conversation tool selection.",

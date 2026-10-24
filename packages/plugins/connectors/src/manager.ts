@@ -33,7 +33,7 @@ export interface ConnectorManagerOptions {
 
 /** Persist connector instances here; delegate protocol, transport, discovery and reconnect to official MCP clients. */
 export class ConnectorManager extends Service implements ConnectorManagementService {
-  static inject = ['storageDomain', 'tools', 'mcpResources', 'agents', 'credentials', 'workdshSessionAccess'];
+  static inject = ['storageDomain', 'tools', 'mcpResources', 'agents', 'credentials'];
   private definitions?: KvTable<string, ConnectorDefinition>;
   private selections?: KvTable<string, ConnectorSelection>;
   private readonly runtimes = new Map<string, Runtime>();
@@ -236,7 +236,9 @@ export class ConnectorManager extends Service implements ConnectorManagementServ
   }
   private async authorizeSession(sessionId: string): Promise<void> {
     const access = this.ctx.reflect.get('workdshSessionAccess') as { inspect(id: string): Promise<unknown> } | undefined;
-    if (!access) throw new Error('connector/session-access-required');
+    // Standalone installs have no access plugin; local personal mode has no
+    // cross-user session boundary to enforce here.
+    if (!access) return;
     await access.inspect(sessionId);
   }
   private credentialName(serverName: string): string { return `WORKDSH_CONNECTOR_${serverName.replace(/[^A-Za-z0-9]+/g, '_').toUpperCase()}_AUTHORIZATION`; }

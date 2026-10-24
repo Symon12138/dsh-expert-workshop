@@ -12,7 +12,7 @@ export * from './shared.js';
 export * from './connection-api.js';
 export * from './manager.js';
 export const name = 'workdsh-plugin-connectors';
-export const inject = ['connection', 'tools', 'mcpResources', 'storageDomain', 'agents', 'credentials', 'workdshSessionAccess'];
+export const inject = ['connection', 'tools', 'mcpResources', 'storageDomain', 'agents', 'credentials'];
 
 export async function apply(ctx: Context, options: ConnectorManagerOptions = {}): Promise<void> {
   await ctx.plugin(ConnectorManager, options);
