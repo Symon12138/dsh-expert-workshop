@@ -1,7 +1,8 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { copyFile, lstat, mkdir, open, readFile, readdir, realpath, rename, rm, stat, unlink, writeFile } from 'node:fs/promises';
+import { copyFile, cp, lstat, mkdir, open, readFile, readdir, realpath, rename, rm, stat, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { basename, dirname, extname, join, relative, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Context, Service } from '@deepseek-ai/cordis';
 import { isSkillName, type SkillDefinition, type SkillSummary } from '@deepseek-ai/dsh-skill';
 import { parse } from 'yaml';
@@ -169,6 +170,7 @@ export class SkillManager extends Service implements SkillManagementService {
   private readonly dependencyInspectors = new Set<SkillDependencyInspector>();
   private readonly displayContributions = new Map<string, ReadonlyMap<string, SkillDisplayMetadata>>();
   readonly imports: SkillImportStaging;
+  private bundledSeeded = false;
 
   constructor(ctx: Context, options: SkillManagerOptions = {}) {
     super(ctx, 'workdshSkills');
@@ -192,8 +194,28 @@ export class SkillManager extends Service implements SkillManagementService {
     );
   }
 
+  /** One-click installs ship the expert skill packs; copy missing ones into the writable root. */
+  private async seedBundledSkills(): Promise<void> {
+    if (this.bundledSeeded) return;
+    this.bundledSeeded = true;
+    const root = fileURLToPath(new URL('../../resources/seed-skills/', import.meta.url));
+    try {
+      const targetRoot = this.activeRoots[0];
+      await mkdir(targetRoot, { recursive: true });
+      for (const entry of await readdir(root, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const target = join(targetRoot, entry.name);
+        try { await lstat(target); continue; } catch { /* absent */ }
+        await cp(join(root, entry.name), target, { recursive: true });
+      }
+    } catch (error) {
+      console.warn('[skills] bundled skills not seeded', error);
+    }
+  }
+
   async list(signal?: AbortSignal): Promise<readonly ManagedSkillSummary[]> {
     signal?.throwIfAborted();
+    await this.seedBundledSkills();
     const skills = await this.ctx.skills.list({ signal });
     const rows: ManagedSkillSummary[] = [];
     const registeredFiles = new Set<string>();

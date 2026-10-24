@@ -1,7 +1,8 @@
 import { definitionFromDocuments, parseExpertDocument } from '../authoring/documents.js';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import type { ConnectorManagementService } from 'workdsh-contracts';
 import { Context, Service } from '@deepseek-ai/cordis';
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain';
@@ -240,6 +241,30 @@ export class ExpertsManager extends Service implements ExpertsService {
     return compileExpertPreset(this.ctx, { ...input, ...(this.includeDefaultSkillRoots === false ? { includeDefaultSkillRoots: false } : {}) }, this.agentsHome);
   }
 
+  /** One-click installs ship the WorkBuddy catalog; seed it before the first read. */
+  private async seedBundledCatalog(): Promise<void> {
+    if (this.expertsTable().size > 0) return;
+    const root = fileURLToPath(new URL('../../resources/seed/', import.meta.url));
+    try {
+      const seed = JSON.parse(await readFile(join(root, 'catalog.json'), 'utf8')) as {
+        experts?: readonly { id: string }[];
+        drafts?: readonly { expertId: string }[];
+        revisions?: readonly { expertId: string; revisionId: string }[];
+        bindings?: readonly { sessionId: string }[];
+        preferences?: readonly { principalId: string; expertId: string }[];
+      };
+      for (const record of seed.experts ?? []) await this.expertsTable().put(keys.expert(record.id), record as never);
+      for (const record of seed.drafts ?? []) await this.draftsTable().put(keys.draft(record.expertId), record as never);
+      for (const record of seed.revisions ?? []) await this.revisionsTable().put(keys.revision(record.expertId, record.revisionId), record as never);
+      for (const record of seed.bindings ?? []) await this.bindingsTable().put(keys.binding(record.sessionId), record as never);
+      for (const record of seed.preferences ?? []) await this.preferencesTable().put(keys.preference(record.principalId, record.expertId), record as never);
+      await cp(join(root, 'presets'), join(this.agentsHome, '.workdsh-state', 'experts', 'presets'), { recursive: true, force: false, errorOnExist: false });
+      console.log('[experts] bundled catalog seeded', seed.experts?.length ?? 0);
+    } catch (error) {
+      console.warn('[experts] bundled catalog not seeded', error);
+    }
+  }
+
   async [Service.init](): Promise<void> {
     this.ctx.inject(['workdshConnectors'], (ctx) => {
       const service = ctx.workdshConnectors;
@@ -256,6 +281,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     this.bindings = domain.table('bindings');
     this.preferences = domain.table('preferences');
     this.operations = domain.table('operations');
+    await this.seedBundledCatalog();
     const activePresets = new Map<string, string>();
     for (const [, binding] of this.bindings.entries()) {
       activePresets.set(binding.presetRevisionRef, binding.compositionDigest);
