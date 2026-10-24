@@ -215,4 +215,39 @@ export function registerSkillManagementConnection(ctx: Context): void {
       }
     }),
   }));
+  unregister.push(connection.fetch.register({
+    // Same-origin bridge for SkillHub's public catalog and download endpoints:
+    // api.skillhub.cn sends no CORS headers, so the browser cannot call it directly.
+    path: '/api/workdsh-skills/skillhub',
+    methods: ['GET'],
+    requestBody: 'buffered',
+    fetch: handle(async request => {
+      const url = new URL(request.url);
+      const kind = url.searchParams.get('kind');
+      try {
+        if (kind === 'showcase') {
+          const section = url.searchParams.get('section');
+          if (!section || !['hot', 'trending', 'featured', 'recommended'].includes(section)) return new Response('未知的 SkillHub 榜单。', { status: 400 });
+          const upstream = await fetch(`https://api.skillhub.cn/api/v1/showcase/${section}`, { headers: { accept: 'application/json' }, signal: AbortSignal.any([request.signal, AbortSignal.timeout(20_000)]) });
+          if (!upstream.ok) return new Response('SkillHub 榜单暂不可用。', { status: 502 });
+          return new Response(await upstream.text(), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (kind === 'download') {
+          const slug = url.searchParams.get('slug');
+          if (!slug) return new Response('缺少技能标识。', { status: 400 });
+          const query = new URLSearchParams({ slug });
+          for (const key of ['version', 'namespace']) {
+            const value = url.searchParams.get(key);
+            if (value) query.set(key, value);
+          }
+          const upstream = await fetch(`https://api.skillhub.cn/api/v1/download?${query.toString()}`, { headers: { accept: 'application/zip' }, signal: AbortSignal.any([request.signal, AbortSignal.timeout(60_000)]) });
+          if (!upstream.ok) return new Response('该技能暂不提供下载。', { status: upstream.status === 404 ? 404 : 502 });
+          const bytes = new Uint8Array(await upstream.arrayBuffer());
+          if (bytes.byteLength > maximumUploadBytes) return new Response('技能包过大。', { status: 413 });
+          return new Response(bytes, { status: 200, headers: { 'content-type': 'application/zip', 'content-length': String(bytes.byteLength) } });
+        }
+        return new Response('未知的 SkillHub 请求。', { status: 400 });
+      } catch { return new Response('SkillHub 请求失败。', { status: 502 }); }
+    }),
+  }));
 }

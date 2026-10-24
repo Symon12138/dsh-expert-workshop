@@ -8,6 +8,7 @@ import type { SkillTaskKind } from './drafts.js';
 import type { SkillManagementClient } from './management.js';
 import { ImportSkillModal } from './ImportSkillModal.js';
 import { SkillReposPanel } from './SkillReposPanel.js';
+import { SkillHubPanel } from './SkillHubPanel.js';
 import { skillsActionsCss, skillsCss, skillsMarketCss } from './styles.js';
 
 type SkillsPanelInjected = {
@@ -66,7 +67,7 @@ export function SkillsPanel({ toggleNavigation, management, startSkillTask, star
   const [selectedNames, setSelectedNames] = useState<readonly string[]>([]);
   const [confirmBatchUninstall, setConfirmBatchUninstall] = useState(false);
   const [view, setView] = useState<'market' | 'installed'>('market');
-  const [marketSource, setMarketSource] = useState<'local' | 'skillhub'>('local');
+  const [marketSource, setMarketSource] = useState<'local' | 'skillhub' | 'repos'>('local');
   const [marketSort, setMarketSort] = useState<'mix' | 'new'>('mix');
   const [featuredOffset, setFeaturedOffset] = useState(0);
   const [installedQuery, setInstalledQuery] = useState('');
@@ -279,8 +280,8 @@ export function SkillsPanel({ toggleNavigation, management, startSkillTask, star
       <div className="add-menu-wrap" ref={addMenu}><Button variant="primary" className="add-skill" disabled={creating} aria-haspopup="menu" aria-expanded={addMenuOpen} onClick={() => setAddMenuOpen(open => !open)}>＋ 添加技能</Button>{addMenuOpen && <div className="add-menu" role="menu"><button role="menuitem" onClick={() => { setAddMenuOpen(false); search.current?.focus(); }}>查找技能</button><button role="menuitem" onClick={() => { setAddMenuOpen(false); setImportOpen(true); }}>上传技能</button><button role="menuitem" onClick={() => void beginSkillTask('create')}>创建技能</button></div>}</div>
     </header>
     <div className="section-head"><h1>技能市场</h1><div className="market-tools"><span className="sort-group" aria-label="技能排序"><button className={marketSort === 'mix' ? 'active' : ''} aria-pressed={marketSort === 'mix'} onClick={() => setMarketSort('mix')}>综合</button><button className={marketSort === 'new' ? 'active' : ''} aria-pressed={marketSort === 'new'} onClick={() => setMarketSort('new')}>最新</button></span><Button className="refresh" onClick={() => void refresh()} disabled={busy}>刷新</Button></div></div>
-    <nav className="skill-source-tabs" aria-label="技能来源"><button className={marketSource === 'local' ? 'active' : ''} aria-current={marketSource === 'local' ? 'page' : undefined} onClick={() => setMarketSource('local')}>推荐</button><button className={marketSource === 'skillhub' ? 'active' : ''} aria-current={marketSource === 'skillhub' ? 'page' : undefined} onClick={() => setMarketSource('skillhub')}>技能市场</button></nav>
-    {marketSource === 'skillhub' ? <SkillReposPanel query={query} onInstalled={refresh} onOpenInstalled={openInstalled} /> : <>
+    <nav className="skill-source-tabs" aria-label="技能来源"><button className={marketSource === 'local' ? 'active' : ''} aria-current={marketSource === 'local' ? 'page' : undefined} onClick={() => setMarketSource('local')}>推荐</button><button className={marketSource === 'skillhub' ? 'active' : ''} aria-current={marketSource === 'skillhub' ? 'page' : undefined} onClick={() => setMarketSource('skillhub')}>SkillHub</button><button className={marketSource === 'repos' ? 'active' : ''} aria-current={marketSource === 'repos' ? 'page' : undefined} onClick={() => setMarketSource('repos')}>GitHub 仓库</button></nav>
+    {marketSource === 'skillhub' ? <SkillHubPanel query={query} management={management} onInstalled={refresh} onOpenInstalled={openInstalled} /> : marketSource === 'repos' ? <SkillReposPanel query={query} onInstalled={refresh} onOpenInstalled={openInstalled} /> : <>
     {(featured.length > 0 || skills.length > 0) && <section className="market-section featured-section" aria-label="精选技能"><div className="market-head"><h2>精选技能</h2><span className="muted">{featured.length ? '来自本地技能目录，点击 ＋ 直接安装' : '本机已安装技能'}</span>{featuredPool.length > 4 && <Button className="featured-refresh" onClick={() => setFeaturedOffset(value => (value + 4) % featuredPool.length)}>换一批</Button>}</div><div className="grid featured-grid">{featured.length ? featured.map(renderMarketCard) : skills.slice(0, 4).map(skill => <article className="card market-card" key={`featured-${skill.name}`}>
       <div className="card-top"><button className="card-open" aria-label={`查看技能 ${skill.name}`} onClick={() => void openDetail(skill.name)}><SkillMark name={skill.name} title={skill.title} iconUrl={skill.iconUrl} /><span className="card-title"><strong title={skill.name}>{skill.title ?? skill.name}</strong>{skill.categories?.length ? <small>{skill.categories.slice(0, 2).join(' · ')}</small> : null}</span></button>
         <Button className="install is-status is-installed" disabled aria-label={`已安装 ${skill.name}`}>已安装</Button>

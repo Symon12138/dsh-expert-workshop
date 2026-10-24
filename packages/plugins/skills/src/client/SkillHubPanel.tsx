@@ -1,88 +1,117 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
 import { Button } from 'workdsh-ui';
+import { useEffect, useMemo, useState } from 'react';
+import type { SkillManagementClient } from './management.js';
 
-type SkillHubCard = {
+type HubSkill = {
   slug: string;
   name: string;
   description: string;
-  categoryLabel?: string;
-  version?: string;
-  owner?: string;
+  description_zh?: string;
+  category: string;
   iconUrl?: string;
-  pageUrl?: string;
-  installed?: boolean;
+  version?: string;
+  downloads?: number;
+  stars?: number;
+  subCategories?: readonly { key: string; name: string }[];
+  namespace?: { handle?: string; canonicalName?: string };
 };
+type Showcase = { section: string; skills?: HubSkill[] };
 
-type SearchResponse = { ok: boolean; items?: SkillHubCard[]; total?: number; error?: string };
-const PAGE_SIZE = 24;
+const SECTIONS = [
+  { key: 'hot', label: '热门' },
+  { key: 'trending', label: '趋势' },
+  { key: 'featured', label: '精选' },
+  { key: 'recommended', label: '推荐' },
+] as const;
 
-function SkillHubIcon({ card }: { card: SkillHubCard }) {
-  const iconUrl = card.iconUrl && /^https:\/\//i.test(card.iconUrl) ? card.iconUrl : undefined;
-  return <span className="skillhub-icon" aria-hidden="true">{card.name.slice(0, 1).toUpperCase()}{iconUrl && <img src={iconUrl} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={event => { event.currentTarget.hidden = true; }} />}</span>;
+const PAGE_SIZE = 60;
+
+async function proxy<T>(params: Record<string, string>): Promise<T> {
+  const response = await fetch(`/api/workdsh-skills/skillhub?${new URLSearchParams(params)}`, { credentials: 'same-origin' });
+  if (!response.ok) throw new Error(`SkillHub 请求失败（${response.status}）。`);
+  return await response.json() as T;
 }
 
-async function skillHub<T extends { ok: boolean; error?: string }>(method: string, payload: Record<string, unknown>, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(new URL('./skillhub', document.baseURI), {
-    method: 'POST', credentials: 'same-origin',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ method, ...payload }), signal,
-  });
-  const result = await response.json() as T;
-  if (!response.ok || !result.ok) throw new Error(result.error || `SkillHub 请求失败 (${response.status})`);
-  return result;
+function formatCount(value?: number): string {
+  if (!value) return '0';
+  if (value >= 10000) return `${(value / 10000).toFixed(1)}万`;
+  return String(value);
 }
 
-/** Reuse the installed DSH plugin's search and verified installation path. */
-export function SkillHubPanel({ query, onInstalled, onOpenInstalled }: { query: string; onInstalled: () => Promise<void>; onOpenInstalled: () => void }) {
-  const [cards, setCards] = useState<SkillHubCard[]>([]);
-  const [total, setTotal] = useState(0);
+export function SkillHubPanel({ query, management, onInstalled, onOpenInstalled }: { query: string; management: SkillManagementClient; onInstalled: () => Promise<void>; onOpenInstalled: () => void }) {
+  const [items, setItems] = useState<readonly (HubSkill & { section: string })[]>([]);
+  const [section, setSection] = useState('全部');
+  const [limit, setLimit] = useState(PAGE_SIZE);
   const [busy, setBusy] = useState(true);
-  const [error, setError] = useState('');
   const [installing, setInstalling] = useState('');
-  const [installedName, setInstalledName] = useState('');
-  const [page, setPage] = useState(0);
-
-  useEffect(() => { setPage(0); }, [query]);
+  const [installed, setInstalled] = useState<readonly string[]>([]);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const controller = new AbortController();
-    const timer = window.setTimeout(() => {
-      setBusy(true); setError('');
-      void skillHub<SearchResponse>('search', { query: query.trim(), limit: PAGE_SIZE, offset: page * PAGE_SIZE }, controller.signal)
-        .then(result => { setCards([...new Map((result.items ?? []).map(item => [item.slug, item])).values()]); setTotal(result.total ?? 0); })
-        .catch(cause => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : 'SkillHub 暂不可用'); })
-        .finally(() => { if (!controller.signal.aborted) setBusy(false); });
-    }, 250);
-    return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [query, page]);
+    setBusy(true); setError('');
+    void (async () => {
+      const results = await Promise.all(SECTIONS.map(async ({ key }) => {
+        const response = await fetch(`/api/workdsh-skills/skillhub?kind=showcase&section=${key}`, { credentials: 'same-origin', signal: controller.signal });
+        if (!response.ok) throw new Error(`SkillHub ${key} 榜单不可用（${response.status}）。`);
+        return { key, data: await response.json() as Showcase };
+      }));
+      if (controller.signal.aborted) return;
+      const bySlug = new Map<string, HubSkill & { section: string }>();
+      for (const { key, data } of results) {
+        for (const skill of data.skills ?? []) {
+          if (!bySlug.has(skill.slug)) bySlug.set(skill.slug, { ...skill, section: key });
+        }
+      }
+      setItems([...bySlug.values()]);
+    })().catch(cause => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : '读取 SkillHub 失败。'); })
+      .finally(() => { if (!controller.signal.aborted) setBusy(false); });
+    return () => controller.abort();
+  }, []);
 
-  const install = async (card: SkillHubCard) => {
-    setInstalling(card.slug); setError('');
+  const normalized = query.trim().toLowerCase();
+  useEffect(() => { setLimit(PAGE_SIZE); }, [section, normalized]);
+  const filtered = useMemo(() => items.filter(item => (section === '全部' || item.section === section)
+    && (!normalized || `${item.name} ${item.slug} ${item.description_zh ?? item.description} ${item.category}`.toLowerCase().includes(normalized))), [items, section, normalized]);
+  const visible = filtered.slice(0, limit);
+  const sectionCounts = useMemo(() => {
+    const counts: Record<string, number> = { 全部: items.length };
+    for (const item of items) counts[item.section] = (counts[item.section] ?? 0) + 1;
+    return counts;
+  }, [items]);
+
+  const install = async (item: HubSkill) => {
+    setInstalling(item.slug); setError(''); setMessage('');
     try {
-      await skillHub('install', { slug: card.slug });
-      setCards(current => current.map(item => item.slug === card.slug ? { ...item, installed: true } : item));
-      setInstalledName(card.name);
-      void onInstalled();
-    } catch (cause) { setError(cause instanceof Error ? cause.message : '安装失败，请重试。'); }
+      const params = new URLSearchParams({ kind: 'download', slug: item.slug });
+      if (item.version) params.set('version', item.version);
+      if (item.namespace?.handle) params.set('namespace', item.namespace.handle);
+      const response = await fetch(`/api/workdsh-skills/skillhub?${params}`, { credentials: 'same-origin' });
+      if (!response.ok) throw new Error(response.status === 404 ? '该技能暂不提供下载（可能是企业专有技能）。' : `下载失败（${response.status}）。`);
+      const blob = await response.blob();
+      const file = new File([blob], `${item.slug}.zip`, { type: 'application/zip' });
+      const staged = await management.stageImport(file);
+      await management.commitImport(staged.id, 'shared-agents');
+      setInstalled(current => [...new Set([...current, item.slug])]);
+      setMessage(`已安装「${item.name ?? item.slug}」。`);
+      await onInstalled();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : '安装 SkillHub 技能失败。'); }
     finally { setInstalling(''); }
   };
 
-  const pageCount = Math.ceil(total / PAGE_SIZE);
-  const firstPage = Math.max(0, Math.min(page - 2, pageCount - 5));
-  const pageNumbers = Array.from({ length: Math.min(5, pageCount) }, (_, index) => firstPage + index);
-
   return <section className="skillhub-market" aria-label="SkillHub 技能目录">
-    <div className="market-head"><h2>SkillHub <span className="market-count">{total}</span></h2><span className="muted">来源：SkillHub · 安装到本机 DSH 技能目录</span></div>
-    {installedName && <div className="skillhub-success" role="status"><span>已安装「{installedName}」。</span><Button onClick={onOpenInstalled}>查看已安装</Button><button className="skillhub-dismiss" aria-label="关闭安装提示" onClick={() => setInstalledName('')}>×</button></div>}
+    <div className="market-head"><h2>SkillHub <span className="market-count">{items.length}</span></h2><span className="muted">来自 skillhub.cn 公开榜单，安装到本机 DSH 技能目录</span></div>
+    {message && <div className="skillhub-success" role="status"><span>{message}</span><Button onClick={onOpenInstalled}>查看已安装</Button><button className="skillhub-dismiss" aria-label="关闭安装提示" onClick={() => setMessage('')}>×</button></div>}
     {error && <p className="catalog-note" role="alert">{error}</p>}
-    {busy ? <p className="muted" role="status">正在读取 SkillHub…</p> : cards.length ? <div className="grid">{cards.map(card =>
-      <article className="card market-card" key={card.slug}>
-        <div className="card-top"><a className="card-open" href={card.pageUrl?.startsWith('https://skillhub.cn/skills/') ? card.pageUrl : `https://skillhub.cn/skills/${encodeURIComponent(card.slug)}`} target="_blank" rel="noopener noreferrer" aria-label={`查看 ${card.name} 的来源页`}><SkillHubIcon card={card} /><span className="card-title"><strong title={card.name}>{card.name}</strong><small>{card.categoryLabel || card.owner || card.slug}</small></span></a>
-          <Button className={`install${card.installed || installing === card.slug ? ' is-status' : ''}${card.installed ? ' is-installed' : ''}`} disabled={card.installed || Boolean(installing)} aria-label={card.installed ? `已安装 ${card.name}` : `安装 ${card.name}`} onClick={() => void install(card)}>{card.installed ? '已安装' : installing === card.slug ? '安装中…' : '＋'}</Button></div>
-        <p className="muted">{card.description}</p>
-        <small className="skillhub-meta">版本 {card.version || '未标注'} · 许可证请查看来源页</small>
-      </article>)}</div> : !error && <p className="muted">没有找到匹配的技能。</p>}
-    {!busy && pageCount > 1 && <nav className="skillhub-pagination" aria-label="SkillHub 分页"><Button disabled={page === 0} onClick={() => setPage(value => value - 1)}>上一页</Button>{firstPage > 0 && <span aria-hidden="true">…</span>}{pageNumbers.map(number => <button key={number} aria-current={page === number ? 'page' : undefined} className={page === number ? 'active' : ''} onClick={() => setPage(number)}>{number + 1}</button>)}{firstPage + pageNumbers.length < pageCount && <span aria-hidden="true">…</span>}<Button disabled={page + 1 >= pageCount} onClick={() => setPage(value => value + 1)}>下一页</Button><span className="muted">第 {page + 1} / {pageCount} 页</span></nav>}
+    <nav className="category-tabs" aria-label="SkillHub 榜单">{['全部', ...SECTIONS.map(item => item.key)].map(key => <button key={key} className={section === key ? 'active' : ''} aria-pressed={section === key} onClick={() => setSection(key)}>{key === '全部' ? '全部' : (SECTIONS.find(item => item.key === key)?.label ?? key)} {sectionCounts[key] ?? 0}</button>)}</nav>
+    {busy ? <p className="muted" role="status">正在读取 SkillHub…</p> : visible.length ? <div className="grid">{visible.map(item => <article className="card market-card" key={item.slug}>
+      <div className="card-top"><span className="skillhub-icon" aria-hidden>{item.iconUrl ? <img src={item.iconUrl} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={event => { event.currentTarget.hidden = true; }} /> : item.name.slice(0, 1).toUpperCase()}</span><span className="card-title"><strong title={item.name}>{item.name}</strong><small>{item.subCategories?.[0]?.name || item.category} · v{item.version || '—'}</small></span>
+        <Button className={`install${installed.includes(item.slug) ? ' is-status is-installed' : ''}`} disabled={installed.includes(item.slug) || installing === item.slug} aria-label={`安装 ${item.name}`} onClick={() => void install(item)}>{installed.includes(item.slug) ? '已安装' : installing === item.slug ? '…' : '＋'}</Button></div>
+      <p className="muted">{item.description_zh ?? item.description}</p>
+      <small className="skillhub-meta">下载 {formatCount(item.downloads)} · 收藏 {formatCount(item.stars)}</small>
+    </article>)}</div> : <p className="muted">没有匹配的技能。</p>}
+    {visible.length < filtered.length && <div className="market-more"><Button onClick={() => setLimit(value => value + PAGE_SIZE)}>加载更多（{filtered.length - visible.length}）</Button></div>}
   </section>;
 }
