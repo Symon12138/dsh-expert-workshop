@@ -1,9 +1,9 @@
 {
-  "name": "symon-studio-plugin-workbenches",
+  "name": "expert-workshop-plugin-workbenches",
   "version": "3.0.0-alpha.49",
   "private": true,
   "type": "module",
-  "description": "Symon Studio workbench platform Host services; Client management integration is in development.",
+  "description": "Expert Workshop workbench platform Host services; Client management integration is in development.",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -90,6 +90,6 @@
     "@types/semver": "7.7.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "symon-studio-contracts": "workspace:*"
+    "expert-workshop-contracts": "workspace:*"
   }
 }

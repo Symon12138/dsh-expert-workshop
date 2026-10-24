@@ -1,4 +1,4 @@
-import type {LibraryTreeEntry} from 'symon-studio-contracts/library';
+import type {LibraryTreeEntry} from 'expert-workshop-contracts/library';
 import type {QualityLibraryChoice} from './QualityLibraryImport.js';
 import type {QualitySourceDescription,QualityConfigurationView} from './configuration-view.js';
 import type {QualityCleaningPage} from './cleaning-rows.js';

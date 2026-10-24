@@ -1,4 +1,4 @@
-import type { LibraryAssetKind, LibraryOriginalPreviewInput, LibraryOriginalPreviewRegistry } from 'symon-studio-contracts/library';
+import type { LibraryAssetKind, LibraryOriginalPreviewInput, LibraryOriginalPreviewRegistry } from 'expert-workshop-contracts/library';
 
 export function createLibraryPreviewRegistry(): LibraryOriginalPreviewRegistry {
   const handlers = new Map<LibraryOriginalPreviewInput['kind'], (target: HTMLElement, input: LibraryOriginalPreviewInput) => void | (() => void) | Promise<void | (() => void)>>();

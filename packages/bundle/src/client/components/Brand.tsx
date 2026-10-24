@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { LogoMark } from 'symon-studio-ui';
+import { LogoMark } from 'expert-workshop-ui';
 
 export function BrandName() {
-  return <span data-testid="workdsh-brand">Symon Studio</span>;
+  return <span data-testid="workdsh-brand">Expert Workshop</span>;
 }
 
 export function BrandMark() {

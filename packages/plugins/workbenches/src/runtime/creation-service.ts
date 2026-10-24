@@ -4,7 +4,7 @@ import {defineDomain, type DomainFacility,type Domain} from '@deepseek-ai/dsh-st
 import {z} from 'zod';
 import {assertActorContext, parseWorkbenchRequirementsDraft, type ActorContext,
   type IdentityService, type WorkbenchInstallationRef, type WorkbenchRequirementsDraft,
-  type WorkbenchDevelopmentIndexEntry} from 'symon-studio-contracts';
+  type WorkbenchDevelopmentIndexEntry} from 'expert-workshop-contracts';
 
 const fields=['title','scenario','users','dataSources','workflow','firstIteration','acceptance'] as const;
 export type CreationProposal={[Key in typeof fields[number]]?:string};

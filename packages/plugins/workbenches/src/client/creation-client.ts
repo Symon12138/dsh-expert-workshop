@@ -1,5 +1,5 @@
 import type {CreationView,CreationProposal} from '../runtime/creation-service.js';
-import type {WorkbenchRequirementsDraft,WorkbenchDevelopmentIndexEntry} from 'symon-studio-contracts';
+import type {WorkbenchRequirementsDraft,WorkbenchDevelopmentIndexEntry} from 'expert-workshop-contracts';
 export class WorkbenchCreationRequestError extends Error {
  constructor(readonly code:string,readonly requirementsSaved=false,readonly preparationStage?:'development'|'source'|'session'){
   super(code);this.name='WorkbenchCreationRequestError';

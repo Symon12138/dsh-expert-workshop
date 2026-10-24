@@ -3,7 +3,7 @@ import {gt as newerVersion} from 'semver';
 import { defineDomain, type Domain, type DomainFacility } from '@deepseek-ai/dsh-storage-domain';
 import { z } from 'zod';
 import { posix, win32 } from 'node:path';
-import { assertActorContext, type ActorContext, type WorkbenchDevelopmentIndexEntry, type WorkbenchInstallationRef, type WorkbenchRequirementsRevision } from 'symon-studio-contracts';
+import { assertActorContext, type ActorContext, type WorkbenchDevelopmentIndexEntry, type WorkbenchInstallationRef, type WorkbenchRequirementsRevision } from 'expert-workshop-contracts';
 
 const text = z.string().trim().min(1).max(128);
 const targetSchema = z.object({ hostId: text, installationId: text, profileId: text, harnessVersion: text });

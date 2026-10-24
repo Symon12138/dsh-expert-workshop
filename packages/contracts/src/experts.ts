@@ -1,10 +1,10 @@
 /**
- * Symon Studio expert domain contracts (D04 / P1-02, expert module 0.1).
+ * Expert Workshop expert domain contracts (D04 / P1-02, expert module 0.1).
  *
  * Pure DTOs, stable error codes and the Host service interface. No runtime
  * dependency: the Host resolves the actor, owns every write, and never accepts
  * a client- or model-supplied actor/owner/confirmation boolean as authority.
- * These are Symon Studio contracts, not Harness official API.
+ * These are Expert Workshop contracts, not Harness official API.
  */
 import type { ActorContext, ResourceOwner } from './governance.js';
 

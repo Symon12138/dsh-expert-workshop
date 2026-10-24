@@ -1,4 +1,4 @@
-import { parseWorkbenchDescriptor, type WorkbenchDescriptor } from 'symon-studio-contracts';
+import { parseWorkbenchDescriptor, type WorkbenchDescriptor } from 'expert-workshop-contracts';
 import type { WorkbenchRuntimeStatus } from '../runtime/runtime-observation.js';
 export interface WorkbenchCatalogEntry {
   readonly packageName: string; readonly selected: boolean;

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Symon Studio 桌面打包入口（macOS arm64，未签名本地测试版）。
+ * Expert Workshop 桌面打包入口（macOS arm64，未签名本地测试版）。
  *
  * 基于官方 apps/desktop 流水线（deepseek-ai/deepseek-harness，tag dsh-v0.1.5-rc.1）的
  * 隔离快照 + WORKDSH TEST PATCH 补丁（存档见 scripts/desktop/patches/，完整指南见 docs/DESKTOP-PACKAGING.md）。
@@ -26,7 +26,7 @@ const SNAPSHOT = join(WORKSPACE_ROOT, '.artifacts', 'desktop-pack-test', 'upstre
 const DESKTOP_APP = join(SNAPSHOT, 'apps', 'desktop');
 const PATCH_STORE = join(SCRIPT_DIR, 'patches', 'upstream');
 const TARGET_NAME = 'mac-arm64';
-const APP_BUNDLE = join(DESKTOP_APP, '.desktop-build', 'targets', TARGET_NAME, 'artifacts', TARGET_NAME, 'Symon Studio.app');
+const APP_BUNDLE = join(DESKTOP_APP, '.desktop-build', 'targets', TARGET_NAME, 'artifacts', TARGET_NAME, 'Expert Workshop.app');
 const ELECTRON_MIRROR = 'https://npmmirror.com/mirrors/electron/';
 const REQUIRED_NODE = [22, 19];
 
@@ -176,7 +176,7 @@ function verifyArtifact() {
     if (actual !== wanted) problems.push(`${label}: 期望 ${wanted}，实际 ${actual}`);
   };
   expect('CFBundleIdentifier', plistValue('CFBundleIdentifier'), 'com.workdsh.app');
-  expect('CFBundleDisplayName', plistValue('CFBundleDisplayName'), 'Symon Studio');
+  expect('CFBundleDisplayName', plistValue('CFBundleDisplayName'), 'Expert Workshop');
   expect('CFBundleIconFile', plistValue('CFBundleIconFile'), 'icon.icns');
   const iconSource = join(DESKTOP_APP, 'workdsh-icon.icns');
   const iconPacked = join(APP_BUNDLE, 'Contents', 'Resources', 'icon.icns');
@@ -212,9 +212,9 @@ if (flag('--check-only')) {
 }
 
 const pnpm = resolvePnpmEntry();
-if (spawnSync('pgrep', ['-f', 'Symon Studio.app/Contents/MacOS/Symon Studio']).status === 0) {
-  console.log('[pack-desktop] 停止运行中的 Symon Studio 实例（避免覆盖运行中的应用）');
-  spawnSync('pkill', ['-f', 'Symon Studio.app/Contents/MacOS/Symon Studio']);
+if (spawnSync('pgrep', ['-f', 'Expert Workshop.app/Contents/MacOS/Expert Workshop']).status === 0) {
+  console.log('[pack-desktop] 停止运行中的 Expert Workshop 实例（避免覆盖运行中的应用）');
+  spawnSync('pkill', ['-f', 'Expert Workshop.app/Contents/MacOS/Expert Workshop']);
 }
 if (!flag('--skip-build')) {
   console.log('[pack-desktop] 1/2 build:desktop（tsc + tsdown）');

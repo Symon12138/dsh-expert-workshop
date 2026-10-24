@@ -1,4 +1,4 @@
-import type { WorkbenchPackageReceipt } from 'symon-studio-contracts';
+import type { WorkbenchPackageReceipt } from 'expert-workshop-contracts';
 
 /** Persisted bundle selection does not prove the currently loaded version. */
 export function confirmWorkbenchRuntimeSelection<T extends {

@@ -1,4 +1,4 @@
-import { parseWorkbenchDescriptor, workbenchActivationState } from 'symon-studio-contracts';
+import { parseWorkbenchDescriptor, workbenchActivationState } from 'expert-workshop-contracts';
 import type { VerifyClientWorkbenchInstallation } from './client-registration.js';
 /** Read installation facts only. Client Loader ownership is checked separately
  * by ClientWorkbenchRegistration, never inferred from this request payload. */

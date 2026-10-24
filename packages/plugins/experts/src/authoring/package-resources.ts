@@ -1,4 +1,4 @@
-import type { ExpertDefinition } from 'symon-studio-contracts';
+import type { ExpertDefinition } from 'expert-workshop-contracts';
 import { ExpertsError } from '../domain/values.js';
 
 export type PackageAssets = NonNullable<ExpertDefinition['packageAssets']>;

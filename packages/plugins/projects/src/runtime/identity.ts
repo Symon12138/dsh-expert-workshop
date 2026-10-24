@@ -1,5 +1,5 @@
 import type { Context } from '@deepseek-ai/cordis';
-import type { ActorContext, IdentityProfile, IdentityService } from 'symon-studio-contracts';
+import type { ActorContext, IdentityProfile, IdentityService } from 'expert-workshop-contracts';
 
 export function localProjectActor(evidence?: { sessionId?: string; runId?: string }): ActorContext {
   return {

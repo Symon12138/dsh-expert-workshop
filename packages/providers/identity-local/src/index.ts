@@ -15,7 +15,7 @@ import type {
   IdentityService,
   Membership,
   Organization,
-} from 'symon-studio-contracts';
+} from 'expert-workshop-contracts';
 
 export interface LocalIdentityConfig {
   readonly principalId: string;

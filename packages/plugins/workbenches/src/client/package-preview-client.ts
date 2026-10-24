@@ -1,4 +1,4 @@
-import { parseWorkbenchDescriptor } from 'symon-studio-contracts';
+import { parseWorkbenchDescriptor } from 'expert-workshop-contracts';
 /** First-import discovery reads identity from bytes on the Host. It does not
  * accept a filename as identity or declare installation/activation success. */
 export function createWorkbenchPackagePreviewClient(transport: typeof fetch = fetch) {

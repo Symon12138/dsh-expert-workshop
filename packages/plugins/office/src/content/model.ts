@@ -6,7 +6,7 @@ import type {
   OfficeBlockInput,
   OfficeDocumentState,
   OfficeOperation,
-} from "symon-studio-contracts/office";
+} from "expert-workshop-contracts/office";
 
 export const id = z
   .string()

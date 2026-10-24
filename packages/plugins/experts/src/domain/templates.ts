@@ -1,4 +1,4 @@
-import type { ExpertDefinition } from 'symon-studio-contracts';
+import type { ExpertDefinition } from 'expert-workshop-contracts';
 
 /**
  * The three shipped default experts (IMPLEMENTATION-AND-ACCEPTANCE: 3 own

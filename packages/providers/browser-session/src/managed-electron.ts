@@ -62,7 +62,7 @@ export function electronWorkerArguments(port: number, profileDir: string, applic
   ];
 }
 
-/** Start one hidden Electron instance whose CDP exposes no Symon Studio app page. */
+/** Start one hidden Electron instance whose CDP exposes no Expert Workshop app page. */
 export async function launchManagedElectron(executable: string, signal?: AbortSignal, applicationPath?: string): Promise<ManagedChromium> {
   if (!executable.trim()) throw new Error('Desktop Electron executable is required');
   signal?.throwIfAborted();

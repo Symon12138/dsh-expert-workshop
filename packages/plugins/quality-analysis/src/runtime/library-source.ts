@@ -1,4 +1,4 @@
-import type { ActorContext, LibraryService } from 'symon-studio-contracts';
+import type { ActorContext, LibraryService } from 'expert-workshop-contracts';
 import type { QualityCsvImporter } from './csv-import';
 import type {QualityXlsxImporter} from './xlsx-import';
 

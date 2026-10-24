@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-api-session-controller';
-import type { ActorContext, IdentityService, RuntimeBindingService, WorkbenchDevelopment } from 'symon-studio-contracts';
+import type { ActorContext, IdentityService, RuntimeBindingService, WorkbenchDevelopment } from 'expert-workshop-contracts';
 import { ensureWorkbenchDevelopmentWorkspace } from './development-workspace.js';
 
 /** Deterministic native identity survives a lost creation response. Official

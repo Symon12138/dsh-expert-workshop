@@ -15,7 +15,7 @@ const pnpm = resolve(root, 'node_modules/pnpm/bin/pnpm.cjs');
 const version = JSON.parse(readFileSync(resolve(root, '../../packages/bundle/package.json'), 'utf8')).version;
 const tarball = resolve(artifacts, `workdsh-bundle-${version}.tgz`);
 const skillsVersion = JSON.parse(readFileSync(resolve(root, '../../packages/plugins/skills/package.json'), 'utf8')).version;
-const skillsTarball = resolve(artifacts, `symon-studio-plugin-skills-${skillsVersion}.tgz`);
+const skillsTarball = resolve(artifacts, `expert-workshop-plugin-skills-${skillsVersion}.tgz`);
 function command(bin, args) {
   return new Promise((res, rej) => {
     const child = spawn(process.execPath, [bin, ...args], { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -64,7 +64,7 @@ async function authenticate(address) {
   return cookie;
 }
 try {
-  await command(pnpm, ['--filter', 'symon-studio-plugin-skills', 'pack', '--pack-destination', artifacts]);
+  await command(pnpm, ['--filter', 'expert-workshop-plugin-skills', 'pack', '--pack-destination', artifacts]);
   await command(pnpm, ['--filter', 'workdsh-bundle', 'pack', '--pack-destination', artifacts]);
   await command(dsh, ['--profile', 'probe', '--from-default-profile', 'web', '--dump-config']);
   // Official Profile composition explicitly installs feature layers. The product
@@ -89,7 +89,7 @@ try {
     writeFileSync(resolve(home, 'storages/workspace.json'), `${JSON.stringify({
       unit: { name: 'workspace', version: 2 },
       global: { initialized: true, workspaceIds: [workspaceId], archivedSessionIds: [] },
-      tables: { workspaces: { [workspaceId]: { path: root, title: 'Symon Studio Probe', sessionIds: [], createdAt: now, updatedAt: now } } },
+      tables: { workspaces: { [workspaceId]: { path: root, title: 'Expert Workshop Probe', sessionIds: [], createdAt: now, updatedAt: now } } },
     }, null, 2)}\n`);
     const skillDir = resolve(home, 'agents/skills/workdsh-browser-fixture');
     mkdirSync(skillDir, { recursive: true });
@@ -128,7 +128,7 @@ try {
     const fixturePath = resolve(home, 'agents/skills/workdsh-browser-fixture/SKILL.md');
     const fixtureBefore = readFileSync(fixturePath, 'utf8');
     await stopServer();
-    await command(dsh, ['plugin', '--profile', 'probe', 'remove', 'symon-studio-plugin-skills']);
+    await command(dsh, ['plugin', '--profile', 'probe', 'remove', 'expert-workshop-plugin-skills']);
     startServer();
     await until(() => serverOutput.includes('[workdsh:probe] activated') && /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'product without Skill');
     const shellAddress = serverOutput.match(/http:\/\/127\.0\.0\.1:\d+/)[0];

@@ -46,7 +46,7 @@ export async function probeBrowser(address, sessionCookie, screenshotPath, { ins
     await dismissSetup(page);
     const later = page.getByRole('button', { name: 'Configure later', exact: true });
     const graphRows = await page.evaluate(() => window.__DSH_BOOT__?.entries?.filter(row => row.id === 'workdsh-bundle'));
-    const nav = page.getByRole('button', { name: 'Symon Studio 接入验证', exact: true });
+    const nav = page.getByRole('button', { name: 'Expert Workshop 接入验证', exact: true });
     expect(graphRows).toHaveLength(installed ? 1 : 0);
     if (!installed) {
       await expect(page.getByText(/新会话|New Session/, { exact: true }).first()).toBeVisible({ timeout: 30000 });
@@ -61,11 +61,11 @@ export async function probeBrowser(address, sessionCookie, screenshotPath, { ins
       return;
     }
 
-    // Harness stays the sole Sidebar owner; Symon Studio contributes only public slots.
-    await expect(page.getByTestId('workdsh-brand')).toHaveText('Symon Studio', { timeout: 30000 });
+    // Harness stays the sole Sidebar owner; Expert Workshop contributes only public slots.
+    await expect(page.getByTestId('workdsh-brand')).toHaveText('Expert Workshop', { timeout: 30000 });
     await expect(page.getByTestId('workdsh-sidebar')).toHaveCount(0);
     await expect(page.getByRole('button', { name: '专家 · 技能 · 连接器', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: '返回 Symon Studio', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: '返回 Expert Workshop', exact: true })).toHaveCount(0);
     const newSession = page.getByText(/新会话|New Session/, { exact: true }).first();
     await expect(newSession).toBeVisible();
     for (const label of ['项目', '专家 · 技能 · 连接器', '资料库']) {
@@ -200,8 +200,8 @@ export async function probeBrowser(address, sessionCookie, screenshotPath, { ins
     expect(sockets.length).toBeGreaterThan(0);
     const previousConnections = sockets.length;
     for (const { socket, upstream } of [...sockets]) {
-      await socket.close({ code: 1012, reason: 'Symon Studio reconnect probe' });
-      await upstream.close({ code: 1012, reason: 'Symon Studio reconnect probe' });
+      await socket.close({ code: 1012, reason: 'Expert Workshop reconnect probe' });
+      await upstream.close({ code: 1012, reason: 'Expert Workshop reconnect probe' });
     }
     await expect.poll(() => sockets.length, { timeout: 20000 }).toBeGreaterThan(previousConnections);
     await expect.poll(() => sockets.slice(previousConnections).some(socket => socket.received > 0), { timeout: 15000 }).toBe(true);
@@ -217,11 +217,11 @@ export async function probeBrowser(address, sessionCookie, screenshotPath, { ins
     await page.goto(invalid.href);
     await expect.poll(() => new URL(page.url()).searchParams.get('workdsh-view')).toBe('conversation');
     await page.goto(`${address}/?workdsh-view=diagnostics`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: 'Symon Studio 接入验证', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Expert Workshop 接入验证', exact: true })).toHaveCount(0);
     await expect(page.getByTestId('workdsh-probe')).toHaveCount(0);
     await expect.poll(() => new URL(page.url()).searchParams.get('workdsh-view')).toBe('conversation');
     if (errors.length) throw new Error(`Browser reported ${errors.length} uncaught errors: ${errors.join('; ')}`);
-    console.log('PASS: official Sidebar owns native workspace/session actions; Symon Studio contributes brand and additive panels');
+    console.log('PASS: official Sidebar owns native workspace/session actions; Expert Workshop contributes brand and additive panels');
     console.log('PASS: global skill library, real Remote inventory, reconnect, and route normalization');
   } catch (error) {
     if (page) {
@@ -244,18 +244,18 @@ export async function probeProductWithoutSkills(address, sessionCookie) {
     await page.context().addCookies(sessionCookies(address, sessionCookie));
     await page.goto(`${address}/?workdsh-view=skills`);
     await dismissSetup(page);
-    await expect(page.getByTestId('workdsh-brand')).toHaveText('Symon Studio');
+    await expect(page.getByTestId('workdsh-brand')).toHaveText('Expert Workshop');
     await expect(page.getByRole('button', { name: '专家 · 技能 · 连接器', exact: true })).toHaveCount(0);
     await expect.poll(() => new URL(page.url()).searchParams.get('workdsh-view')).toBe('conversation');
     const graph = await page.evaluate(() => window.__DSH_BOOT__.entries.map(row => row.id));
     expect(graph).toContain('workdsh-bundle');
-    expect(graph).not.toContain('symon-studio-plugin-skills');
+    expect(graph).not.toContain('expert-workshop-plugin-skills');
     await page.getByRole('button', { name: '项目', exact: true }).click();
     await expect(page.getByRole('heading', { name: '项目', exact: true })).toBeVisible();
     await page.getByText(/新会话|New Session/, { exact: true }).first().click();
     await expect(page.getByText(/探索未至之境|Into the Unknown/, { exact: true }).first()).toBeVisible();
     expect(errors).toEqual([]);
-    console.log('PASS: removing Skill keeps Symon Studio brand, workbench, native new session, and stale URL recovery');
+    console.log('PASS: removing Skill keeps Expert Workshop brand, workbench, native new session, and stale URL recovery');
   } finally {
     await browser.close();
   }

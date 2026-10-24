@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots';
-import { Icon } from 'symon-studio-ui';
-import type { LibraryTreeEntry } from 'symon-studio-contracts/library';
+import { Icon } from 'expert-workshop-ui';
+import type { LibraryTreeEntry } from 'expert-workshop-contracts/library';
 import type { LibraryClient } from './management.js';
 import { libraryPickerRequestedEvent } from './selection-events.js';
 

@@ -1,4 +1,4 @@
-# Symon Studio 插件独立安装说明
+# Expert Workshop 插件独立安装说明
 
 这套插件把 WorkBuddy 风格的「专家中心、专家团、技能市场、连接器市场、项目」做成独立的 DeepSeek Harness 插件。每个插件都是单独的 npm 包和独立数据域，可以整套安装，也可以按需单独安装。
 
@@ -11,17 +11,17 @@
 
 | 插件 | 包名 | 版本 |
 | --- | --- | --- |
-| 身份 | `symon-studio-provider-identity-local` | `0.1.0-alpha.7` |
-| 审计 | `symon-studio-plugin-audit` | `0.1.0-alpha.6` |
-| 访问控制 | `symon-studio-plugin-access` | `0.1.0-alpha.7` |
-| 技能 | `symon-studio-plugin-skills` | `0.1.0-alpha.59` |
-| 专家/专家团 | `symon-studio-plugin-experts` | `0.1.0-alpha.24` |
-| 连接器 | `symon-studio-plugin-connectors` | `0.1.0-alpha.10` |
-| 项目 | `symon-studio-plugin-projects` | `0.1.0-alpha.5` |
+| 身份 | `expert-workshop-provider-identity-local` | `0.1.0-alpha.7` |
+| 审计 | `expert-workshop-plugin-audit` | `0.1.0-alpha.6` |
+| 访问控制 | `expert-workshop-plugin-access` | `0.1.0-alpha.7` |
+| 技能 | `expert-workshop-plugin-skills` | `0.1.0-alpha.59` |
+| 专家/专家团 | `expert-workshop-plugin-experts` | `0.1.0-alpha.24` |
+| 连接器 | `expert-workshop-plugin-connectors` | `0.1.0-alpha.10` |
+| 项目 | `expert-workshop-plugin-projects` | `0.1.0-alpha.5` |
 
 ## 下载
 
-发布页：https://github.com/Symon12138/symon-studio/releases/tag/symon-studio-v0.1.0
+发布页：https://github.com/Symon12138/symon-studio/releases/tag/expert-workshop-v0.1.0
 
 7 个 `.tgz` 都在该 Release 的 Assets 中，下载后按下面的顺序安装。
 
@@ -30,13 +30,13 @@
 按依赖顺序安装：
 
 ```bash
-dsh plugin --profile web add file:/path/symon-studio-provider-identity-local-0.1.0-alpha.7.tgz
-dsh plugin --profile web add file:/path/symon-studio-plugin-audit-0.1.0-alpha.6.tgz
-dsh plugin --profile web add file:/path/symon-studio-plugin-access-0.1.0-alpha.7.tgz
-dsh plugin --profile web add file:/path/symon-studio-plugin-skills-0.1.0-alpha.59.tgz
-dsh plugin --profile web add file:/path/symon-studio-plugin-experts-0.1.0-alpha.24.tgz
-dsh plugin --profile web add file:/path/symon-studio-plugin-connectors-0.1.0-alpha.10.tgz
-dsh plugin --profile web add file:/path/symon-studio-plugin-projects-0.1.0-alpha.5.tgz
+dsh plugin --profile web add file:/path/expert-workshop-provider-identity-local-0.1.0-alpha.7.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-audit-0.1.0-alpha.6.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-access-0.1.0-alpha.7.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-skills-0.1.0-alpha.59.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-experts-0.1.0-alpha.24.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-connectors-0.1.0-alpha.10.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-projects-0.1.0-alpha.5.tgz
 dsh --profile web
 ```
 
@@ -60,8 +60,8 @@ dsh --profile web
 单装示例（专家 + 技能）：
 
 ```bash
-dsh plugin --profile web add file:/path/symon-studio-plugin-skills-0.1.0-alpha.59.tgz
-dsh plugin --profile web add file:/path/symon-studio-plugin-experts-0.1.0-alpha.24.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-skills-0.1.0-alpha.59.tgz
+dsh plugin --profile web add file:/path/expert-workshop-plugin-experts-0.1.0-alpha.24.tgz
 dsh --profile web
 ```
 
@@ -108,4 +108,4 @@ dsh --profile web
 
 ## 许可
 
-继承上游 Symon Studio 的 MIT 许可；WorkBuddy 相关名称和内容仅用于兼容与迁移说明。
+继承上游 Expert Workshop 的 MIT 许可；WorkBuddy 相关名称和内容仅用于兼容与迁移说明。

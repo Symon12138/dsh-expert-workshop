@@ -55,8 +55,8 @@ async function step(name,args){
 }
 if(!await step('install',['install','--ignore-scripts','--no-frozen-lockfile']))process.exit(1);
 // Build dependency declarations first; do not run the graphical preview or a paid model.
-await step('dependency-build',['--filter','symon-studio-plugin-quality-analysis...','--filter','symon-studio-plugin-skills...','build']);
-for(const name of ['symon-studio-plugin-workbenches','symon-studio-plugin-skills','symon-studio-provider-identity-local','symon-studio-plugin-quality-analysis']){
+await step('dependency-build',['--filter','expert-workshop-plugin-quality-analysis...','--filter','expert-workshop-plugin-skills...','build']);
+for(const name of ['expert-workshop-plugin-workbenches','expert-workshop-plugin-skills','expert-workshop-provider-identity-local','expert-workshop-plugin-quality-analysis']){
  await step(name+'-typecheck',['--filter',name,'typecheck']);
 }
 await step('workbenches-tests',['test:workbenches']);

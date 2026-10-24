@@ -1,5 +1,5 @@
 import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
-import type { ConfirmationProof, ConfirmationRequest } from 'symon-studio-contracts';
+import type { ConfirmationProof, ConfirmationRequest } from 'expert-workshop-contracts';
 import { ExpertsError } from '../domain/values.js';
 
 /**

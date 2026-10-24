@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button } from 'symon-studio-ui';
+import { Button } from 'expert-workshop-ui';
 import { useEffect, useMemo, useState } from 'react';
 import type { SkillManagementClient } from './management.js';
 

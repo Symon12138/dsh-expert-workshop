@@ -1,8 +1,8 @@
 import {pdfStateSchema,pdfEditInput,applyPdf,initialPdf} from "../pdf/model.js";
 import {pdfBytes} from "../pdf/encode.js";
-import type {OfficePdfOpenInput,OfficePdfEditInput} from "symon-studio-contracts/office";
+import type {OfficePdfOpenInput,OfficePdfEditInput} from "expert-workshop-contracts/office";
 import {htmlStateSchema,htmlEditInput,applyHtml} from "../html/model.js";
-import type {OfficeHtmlOpenInput,OfficeHtmlEditInput} from "symon-studio-contracts/office";
+import type {OfficeHtmlOpenInput,OfficeHtmlEditInput} from "expert-workshop-contracts/office";
 import {spreadsheetStateSchema,spreadsheetEditInput,createSpreadsheet,applySpreadsheet,spreadsheetCapabilities} from "../spreadsheet/model.js";
 import { createHash, randomUUID } from "node:crypto";
 import { Service, type Context } from "@deepseek-ai/cordis";
@@ -20,7 +20,7 @@ import type {
   ActorContext,
   AuditEvent,
   ResourceOwner,
-} from "symon-studio-contracts";
+} from "expert-workshop-contracts";
 import type {
   OfficeSnapshot,
   OfficeContentSnapshot,
@@ -30,7 +30,7 @@ import type {
   OfficeReceipt,
   OfficeEditInput,
   OfficeOpenInput,
-} from "symon-studio-contracts/office";
+} from "expert-workshop-contracts/office";
 import {
   applyOperations,
   capabilities,

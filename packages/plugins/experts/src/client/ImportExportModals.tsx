@@ -1,4 +1,4 @@
-import { Button } from 'symon-studio-ui';
+import { Button } from 'expert-workshop-ui';
 import * as React from 'react';
 import { useRef, useState } from 'react';
 import type { ImportPreview } from '../shared.js';

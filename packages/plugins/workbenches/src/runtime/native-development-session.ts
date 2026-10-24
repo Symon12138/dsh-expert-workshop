@@ -1,6 +1,6 @@
 import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-api-session-controller';
-import type { ActorContext, IdentityService, RuntimeBindingService } from 'symon-studio-contracts';
+import type { ActorContext, IdentityService, RuntimeBindingService } from 'expert-workshop-contracts';
 import { createWorkbenchDevelopmentSessionVerifier } from './development-session.js';
 
 /** Native Host adaptation. Session creation/access binding is owned by the

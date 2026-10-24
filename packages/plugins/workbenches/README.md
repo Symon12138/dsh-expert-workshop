@@ -1,12 +1,12 @@
-# Symon Studio 工作台插件平台
+# Expert Workshop 工作台插件平台
 
-Symon Studio 3.0 工作台平台拥有工作台注册、管理、需求修订、开发关联和插件安装入口。工作台是具有导航、多个模块和业务数据的独立插件。简单工作台通过提示词分轮开发；复杂工作台由专业开发者离线开发后导入。两条路径沿用相同的包身份及安装规范，不使用 Puck。
+Expert Workshop 3.0 工作台平台拥有工作台注册、管理、需求修订、开发关联和插件安装入口。工作台是具有导航、多个模块和业务数据的独立插件。简单工作台通过提示词分轮开发；复杂工作台由专业开发者离线开发后导入。两条路径沿用相同的包身份及安装规范，不使用 Puck。
 
 ## 业务包最短接入
 
 已有平台生成的骨架时，保留 package.json 中的工作台声明和 Host 注册入口，直接实现 client.jsx 的业务页面。注册服务由宿主提供；业务包不创建注册服务实例，也不实现平台的安装器、页面外框或原生会话。
 
-三个版本含义不同：`protocolVersion: "1.0"` 是工作台协议；`hostCompatibility.sdk: "^1.0.0"` 匹配当前业务 API 兼容版本；npm 的 `symon-studio-plugin-workbenches@3.0.0-alpha.*` 是平台实现包版本。不要把 npm 包版本填进 API 兼容字段。内核兼容值沿用本机生成的声明，不从示例猜版本。
+三个版本含义不同：`protocolVersion: "1.0"` 是工作台协议；`hostCompatibility.sdk: "^1.0.0"` 匹配当前业务 API 兼容版本；npm 的 `expert-workshop-plugin-workbenches@3.0.0-alpha.*` 是平台实现包版本。不要把 npm 包版本填进 API 兼容字段。内核兼容值沿用本机生成的声明，不从示例猜版本。
 
 Host 骨架已经完成以下注册，不必重新研究 Loader、registry 或服务内部实现：
 
@@ -23,7 +23,7 @@ export async function apply(ctx) {
 
 ```jsx
 import React, {useState} from 'react';
-import {WorkbenchButton} from 'symon-studio-plugin-workbenches/client';
+import {WorkbenchButton} from 'expert-workshop-plugin-workbenches/client';
 import manifest from './package.json';
 export const inject = ['workdshWorkbenchClientRegistration'];
 function Page({workbench}) {
@@ -59,9 +59,9 @@ Host 入口 `src/index.ts` 在官方 Profile、Loader、Storage Domain、身份�
 
 继续开发进入时由平台重新核对当前身份、运行环境、最新需求修订、源码及原生会话关联；核对失败保留开发记录并给出对应提示，不根据旧会话中的“已完成”判断当前状态，不自动接受其他环境的目录。页面展示本轮范围和完成标准。开始或继续开发时再次核对，通过同一规范化生成器准备指令并交给原生会话提交；确认需求时留下的同一份未发送草稿可直接续交，不额外拼接前言造成自身草稿冲突。核对、提交和 AI 执行是不同事实。重试不得覆盖已有草稿、重复创建应用或扩大权限。平台服务核对不代表模型已响应，也不代表插件已安装或页面已验收。
 
-新开发会话明确使用官方 Creator（`cordis`）预设，核对创建回执与打开后的实际预设。开发草稿显式调用官方 `cordis-plugin-development` 和 Symon Studio `workdsh-workbench-dev` 技能，带入已保存需求、插件身份和已验证源码目录；规范正文仅维护在技能 Markdown 中。开发仍由完整原生会话、工具、模型选择及授权执行。已有开发会话不被重建或静默切换；若未使用 Creator，保留需求和源码并明确提示，不能把普通模式当作开发能力已就绪。
+新开发会话明确使用官方 Creator（`cordis`）预设，核对创建回执与打开后的实际预设。开发草稿显式调用官方 `cordis-plugin-development` 和 Expert Workshop `workdsh-workbench-dev` 技能，带入已保存需求、插件身份和已验证源码目录；规范正文仅维护在技能 Markdown 中。开发仍由完整原生会话、工具、模型选择及授权执行。已有开发会话不被重建或静默切换；若未使用 Creator，保留需求和源码并明确提示，不能把普通模式当作开发能力已就绪。
 
-Symon Studio 开发技能要求先明确一件工作的业务对象、状态、用户动作、AI 分工和成果落点，再安排模块与页面。当前用户要求决定本轮交付阶段：产品定义、效果预览或开发候选；暂停打包期间不因构建成功自动继续打包安装。阶段说明是 Agent 工作要求，不是新增的 Host 状态门禁，真实操作仍沿用宿主已有授权及确认流程。
+Expert Workshop 开发技能要求先明确一件工作的业务对象、状态、用户动作、AI 分工和成果落点，再安排模块与页面。当前用户要求决定本轮交付阶段：产品定义、效果预览或开发候选；暂停打包期间不因构建成功自动继续打包安装。阶段说明是 Agent 工作要求，不是新增的 Host 状态门禁，真实操作仍沿用宿主已有授权及确认流程。
 
 原生开发会话可调用 `workbench_read_development_context` 读取本会话关联的需求、源码和实际候选。首次原生 `plugin_manager install_bundle` 使用 `enabled:false`；随后 `workbench_verify_native_installation(version, sha256)` 核对已安装的真实字节并登记归档，用户可从候选入口核验并启用。两项工具使用官方 Agent/工具注册，不接受模型指定其他开发记录或源码路径。核验不安装、不启用，也不证明候选来自当前源码构建；安装、平台登记、活动版本和页面打开分别确认。更新旧包按官方结果重启，并核对重新注册的实际版本。
 
@@ -87,11 +87,11 @@ Symon Studio 开发技能要求先明确一件工作的业务对象、状态、�
 
 实际浏览器管理、创建及业务页交互，Agent 生成后安装和多轮更新全流程，跨版本迁移、备份回滚、安装进程崩溃恢复，以及企业真实后端联调仍需完成。Desktop 内核安装包对齐和产品发布也须通过仓库规定的独立验收门槛。不得把构建成功称为 3.0 已交付。
 
-从 `apps/web` 执行 `corepack pnpm --filter symon-studio-plugin-workbenches build`。在仓库根目录用受支持 Node 执行 `node --test packages/contracts/tests/workbenches.test.mjs packages/plugins/workbenches/tests/*.test.mjs`，先构建契约。实际 GUI 和企业服务联调需要另外提供运行证据。
+从 `apps/web` 执行 `corepack pnpm --filter expert-workshop-plugin-workbenches build`。在仓库根目录用受支持 Node 执行 `node --test packages/contracts/tests/workbenches.test.mjs packages/plugins/workbenches/tests/*.test.mjs`，先构建契约。实际 GUI 和企业服务联调需要另外提供运行证据。
 
 ## 公开注册类型
 
-Host 从包根 `import type {HostWorkbenchRegistration, WorkbenchDescriptor} from "symon-studio-plugin-workbenches"`；Client 从公开入口 `import type {ClientWorkbenchRegistration} from "symon-studio-plugin-workbenches/client"`。业务插件分别取 `workdshWorkbenchRegistration` 与 `workdshWorkbenchClientRegistration`，使用 `registerManaged(ctx, descriptor, page)`。Host page 为页面标识，Client page 为页面组件，声明必须与安装包 manifest 一致。类型导出不提供安装权限，也不代替实际宿主授权检查。质量插件已采用公开 Client 注册类型，可作为当前集成参考。
+Host 从包根 `import type {HostWorkbenchRegistration, WorkbenchDescriptor} from "expert-workshop-plugin-workbenches"`；Client 从公开入口 `import type {ClientWorkbenchRegistration} from "expert-workshop-plugin-workbenches/client"`。业务插件分别取 `workdshWorkbenchRegistration` 与 `workdshWorkbenchClientRegistration`，使用 `registerManaged(ctx, descriptor, page)`。Host page 为页面标识，Client page 为页面组件，声明必须与安装包 manifest 一致。类型导出不提供安装权限，也不代替实际宿主授权检查。质量插件已采用公开 Client 注册类型，可作为当前集成参考。
 
 宿主升级后，托管注册遇到已核验安装内容但内核兼容声明不匹配的旧包，会保留可释放的拒绝记录，让原生插件图继续加载；不会注册 Host 业务入口或挂载 Client 页面，也不会更改用户的插件启用选择。管理页显示“版本不兼容”，可沿原有开发记录修复后安装兼容版本。`registerManaged` 返回不代表应用已可用，仍需分别核对兼容性、实时注册和实际页面。未托管的 `register` 继续抛出兼容错误；伪造声明、安装字节变更、调用者失效及其他错误同样拒绝，不被此恢复逻辑吞掉。
 
@@ -107,7 +107,7 @@ Host 从包根 `import type {HostWorkbenchRegistration, WorkbenchDescriptor} fro
 
 ## 完整原生会话与工作台外框
 
-用户于 2026-10-17 明确授权本机 preview 的两处外框补丁，并于 2026-10-18 明确允许同一补丁用于 Desktop、验证后发布。按用户持续使用最新版并适配既有能力的要求，本轮将同样两处接缝适配到官方 `0.2.1-rc.2`，精确锁定文件版本及输入、输出 SHA256。补丁只把官方已构造的完整 Conversation 节点交给 Symon Studio 外框；页头、对话/轨迹、消息、工具、输入框、模型、权限与文件侧栏仍由官方实现。业务区居中，完整原生会话在最右侧，不添加自制会话标签栏。
+用户于 2026-10-17 明确授权本机 preview 的两处外框补丁，并于 2026-10-18 明确允许同一补丁用于 Desktop、验证后发布。按用户持续使用最新版并适配既有能力的要求，本轮将同样两处接缝适配到官方 `0.2.1-rc.2`，精确锁定文件版本及输入、输出 SHA256。补丁只把官方已构造的完整 Conversation 节点交给 Expert Workshop 外框；页头、对话/轨迹、消息、工具、输入框、模型、权限与文件侧栏仍由官方实现。业务区居中，完整原生会话在最右侧，不添加自制会话标签栏。
 
 这是修改官方发布文件的适配，不是未修改宿主的公共接口。Web 与 Desktop 共用 `scripts/native-workbench-frame-patch` 的同一版本和输入、输出 SHA256；未知版本或字节拒绝应用，原子替换仅改变本 Profile 的文件项，不修改其他安装的 pnpm 硬链接，并支持精确回滚。Desktop 准备阶段应用补丁，`afterPack` 再读取安装包 Resources 中的实际文件并核对输出指纹；构建检查通过仍需真实安装包的启动与页面验收，不能把底座升级仅视为版本号变更。
 
@@ -115,7 +115,7 @@ Host 从包根 `import type {HostWorkbenchRegistration, WorkbenchDescriptor} fro
 
 ## Agent 查询边界
 
-Symon Studio 注册服务是本平台扩展，不属于官方预生成的 Service 接口目录；`no catalogued Service` 不能作为服务未运行的证据。官方 Config 查询的 `absent` 表示没有声明 Config Schema，不表示插件未安装。开发者应读取实际解析包的 README 和 exports 公开类型，按官方 Cordis 生命周期核对注入和注册，再做实际页面验收。完整步骤见随 Symon Studio 开发技能交付的 `references/sdk-verification.md`。
+Expert Workshop 注册服务是本平台扩展，不属于官方预生成的 Service 接口目录；`no catalogued Service` 不能作为服务未运行的证据。官方 Config 查询的 `absent` 表示没有声明 Config Schema，不表示插件未安装。开发者应读取实际解析包的 README 和 exports 公开类型，按官方 Cordis 生命周期核对注入和注册，再做实际页面验收。完整步骤见随 Expert Workshop 开发技能交付的 `references/sdk-verification.md`。
 
 ## 制作交付与用户验收
 
@@ -139,12 +139,12 @@ Symon Studio 注册服务是本平台扩展，不属于官方预生成的 Servic
 
 ## 新建业务包的固定构建边界
 
-平台生成的骨架使用项目内 `.workdsh-pnpm-store`，避免继承全局缓存的旧权限；源码恢复点同时排除该目录与旧版 `.workdsh-npm-cache`。构建时将 React、React DOM 与 `symon-studio-plugin-workbenches/client` 留给宿主提供，不把平台重复打入业务包。通过统一交付入口执行构建、启动检查与 pnpm 打包，不能用 macOS 系统 tar 临时拼包。安装前读取开发上下文，确认同一最终 tgz 的版本、SHA256 与兼容检查通过。检查失败保留具体错误，不能把被拒归档笼统称为候选不存在。
+平台生成的骨架使用项目内 `.workdsh-pnpm-store`，避免继承全局缓存的旧权限；源码恢复点同时排除该目录与旧版 `.workdsh-npm-cache`。构建时将 React、React DOM 与 `expert-workshop-plugin-workbenches/client` 留给宿主提供，不把平台重复打入业务包。通过统一交付入口执行构建、启动检查与 pnpm 打包，不能用 macOS 系统 tar 临时拼包。安装前读取开发上下文，确认同一最终 tgz 的版本、SHA256 与兼容检查通过。检查失败保留具体错误，不能把被拒归档笼统称为候选不存在。
 
 
 ### 共用安装前启动检查
 
-公开入口 `symon-studio-plugin-workbenches/startup-check` 提供 `checkWorkbenchStartup(sourceDirectory)`。仅在用户已授权的官方开发工具沙箱中执行；不要在 Host 包预览 RPC 中 import 候选代码。新工程优先执行 `node deliver.mjs`，先 build，再检查启动，失败即阻止打包；独立执行 prepack 时同样保留检查。已有工程也可执行 `node <SDK目录>/scripts/check-startup.mjs <工程目录>`，不用由 Agent 每次重写 Cordis 启动脚本。
+公开入口 `expert-workshop-plugin-workbenches/startup-check` 提供 `checkWorkbenchStartup(sourceDirectory)`。仅在用户已授权的官方开发工具沙箱中执行；不要在 Host 包预览 RPC 中 import 候选代码。新工程优先执行 `node deliver.mjs`，先 build，再检查启动，失败即阻止打包；独立执行 prepack 时同样保留检查。已有工程也可执行 `node <SDK目录>/scripts/check-startup.mjs <工程目录>`，不用由 Agent 每次重写 Cordis 启动脚本。
 
 检查在子进程中加载真实 Host 构建产物、解析声明运行依赖，使用官方 `ctx.plugin`，等待全部当前子组件生命周期，并检查依赖挂起和清理错误。15 秒超时会停止检查。子进程清空模型密钥等继承环境，使用临时 Home；临时目录与子进程不等于 OS 沙箱，执行权限仍由官方工具沙箱控制。
 
@@ -157,7 +157,7 @@ Symon Studio 注册服务是本平台扩展，不属于官方预生成的 Servic
 
 ### 共用交付入口与耗时
 
-新骨架执行 `node deliver.mjs`；已有工程在官方开发工具的当前权限、沙箱内执行 `<sdk.delivery.command> <sdk.delivery.runner> <source.directory>`。交付入口用 Node 运行已安装或内置的 pnpm JavaScript 文件，不依赖系统 npm、全局 pnpm 或 Windows .cmd 启动器；内置版本不匹配时明确停止。公开入口 `symon-studio-plugin-workbenches/delivery` 统一执行 build → 隔离 Host 启动检查 → pack，失败立即停止；打包关闭重复生命周期脚本，避免再次构建。候选不覆盖同名归档。报告保存于独立临时目录，逐阶段写入真实起止时间和耗时，不把日志、凭据或报告混入业务源码与归档。未完成的 running 记录视为中断、结果未确认。
+新骨架执行 `node deliver.mjs`；已有工程在官方开发工具的当前权限、沙箱内执行 `<sdk.delivery.command> <sdk.delivery.runner> <source.directory>`。交付入口用 Node 运行已安装或内置的 pnpm JavaScript 文件，不依赖系统 npm、全局 pnpm 或 Windows .cmd 启动器；内置版本不匹配时明确停止。公开入口 `expert-workshop-plugin-workbenches/delivery` 统一执行 build → 隔离 Host 启动检查 → pack，失败立即停止；打包关闭重复生命周期脚本，避免再次构建。候选不覆盖同名归档。报告保存于独立临时目录，逐阶段写入真实起止时间和耗时，不把日志、凭据或报告混入业务源码与归档。未完成的 running 记录视为中断、结果未确认。
 
 开发上下文内联当前已安装版本 README 的最短接入示例、文档指纹及公共交付入口。先用示例与骨架，需要额外能力或出现实际接口错误时再查对应公开类型。这不执行 SDK，也不枚举私有实现。报告只是开发诊断；该入口的阶段报告覆盖构建、启动检查、打包；安装后状态与真实页面验收仍独立核对。
 
@@ -170,4 +170,4 @@ Symon Studio 注册服务是本平台扩展，不属于官方预生成的 Servic
 
 启动检查还核对直接运行依赖与 peer 的实际安装版本，不把“模块能解析”当成满足版本范围；缺少明确 optional 的 peer 不阻断。无法按 SemVer 核对的来源明确失败，诊断不回显可能带凭据的版本 URL。这仍不等于完整传递依赖闭包证明。
 
-业务骨架的 Symon Studio SDK peer 使用从实际已交付版本起的兼容范围（例如 `^3.0.0-alpha.48`），同时由 `hostCompatibility.sdk` 检查业务 API 契约，避免平台内部兼容修复后每个业务包都因精确锁定旧 SDK 而重新制作。官方 DSH/Cordis 依赖继续遵循目标运行时的版本约束；若确有不兼容的公开 API 变化，必须先验证适配，不能仅放宽范围掩盖错误。
+业务骨架的 Expert Workshop SDK peer 使用从实际已交付版本起的兼容范围（例如 `^3.0.0-alpha.48`），同时由 `hostCompatibility.sdk` 检查业务 API 契约，避免平台内部兼容修复后每个业务包都因精确锁定旧 SDK 而重新制作。官方 DSH/Cordis 依赖继续遵循目标运行时的版本约束；若确有不兼容的公开 API 变化，必须先验证适配，不能仅放宽范围掩盖错误。

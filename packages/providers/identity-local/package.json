@@ -1,5 +1,5 @@
 {
-  "name": "symon-studio-provider-identity-local",
+  "name": "expert-workshop-provider-identity-local",
   "version": "0.1.0-alpha.7",
   "private": true,
   "type": "module",
@@ -39,7 +39,7 @@
     "@deepseek-ai/cordis": "4.0.5",
     "@deepseek-ai/dsh-storage-domain": "0.2.1-rc.2",
     "@types/node": "22.19.0",
-    "symon-studio-contracts": "workspace:*"
+    "expert-workshop-contracts": "workspace:*"
   },
   "description": "Provides trusted local identity and personal workspace ownership."
 }

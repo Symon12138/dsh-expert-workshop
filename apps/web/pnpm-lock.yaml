@@ -520,15 +520,15 @@ importers:
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
+      expert-workshop-plugin-workbench:
+        specifier: workspace:*
+        version: link:../plugins/workbench
+      expert-workshop-ui:
+        specifier: workspace:*
+        version: link:../ui
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-plugin-workbench:
-        specifier: workspace:*
-        version: link:../plugins/workbench
-      symon-studio-ui:
-        specifier: workspace:*
-        version: link:../ui
 
   ../../packages/contracts:
     devDependencies:
@@ -560,7 +560,7 @@ importers:
       '@types/node':
         specifier: 22.19.0
         version: 22.19.0
-      symon-studio-contracts:
+      expert-workshop-contracts:
         specifier: workspace:*
         version: link:../../contracts
 
@@ -593,12 +593,12 @@ importers:
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
 
   ../../packages/plugins/audit:
     dependencies:
@@ -615,7 +615,7 @@ importers:
       '@types/node':
         specifier: 22.19.0
         version: 22.19.0
-      symon-studio-contracts:
+      expert-workshop-contracts:
         specifier: workspace:*
         version: link:../../contracts
 
@@ -672,15 +672,15 @@ importers:
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
+      expert-workshop-ui:
+        specifier: workspace:*
+        version: link:../../ui
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
-      symon-studio-ui:
-        specifier: workspace:*
-        version: link:../../ui
       zod:
         specifier: ^4.3.6
         version: 4.4.3
@@ -757,15 +757,15 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
       react:
         specifier: 19.2.4
         version: 19.2.4
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
 
   ../../packages/plugins/experts:
     dependencies:
@@ -866,15 +866,15 @@ importers:
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
+      expert-workshop-ui:
+        specifier: workspace:*
+        version: link:../../ui
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
-      symon-studio-ui:
-        specifier: workspace:*
-        version: link:../../ui
 
   ../../packages/plugins/library:
     dependencies:
@@ -966,18 +966,18 @@ importers:
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
+      expert-workshop-ui:
+        specifier: workspace:*
+        version: link:../../ui
       pdf-lib:
         specifier: 1.17.1
         version: 1.17.1
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
-      symon-studio-ui:
-        specifier: workspace:*
-        version: link:../../ui
       workdsh-tabular:
         specifier: workspace:*
         version: link:../../tabular
@@ -1135,7 +1135,7 @@ importers:
       '@univerjs/slides-ui':
         specifier: 0.25.1
         version: 0.25.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(rxjs@7.8.2)
-      symon-studio-contracts:
+      expert-workshop-contracts:
         specifier: workspace:*
         version: link:../../contracts
       workdsh-tabular:
@@ -1223,18 +1223,18 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
+      expert-workshop-ui:
+        specifier: workspace:*
+        version: link:../../ui
       react:
         specifier: 19.2.4
         version: 19.2.4
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
-      symon-studio-ui:
-        specifier: workspace:*
-        version: link:../../ui
 
   ../../packages/plugins/quality-analysis:
     dependencies:
@@ -1281,18 +1281,18 @@ importers:
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
+      expert-workshop-plugin-library:
+        specifier: workspace:*
+        version: link:../library
+      expert-workshop-plugin-workbenches:
+        specifier: workspace:*
+        version: link:../workbenches
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
-      symon-studio-plugin-library:
-        specifier: workspace:*
-        version: link:../library
-      symon-studio-plugin-workbenches:
-        specifier: workspace:*
-        version: link:../workbenches
       workdsh-tabular:
         specifier: workspace:*
         version: link:../../tabular
@@ -1357,15 +1357,15 @@ importers:
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
+      expert-workshop-ui:
+        specifier: workspace:*
+        version: link:../../ui
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
-      symon-studio-ui:
-        specifier: workspace:*
-        version: link:../../ui
 
   ../../packages/plugins/workbench:
     devDependencies:
@@ -1411,12 +1411,12 @@ importers:
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
+      expert-workshop-ui:
+        specifier: workspace:*
+        version: link:../../ui
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-ui:
-        specifier: workspace:*
-        version: link:../../ui
 
   ../../packages/plugins/workbenches:
     dependencies:
@@ -1493,15 +1493,15 @@ importers:
       '@types/semver':
         specifier: 7.7.1
         version: 7.7.1
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
       react:
         specifier: 19.2.4
         version: 19.2.4
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
 
   ../../packages/providers/browser-session:
     dependencies:
@@ -1563,12 +1563,12 @@ importers:
       esbuild:
         specifier: 0.25.12
         version: 0.25.12
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -1618,12 +1618,12 @@ importers:
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
+      expert-workshop-contracts:
+        specifier: workspace:*
+        version: link:../../contracts
       react:
         specifier: 19.2.4
         version: 19.2.4
-      symon-studio-contracts:
-        specifier: workspace:*
-        version: link:../../contracts
 
   ../../packages/providers/identity-local:
     dependencies:
@@ -1643,7 +1643,7 @@ importers:
       '@types/node':
         specifier: 22.19.0
         version: 22.19.0
-      symon-studio-contracts:
+      expert-workshop-contracts:
         specifier: workspace:*
         version: link:../../contracts
 

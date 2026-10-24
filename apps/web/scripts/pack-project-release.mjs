@@ -66,7 +66,7 @@ for (const directory of packageDirectories) {
 packages.sort((left, right) => left.name.localeCompare(right.name));
 await writeFile(join(destination, 'SHA256SUMS'), packages.map(item => `${item.sha256}  ${item.filename}`).join('\n') + '\n');
 await writeFile(join(destination, 'release-manifest.json'), JSON.stringify({
-  project: 'Symon Studio',
+  project: 'Expert Workshop',
   version: project.version,
   tag,
   channel: 'github-release',
@@ -78,8 +78,8 @@ await writeFile(join(destination, 'release-manifest.json'), JSON.stringify({
   runtimeOverrides: Object.fromEntries(Object.entries(project.pnpm.overrides).filter(([name]) => name.startsWith('@deepseek-ai/'))),
   packages,
   installation: {
-    defaultPackages: ['symon-studio-provider-identity-local','symon-studio-provider-browser-session','symon-studio-plugin-audit','symon-studio-plugin-access','symon-studio-plugin-skills','symon-studio-plugin-experts','symon-studio-plugin-connectors','symon-studio-plugin-library','symon-studio-plugin-workbenches','workdsh-bundle'],
-    optionalPackages: ['symon-studio-plugin-office','symon-studio-plugin-projects','symon-studio-plugin-activity','symon-studio-plugin-quality-analysis'],
+    defaultPackages: ['expert-workshop-provider-identity-local','expert-workshop-provider-browser-session','expert-workshop-plugin-audit','expert-workshop-plugin-access','expert-workshop-plugin-skills','expert-workshop-plugin-experts','expert-workshop-plugin-connectors','expert-workshop-plugin-library','expert-workshop-plugin-workbenches','workdsh-bundle'],
+    optionalPackages: ['expert-workshop-plugin-office','expert-workshop-plugin-projects','expert-workshop-plugin-activity','expert-workshop-plugin-quality-analysis'],
     enterprisePackages: 'Separate artifacts; not included in this personal collection',
     preservesPreviouslyInstalledOptionalPackages: true,
   },

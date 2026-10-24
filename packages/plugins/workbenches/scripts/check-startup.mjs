@@ -48,7 +48,7 @@ async function worker(directory,home){
  let ctx,stage='dependencies';const providers=['workdshWorkbenchRegistration (test adapter)'];
  try{
   const pkg=JSON.parse(await readFile(join(directory,'package.json'),'utf8')),require=createRequire(join(directory,'package.json'));
-  const hostRequire=await hostPeerRequire(directory),hostPeers=new Set(['@deepseek-ai/cordis','symon-studio-plugin-workbenches']);
+  const hostRequire=await hostPeerRequire(directory),hostPeers=new Set(['@deepseek-ai/cordis','expert-workshop-plugin-workbenches']);
   const missing=[],mismatches=[],resolvers=new Map();
   const semver=createRequire(import.meta.url)('semver');
   for(const [name,range] of Object.entries({...pkg.dependencies,...pkg.peerDependencies})){

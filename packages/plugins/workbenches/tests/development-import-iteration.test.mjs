@@ -15,7 +15,7 @@ const build=options=>esbuildBuild({...options,plugins:[preflightExternals,...(op
 // Run the actual import Host and durable official JSON journal. Package execution
 // is a fixture: this tests authorization/iteration ordering, not installed bytes.
 const built = await build({ entryPoints: [join(root, 'packages/plugins/workbenches/src/runtime/profile-import-host.ts')], bundle: true, platform: 'node', format: 'esm', write: false,
-  alias: { 'symon-studio-contracts': join(root, 'packages/contracts/src/index.ts') },
+  alias: { 'expert-workshop-contracts': join(root, 'packages/contracts/src/index.ts') },
   plugins: [{ name: 'iteration-install-fixture', setup(builder) {
     builder.onResolve({ filter: /^\.\/profile-target\.js$/ }, () => ({ path: 'target', namespace: 'iteration-fixture' }));
     builder.onResolve({ filter: /^\.\/profile-installer\.js$/ }, () => ({ path: 'installer', namespace: 'iteration-fixture' }));

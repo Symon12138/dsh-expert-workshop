@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import type { ConnectorManagementService } from 'symon-studio-contracts';
+import type { ConnectorManagementService } from 'expert-workshop-contracts';
 import { Context, Service } from '@deepseek-ai/cordis';
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain';
 import type { SessionCreateRequest, SessionCreateValue } from '@deepseek-ai/dsh-api-session-controller';
@@ -53,8 +53,8 @@ import type {
   PublishReceipt,
   ResourceOwner,
   SkillRevisionRef,
-} from 'symon-studio-contracts';
-import type { SkillManagementService } from 'symon-studio-contracts/skills';
+} from 'expert-workshop-contracts';
+import type { SkillManagementService } from 'expert-workshop-contracts/skills';
 import { expertsDomainSpec, keys } from '../storage/domain.js';
 import { COMPILER_VERSION, compileExpertPreset, presetIdFor, verifyPackageFiles } from '../runtime/preset-compiler.js';
 import { ConfirmationStore } from '../runtime/confirmation.js';
@@ -518,7 +518,7 @@ export class ExpertsManager extends Service implements ExpertsService {
    * Recompile an older published team for the current runtime without mutating its
    * immutable revision. Existing Sessions keep their old binding; only future
    * executions move to the derived revision. This is intentionally done on use so
-   * installations upgraded from an earlier Symon Studio release need no manual republish.
+   * installations upgraded from an earlier Expert Workshop release need no manual republish.
    */
   private async ensureCurrentExecutionRevision(actor: ActorContext, revision: ExpertRevision, signal?: AbortSignal): Promise<ExpertRevision> {
     if (!revision.definition.team || revision.compilerVersion === COMPILER_VERSION) return revision;

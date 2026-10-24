@@ -13,4 +13,4 @@ const result = await build({
   external: ['react', 'react/jsx-runtime'],
 });
 await writeFile(new URL('dist/client.browser.js', entry),
-  `window.__ModuleLoader__.load({id: "symon-studio-provider-browser-session", factory: function(require) { const module = {exports:{}};\n${result.outputFiles[0].text}\nreturn module.exports; }});\n`);
+  `window.__ModuleLoader__.load({id: "expert-workshop-provider-browser-session", factory: function(require) { const module = {exports:{}};\n${result.outputFiles[0].text}\nreturn module.exports; }});\n`);

@@ -1,4 +1,4 @@
-import type {LibraryOriginalPreviewInput} from 'symon-studio-contracts/library';
+import type {LibraryOriginalPreviewInput} from 'expert-workshop-contracts/library';
 /** Owns one detached-capable target. Late Office mounts are always disposed. */
 export function mountQualitySourcePreview(target:HTMLElement,input:Omit<LibraryOriginalPreviewInput,'bytes'>,read:(signal:AbortSignal)=>Promise<Uint8Array>,mount:(target:HTMLElement,input:LibraryOriginalPreviewInput)=>Promise<()=>void>,state:(status:'ready'|'error')=>void){
  const request=new AbortController();

@@ -34,21 +34,21 @@ const groupVersion = manifest.runtimeOverrides?.['@deepseek-ai/cordis-plugin-gro
 if (typeof groupVersion !== 'string' || !/^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$/.test(groupVersion)) throw new Error('Release manifest must pin the exact official Cordis group version.');
 const packages = new Map(manifest.packages.map(item => [item.name, item]));
 const defaultInstallOrder = [
-  'symon-studio-provider-identity-local',
-  'symon-studio-provider-browser-session',
-  'symon-studio-plugin-audit',
-  'symon-studio-plugin-access',
-  'symon-studio-plugin-skills',
+  'expert-workshop-provider-identity-local',
+  'expert-workshop-provider-browser-session',
+  'expert-workshop-plugin-audit',
+  'expert-workshop-plugin-access',
+  'expert-workshop-plugin-skills',
   // The experts layer installs and activates the three official DSH Agent Team modules.
-  'symon-studio-plugin-experts',
-  'symon-studio-plugin-connectors',
-  'symon-studio-plugin-library',
-  'symon-studio-plugin-workbenches',
+  'expert-workshop-plugin-experts',
+  'expert-workshop-plugin-connectors',
+  'expert-workshop-plugin-library',
+  'expert-workshop-plugin-workbenches',
   'workdsh-bundle',
 ];
 
 const optionalFeatures = {
-  office:'symon-studio-plugin-office',projects:'symon-studio-plugin-projects',activity:'symon-studio-plugin-activity','quality-analysis':'symon-studio-plugin-quality-analysis',
+  office:'expert-workshop-plugin-office',projects:'expert-workshop-plugin-projects',activity:'expert-workshop-plugin-activity','quality-analysis':'expert-workshop-plugin-quality-analysis',
 };
 const requested = value('--with','');
 if (typeof requested !== 'string') throw new Error('--with requires comma-separated feature names');
@@ -105,7 +105,7 @@ const dshHome = resolve(process.env.DSH_HOME || join(homedir(), '.dsh'));
 const versionResult = execute(['--version'], { always: true, capture: true });
 const actualHarness = versionResult?.stdout?.trim();
 if (actualHarness !== expectedHarness) {
-  throw new Error(`Symon Studio ${manifest.version} requires dsh ${expectedHarness}; found ${actualHarness || 'unknown'}. Pass --dsh /absolute/path/to/a-compatible-dsh.`);
+  throw new Error(`Expert Workshop ${manifest.version} requires dsh ${expectedHarness}; found ${actualHarness || 'unknown'}. Pass --dsh /absolute/path/to/a-compatible-dsh.`);
 }
 
 const profileManifest = join(dshHome, 'profiles', profile, 'package.json');
@@ -179,7 +179,7 @@ execute(['plugin', '--profile', profile, 'add', `@deepseek-ai/dsh-base@${expecte
 if (!dryRun) {
   const profilePackage = JSON.parse(readFileSync(profileManifest, 'utf8'));
   const bundles = profilePackage.dsh?.profile?.bundles ?? [];
-  for (const name of installOrder) if (name !== 'symon-studio-provider-browser-session' && !bundles.includes(name)) bundles.push(name);
+  for (const name of installOrder) if (name !== 'expert-workshop-provider-browser-session' && !bundles.includes(name)) bundles.push(name);
   profilePackage.dsh = { ...profilePackage.dsh, profile: { ...profilePackage.dsh?.profile, bundles } };
   writeFileSync(profileManifest, JSON.stringify(profilePackage, null, 2) + '\n');
 }
@@ -192,7 +192,7 @@ if (!dryRun) {
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
-// Profiles disable automatic peers, because Symon Studio's build-only workspace peers
+// Profiles disable automatic peers, because Expert Workshop's build-only workspace peers
 // are bundled and not published to npm. Install the official runtime peer closure
 // explicitly so a clean Profile can boot without relying on the developer repo.
 if (!dryRun) {
@@ -219,5 +219,5 @@ if (!dryRun) {
 }
 if (!dryRun) await retainWorkbenchArchives(join(dshHome, 'profiles', profile), directory, installOrder.map(name => packages.get(name)));
 const profileCli = join(dshHome, 'profiles', profile, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js');
-console.log(`\nSymon Studio ${manifest.version} ${dryRun ? 'installation plan verified' : 'is installed'} in profile ${profile}.`);
+console.log(`\nExpert Workshop ${manifest.version} ${dryRun ? 'installation plan verified' : 'is installed'} in profile ${profile}.`);
 console.log(`Start it with: node ${JSON.stringify(profileCli)} --profile ${JSON.stringify(profile)}`);

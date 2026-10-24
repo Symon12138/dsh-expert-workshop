@@ -4,7 +4,7 @@ import { extname, join, relative, resolve, sep } from 'node:path';
 import type { SkillCatalogEntry, SkillCatalogIcon, SkillCatalogStatus, SkillCatalogSummary, SkillDiagnostic } from '../shared.js';
 
 /**
- * Read-only view over the Symon Studio-owned local skill catalog.
+ * Read-only view over the Expert Workshop-owned local skill catalog.
  *
  * The catalog is plain data below the shared Agents home (`catalog.json`,
  * `icons/`, `payloads/`). This store owns metadata lookup, icon bytes and

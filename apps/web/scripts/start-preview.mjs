@@ -22,7 +22,7 @@ if (existsSync(profileManifestPath)) {
   const normalizedManifest = withoutRedundantAgentTeamProfile(profileManifest);
   if (normalizedManifest) {
     writeFileSync(profileManifestPath, `${JSON.stringify(normalizedManifest, null, 2)}\n`);
-    console.log('Removed redundant standalone Agent Team profile; Symon Studio experts owns Team composition.');
+    console.log('Removed redundant standalone Agent Team profile; Expert Workshop experts owns Team composition.');
   }
 }
 const dsh = resolve(profile, 'node_modules/@deepseek-ai/dsh/lib/bin.js');

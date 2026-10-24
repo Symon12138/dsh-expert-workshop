@@ -1,4 +1,4 @@
-import { parseWorkbenchDescriptor, type WorkbenchDescriptor, type WorkbenchPackageReceipt } from 'symon-studio-contracts';
+import { parseWorkbenchDescriptor, type WorkbenchDescriptor, type WorkbenchPackageReceipt } from 'expert-workshop-contracts';
 
 export interface WorkbenchRegistrationAuthority {
   readonly descriptor: WorkbenchDescriptor;

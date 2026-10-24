@@ -77,7 +77,7 @@ const client = await build({
 });
 await writeFile(
   new URL("dist/client.browser.js", root),
-  `window.__ModuleLoader__.load({id:"symon-studio-plugin-office",factory:function(require){const module={exports:{}};${client.outputFiles[0].text}\nreturn module.exports;}});`,
+  `window.__ModuleLoader__.load({id:"expert-workshop-plugin-office",factory:function(require){const module={exports:{}};${client.outputFiles[0].text}\nreturn module.exports;}});`,
 );
 const host = await build({
   metafile: true,

@@ -10,7 +10,7 @@ import type { ManagedSkillDetail, ManagedSkillResource, ManagedSkillSummary, Ski
 import { SkillImportStaging } from './import-staging.js';
 import { SkillCatalogStore } from './catalog.js';
 import type { SkillManagementService, SkillDependencyInspector, SkillDisplayMetadata } from '../shared.js';
-import type { RetainedSkillRevision, SkillConsumerRef, SkillRevisionCheck, SkillRevisionRef, SkillRevisionStatus } from 'symon-studio-contracts';
+import type { RetainedSkillRevision, SkillConsumerRef, SkillRevisionCheck, SkillRevisionRef, SkillRevisionStatus } from 'expert-workshop-contracts';
 
 declare module '@deepseek-ai/cordis' {
   interface Context { workdshSkills: SkillManagementService; }

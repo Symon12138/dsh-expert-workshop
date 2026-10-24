@@ -20,7 +20,7 @@ export const name='workdsh-workbenches';
 export const inject=['profileContext','loader','storageDomain','connection','workdshIdentity','workdshAccess','sessionController','workspaceController','tools'];
 export async function apply(ctx:Context) {
   const kernel=getDshRuntimeVersion();
-  const isCompatible = (descriptor: import('symon-studio-contracts').WorkbenchDescriptor) =>
+  const isCompatible = (descriptor: import('expert-workshop-contracts').WorkbenchDescriptor) =>
     semver.satisfies('1.0.0',descriptor.hostCompatibility.sdk,{includePrerelease:true}) &&
     semver.satisfies(kernel,descriptor.hostCompatibility.harness,{includePrerelease:true});
   const registration = await mountWorkbenchRegistrationHost<string>(ctx,isCompatible);
@@ -40,5 +40,5 @@ export async function apply(ctx:Context) {
 export type { HostWorkbenchRegistration } from './runtime/host-registration.js';
 
 /** Public authoring types; owned contracts are bundled into the platform archive. */
-export type { WorkbenchDescriptor, WorkbenchPackageReceipt, WorkbenchRequirementsDraft, WorkbenchRequirementsRevision, WorkbenchDevelopmentIndexEntry } from 'symon-studio-contracts';
-export type { WorkbenchSystemDefinition, WorkbenchSystemModule } from 'symon-studio-contracts';
+export type { WorkbenchDescriptor, WorkbenchPackageReceipt, WorkbenchRequirementsDraft, WorkbenchRequirementsRevision, WorkbenchDevelopmentIndexEntry } from 'expert-workshop-contracts';
+export type { WorkbenchSystemDefinition, WorkbenchSystemModule } from 'expert-workshop-contracts';

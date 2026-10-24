@@ -1,4 +1,4 @@
-import type {WorkbenchRequirementsDraft,WorkbenchRequirementsRevision} from 'symon-studio-contracts';
+import type {WorkbenchRequirementsDraft,WorkbenchRequirementsRevision} from 'expert-workshop-contracts';
 import type {CreationView} from './creation-client.js';
 
 export interface WorkbenchCreationReview {

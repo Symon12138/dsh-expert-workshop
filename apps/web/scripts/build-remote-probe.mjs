@@ -20,7 +20,7 @@ try {
   throw error; // A known gap remains a failing gate, never a simulated pass.
 }
 for (const artifact of artifacts) {
-  assert.ok(artifact.remote, 'Symon Studio must publish generated Remote descriptors');
+  assert.ok(artifact.remote, 'Expert Workshop must publish generated Remote descriptors');
   const out = resolve(artifact.packageRoot, 'lib');
   mkdirSync(out, { recursive: true });
   for (const [name, content] of Object.entries({
@@ -31,4 +31,4 @@ for (const artifact of artifacts) {
     'typert.remote-client.d.ts.map': artifact.remote.dtsMap,
   })) writeFileSync(resolve(out, name), content);
 }
-console.log('PASS: official generator emitted Symon Studio Host and Remote Client artifacts');
+console.log('PASS: official generator emitted Expert Workshop Host and Remote Client artifacts');

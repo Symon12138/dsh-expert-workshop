@@ -1,5 +1,5 @@
 {
-  "name": "symon-studio-plugin-audit",
+  "name": "expert-workshop-plugin-audit",
   "version": "0.1.0-alpha.6",
   "private": true,
   "type": "module",
@@ -38,7 +38,7 @@
     "@deepseek-ai/cordis": "4.0.5",
     "@deepseek-ai/dsh-storage-domain": "0.2.1-rc.2",
     "@types/node": "22.19.0",
-    "symon-studio-contracts": "workspace:*"
+    "expert-workshop-contracts": "workspace:*"
   },
   "description": "Records local management and execution events for audit."
 }

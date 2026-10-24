@@ -1,5 +1,5 @@
 import React,{useEffect,useRef,useState,useSyncExternalStore} from 'react';
-import type {LibraryOriginalPreviewRegistry} from 'symon-studio-contracts/library';
+import type {LibraryOriginalPreviewRegistry} from 'expert-workshop-contracts/library';
 import type {QualityLibraryChoice} from './QualityLibraryImport.js';
 
 /** Library navigates to the native file panel; this workbench owns no file viewer. */

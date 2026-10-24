@@ -17,4 +17,4 @@
     - id: client-ui-agent-team
       name: '@deepseek-ai/dsh-experimental-client-ui-agent-team'
     - id: workdsh-experts
-      name: symon-studio-plugin-experts
+      name: expert-workshop-plugin-experts

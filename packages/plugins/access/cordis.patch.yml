@@ -1,9 +1,9 @@
 - insert:
     - id: workdsh-access
-      name: symon-studio-plugin-access
+      name: expert-workshop-plugin-access
     - id: workdsh-session-access
-      name: symon-studio-plugin-access/session
+      name: expert-workshop-plugin-access/session
     - id: workdsh-tool-access
-      name: symon-studio-plugin-access/tool
+      name: expert-workshop-plugin-access/tool
       config:
         autoBindPersonalSessions: true

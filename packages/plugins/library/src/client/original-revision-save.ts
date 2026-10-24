@@ -1,4 +1,4 @@
-import type {LibraryOriginalRevisionInput,LibraryTreeEntry} from 'symon-studio-contracts/library';
+import type {LibraryOriginalRevisionInput,LibraryTreeEntry} from 'expert-workshop-contracts/library';
 const hash=async(bytes:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',Uint8Array.from(bytes))),byte=>byte.toString(16).padStart(2,'0')).join('');
 /** The Library owner persists a new immutable revision; Office only supplies edited bytes. */
 export function createLibraryOriginalRevisionSave(source:{assetId:string;revisionId:string;kind:string},

@@ -8,7 +8,7 @@ import type {
   ExecutionBinding,
   Operation,
   SkillRevisionRef,
-} from 'symon-studio-contracts';
+} from 'expert-workshop-contracts';
 import { expertDefinitionSchema } from '../domain/definition.js';
 
 /**

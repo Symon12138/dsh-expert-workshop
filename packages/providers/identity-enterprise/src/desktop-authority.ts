@@ -1,4 +1,4 @@
-import type { EnterpriseRequest } from 'symon-studio-contracts';
+import type { EnterpriseRequest } from 'expert-workshop-contracts';
 import { readProtectedFile } from './protected-file.js';
 import { isAbsolute } from 'node:path';
 import type { VerifiedMember } from './request-context.js';

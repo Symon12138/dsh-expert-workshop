@@ -1,4 +1,4 @@
-import { Button } from 'symon-studio-ui';
+import { Button } from 'expert-workshop-ui';
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ExpertAvailability, ExpertDefinition, ExpertDetail, ExpertSkillOption } from '../shared.js';

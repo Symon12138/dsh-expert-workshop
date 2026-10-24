@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Icon } from 'symon-studio-ui';
+import { Icon } from 'expert-workshop-ui';
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client';
-import type { LibraryComposerReference } from 'symon-studio-contracts/library';
+import type { LibraryComposerReference } from 'expert-workshop-contracts/library';
 import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-client-connection/client';
 import type {} from '@deepseek-ai/dsh-client-ui-slots';
@@ -13,7 +13,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-workspace/client';
 import type {} from '@deepseek-ai/dsh-api-session-controller/client';
 import type {} from '@deepseek-ai/dsh-api-workspace-controller/client';
 import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client';
-import type { ProjectInputRef, ProjectSnapshot, ProjectCapabilityRef, ProjectTaskContext } from 'symon-studio-contracts/projects';
+import type { ProjectInputRef, ProjectSnapshot, ProjectCapabilityRef, ProjectTaskContext } from 'expert-workshop-contracts/projects';
 import { createProjectClient } from './client/management.js';
 import { publishProjectFocus, ProjectsPanel } from './client/ProjectsPanel.js';
 import { ProjectConversationMenu, projectApi } from './client/components/project-composer/ProjectConversationMenu.js';
@@ -89,7 +89,7 @@ export function apply(ctx: Context): void {
   };
   // Opening a task is official Session navigation: the Session becomes current and the
   // layout returns to the built-in conversation view, whose shell owns message history,
-  // streaming, composer, model and permissions. Symon Studio keeps no second conversation
+  // streaming, composer, model and permissions. Expert Workshop keeps no second conversation
   // renderer or send path for project tasks.
   // A reload-restored snapshot can mount before the session list pull lands; retry briefly instead of failing loud.
   const openTask = (sessionId: string, onFailed?: () => void): void => {

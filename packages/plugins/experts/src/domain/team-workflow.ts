@@ -1,4 +1,4 @@
-import type { ExpertTeamDefinition } from 'symon-studio-contracts';
+import type { ExpertTeamDefinition } from 'expert-workshop-contracts';
 
 /** Validate authored instructions only; runtime tasks and transitions belong to DSH. */
 export function validateTeamWorkflow(stages: ExpertTeamDefinition['workflows'][number]['stages']): void {

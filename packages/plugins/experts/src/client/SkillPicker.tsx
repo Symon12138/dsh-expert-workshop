@@ -1,4 +1,4 @@
-import { Input, Button } from 'symon-studio-ui';
+import { Input, Button } from 'expert-workshop-ui';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { EXPERT_LIMITS } from '../shared.js';

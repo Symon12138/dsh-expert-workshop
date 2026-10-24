@@ -1,4 +1,4 @@
-import type { MembershipRole } from 'symon-studio-contracts';
+import type { MembershipRole } from 'expert-workshop-contracts';
 
 /** Member information verified by the configured authentication backend. */
 export interface VerifiedMember {

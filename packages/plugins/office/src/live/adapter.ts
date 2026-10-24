@@ -7,7 +7,7 @@ import type {
   OfficeOperation,
   OfficeList,
   OfficeTextStyle,
-} from "symon-studio-contracts/office";
+} from "expert-workshop-contracts/office";
 
 /** Semantic styles cross the Host boundary; editor HTML/JSON never does. */
 export const BlockIdentity = Extension.create({

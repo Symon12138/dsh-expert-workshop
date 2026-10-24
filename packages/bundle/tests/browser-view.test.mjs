@@ -154,7 +154,7 @@ function clientFixture(status,{providerEnabled=false}={}) {
     effect(body){const stop=body();if(typeof stop==='function')cleanups.push(stop);},
     slots:{inject(_slot,body){const stop=body();if(typeof stop==='function')cleanups.push(stop);},register(){return()=>{};},entriesOfSlot(){return[];}},
     layout:{selectPanel(){}},
-    remote:{pluginInventory:{async list(){return{ok:true,value:{entries:providerEnabled?[{moduleName:'symon-studio-provider-browser-session',enabled:true}]:[]}};}}},
+    remote:{pluginInventory:{async list(){return{ok:true,value:{entries:providerEnabled?[{moduleName:'expert-workshop-provider-browser-session',enabled:true}]:[]}};}}},
     sidebarRightTabs:{register(){return()=>{};}},
     sidebarRight:{
       openTabs:{getSnapshot:()=>tabs},

@@ -1,7 +1,7 @@
-import { Button } from 'symon-studio-ui';
+import { Button } from 'expert-workshop-ui';
 import * as React from 'react';
 import { useState } from 'react';
-import { Modal } from 'symon-studio-ui';
+import { Modal } from 'expert-workshop-ui';
 import type { ExpertDefinition, PublishReceipt, SkillRevisionRef } from '../shared.js';
 import type { ExpertManagementClient } from './management.js';
 import { ExpertUsagePreview } from './ExpertUsagePreview.js';

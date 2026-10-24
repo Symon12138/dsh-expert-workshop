@@ -1,9 +1,9 @@
-import type { ComposerHandoffSource } from 'symon-studio-contracts/composer';
+import type { ComposerHandoffSource } from 'expert-workshop-contracts/composer';
 import * as React from 'react';
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots';
 import type { ExpertSummary } from '../shared.js';
 import type { ExpertManagementClient } from './management.js';
-import { Button, Icon, Modal } from 'symon-studio-ui';
+import { Button, Icon, Modal } from 'expert-workshop-ui';
 import { avatarColor, expertTitle } from './avatar.js';
 import { WB_AVATARS } from './workbuddy-content.js';
 

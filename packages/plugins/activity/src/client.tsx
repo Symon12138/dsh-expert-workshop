@@ -1,5 +1,5 @@
 import type { Context } from '@deepseek-ai/cordis';
-import type { ActivityPresentation } from 'symon-studio-contracts/activity';
+import type { ActivityPresentation } from 'expert-workshop-contracts/activity';
 import { createPresentationRegistry } from './registry.js';
 
 // Compatibility for identity contributors only. Native Harness owns process and Team UI.

@@ -21,7 +21,7 @@ async function rewrite(directory){
     const text=await readFile(path,'utf8');
     let target=relative(dirname(path),join(destination,'index.js')).replaceAll('\\','/');
     if(!target.startsWith('.'))target='./'+target;
-    await writeFile(path,text.replace(/(['"])symon-studio-contracts\1/g,JSON.stringify(target)));
+    await writeFile(path,text.replace(/(['"])expert-workshop-contracts\1/g,JSON.stringify(target)));
   }
 }
 await rewrite(dist);
@@ -30,4 +30,4 @@ for(const name of await readdir(join(dist,'runtime')))if(name.endsWith('.js'))aw
 
 // Official browser module envelope; React is supplied by the native renderer.
 const client = await build({entryPoints:[fileURLToPath(new URL('src/client.tsx',root))],bundle:true,write:false,platform:'browser',format:'cjs',target:'es2022',external:['@deepseek-ai/dsh-client-ui-primitives','react','react/jsx-runtime','react-dom']});
-await writeFile(new URL('dist/client.browser.js',root), `window.__ModuleLoader__.load({id:"symon-studio-plugin-workbenches",factory:function(require){const module={exports:{}};\n${client.outputFiles[0].text}\nreturn module.exports;}});\n`);
+await writeFile(new URL('dist/client.browser.js',root), `window.__ModuleLoader__.load({id:"expert-workshop-plugin-workbenches",factory:function(require){const module={exports:{}};\n${client.outputFiles[0].text}\nreturn module.exports;}});\n`);

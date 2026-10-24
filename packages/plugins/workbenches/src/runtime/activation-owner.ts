@@ -1,4 +1,4 @@
-import type { WorkbenchDescriptor } from 'symon-studio-contracts';
+import type { WorkbenchDescriptor } from 'expert-workshop-contracts';
 import { verifyInstalledWorkbenchArtifact } from './installed-artifact.js';
 import type { WorkbenchInstallationArchives } from './installation-archives.js';
 export interface WorkbenchBundleManager {

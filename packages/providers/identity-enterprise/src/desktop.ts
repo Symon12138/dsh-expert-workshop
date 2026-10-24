@@ -1,5 +1,5 @@
 import { Service, type Context } from '@deepseek-ai/cordis';
-import type { EnterpriseService, EnterpriseRequest, IdentityResolutionContext, IdentityService } from 'symon-studio-contracts';
+import type { EnterpriseService, EnterpriseRequest, IdentityResolutionContext, IdentityService } from 'expert-workshop-contracts';
 import type {} from '@deepseek-ai/dsh-client-connection';
 import type {} from '@deepseek-ai/dsh-api-session-controller';
 import { EnterpriseMemberIdentity } from './member-identity.js';

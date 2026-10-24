@@ -1,4 +1,4 @@
-import type { WorkbenchDevelopment } from 'symon-studio-contracts';
+import type { WorkbenchDevelopment } from 'expert-workshop-contracts';
 import type { createWorkbenchDevelopmentClient } from './development-client.js';
 
 export type WorkbenchCandidateDevelopment = Pick<WorkbenchDevelopment,

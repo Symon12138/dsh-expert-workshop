@@ -11,7 +11,7 @@ import type {
   ModelSelectionRequest,
   MutationContext,
   SkillRequirement,
-} from 'symon-studio-contracts';
+} from 'expert-workshop-contracts';
 import { ExpertsError } from '../domain/values.js';
 import type { ExpertsManager } from './experts-manager.js';
 import { EXPERT_IMPORT_LIMITS, buildExport } from './portability.js';

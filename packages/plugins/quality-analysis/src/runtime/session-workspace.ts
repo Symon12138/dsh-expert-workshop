@@ -4,7 +4,7 @@ import {homedir} from 'node:os';
 import {isAbsolute,join} from 'node:path';
 import type {Context} from '@deepseek-ai/cordis';
 import type {SessionCreateRequest} from '@deepseek-ai/dsh-api-session-controller/types';
-import type {ActorContext} from 'symon-studio-contracts';
+import type {ActorContext} from 'expert-workshop-contracts';
 
 type WorkspaceId=NonNullable<SessionCreateRequest['workspaceId']>;
 type SessionId=NonNullable<SessionCreateRequest['sessionId']>;

@@ -45,10 +45,10 @@ content: { type: 'string', required: true }
 
 ## 所有工作台的主题规范
 
-应用使用宿主系统设置中的浅色、深色和跟随系统，不维护自己的颜色模式。优先从公开 SDK 导入 WorkbenchButton（默认使用原生 toolbar 样式），或使用官方 Button/Input/Menu。Symon Studio 只设默认变体，主题、键盘和焦点仍由原生控件维护。
+应用使用宿主系统设置中的浅色、深色和跟随系统，不维护自己的颜色模式。优先从公开 SDK 导入 WorkbenchButton（默认使用原生 toolbar 样式），或使用官方 Button/Input/Menu。Expert Workshop 只设默认变体，主题、键盘和焦点仍由原生控件维护。
 
 ```jsx
-import { WorkbenchButton } from 'symon-studio-plugin-workbenches/client';
+import { WorkbenchButton } from 'expert-workshop-plugin-workbenches/client';
 <WorkbenchButton onClick={save}>保存</WorkbenchButton>
 <WorkbenchButton variant="outline" onClick={cancel}>取消</WorkbenchButton>
 ```

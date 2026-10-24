@@ -1,8 +1,8 @@
-import { Button, Input, Select, Textarea } from 'symon-studio-ui';
+import { Button, Input, Select, Textarea } from 'expert-workshop-ui';
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots';
-import { Icon, Modal } from 'symon-studio-ui';
+import { Icon, Modal } from 'expert-workshop-ui';
 import type { ConnectorConfigView, ConnectorInput, ConnectorSummary } from '../shared.js';
 import type { ConnectorManagementClient } from './management.js';
 import { connectorCss } from './styles.js';

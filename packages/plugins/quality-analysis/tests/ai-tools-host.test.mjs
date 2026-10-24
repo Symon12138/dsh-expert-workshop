@@ -17,7 +17,7 @@ const nativeLoad=name=>import(pathToFileURL(web.resolve(name)).href);
 const [Agents,AgentLoop,Sessions,Projections,SystemPrompt,Tools,Llm]=await Promise.all(['dsh-agent','dsh-agent-loop','dsh-session','dsh-session-projection','dsh-system-prompt','dsh-tools','dsh-llm'].map(name=>nativeLoad('@deepseek-ai/'+name)));
 const actor={principalId:'member.a',organizationId:'org',requestId:'quality-ai-test',resolvedBy:'trusted-fixture'};
 const compiled=await build({stdin:{contents:"export * from './ai-tools';export * from './run-service';export * from './analysis-run';export * from './analysis-executor';export * from './record-rpc';export {LibraryManager} from '../../../library/src/services/library-manager';",resolveDir:fileURLToPath(new URL('../src/runtime/',import.meta.url)),loader:'ts'},bundle:true,platform:'node',format:'esm',write:false,
- alias:{'symon-studio-contracts':fileURLToPath(new URL('../../../contracts/src/index.ts',import.meta.url))},plugins:[{name:'shared-published-runtime',setup(b){
+ alias:{'expert-workshop-contracts':fileURLToPath(new URL('../../../contracts/src/index.ts',import.meta.url))},plugins:[{name:'shared-published-runtime',setup(b){
   b.onResolve({filter:/^(?:@deepseek-ai\/cordis|@deepseek-ai\/dsh-storage-domain|zod)$/},a=>({path:pathToFileURL(runtime.resolve(a.path)).href,external:true}));
   b.onResolve({filter:/^(?:@deepseek-ai\/dsh-tools|workdsh-tabular|jszip|pdfjs-dist(?:\/.*)?)$/},a=>({path:pathToFileURL(libraryRequire.resolve(a.path)).href,external:true}));
  }}]});

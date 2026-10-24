@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 import ExcelJS from "exceljs";
-import type { OfficeSnapshot, OfficeBlockInput, OfficeChart } from "symon-studio-contracts/office";
+import type { OfficeSnapshot, OfficeBlockInput, OfficeChart } from "expert-workshop-contracts/office";
 const xml = (text: string) =>
   text
     .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "")

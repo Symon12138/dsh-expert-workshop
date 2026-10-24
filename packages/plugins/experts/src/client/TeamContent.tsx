@@ -1,4 +1,4 @@
-import { Textarea } from 'symon-studio-ui';
+import { Textarea } from 'expert-workshop-ui';
 import * as React from 'react';
 import type { ExpertTeamDefinition } from '../shared.js';
 

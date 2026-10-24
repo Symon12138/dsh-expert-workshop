@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Input } from 'symon-studio-ui';
+import { Input } from 'expert-workshop-ui';
 
 export type ProjectMenuKind = 'file' | 'mode' | 'expert' | 'skill' | 'connector';
 export type ProjectMenuItem = { id: string; label: string; description?: string; selected?: boolean; disabled?: boolean };

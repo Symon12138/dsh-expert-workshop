@@ -1,6 +1,6 @@
 import { extractTabularText } from 'workdsh-tabular';
 import JSZip from 'jszip';
-import type { LibraryAssetKind } from 'symon-studio-contracts/library';
+import type { LibraryAssetKind } from 'expert-workshop-contracts/library';
 
 export interface ConversionResult {
   readonly markdown: string;

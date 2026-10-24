@@ -1,4 +1,4 @@
-import { controlsCss, modalCss } from 'symon-studio-ui';
+import { controlsCss, modalCss } from 'expert-workshop-ui';
 
 export const projectsCss = `${modalCss}
 @layer workdsh-business {

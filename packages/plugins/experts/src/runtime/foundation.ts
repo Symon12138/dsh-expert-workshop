@@ -5,8 +5,8 @@ import type {
   ActorContext,
   AuditService,
   IdentityService,
-} from 'symon-studio-contracts';
-import type { SkillManagementService } from 'symon-studio-contracts/skills';
+} from 'expert-workshop-contracts';
+import type { SkillManagementService } from 'expert-workshop-contracts/skills';
 
 /** Local personal actor used when the identity/access foundation is absent. */
 export function localActor(evidence?: { sessionId?: string; runId?: string }): ActorContext {

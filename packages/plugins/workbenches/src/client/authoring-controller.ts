@@ -1,4 +1,4 @@
-import type { WorkbenchRequirementsRevision } from 'symon-studio-contracts';
+import type { WorkbenchRequirementsRevision } from 'expert-workshop-contracts';
 import type { createWorkbenchDevelopmentClient } from './development-client.js';
 import { createWorkbenchDevelopmentInstruction } from './development-instruction.js';
 

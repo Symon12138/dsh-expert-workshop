@@ -1,7 +1,7 @@
-import type {LibraryOriginalPreviewRegistry} from 'symon-studio-contracts/library';
+import type {LibraryOriginalPreviewRegistry} from 'expert-workshop-contracts/library';
 import {QualitySourcePreview} from './QualitySourcePreview.js';
 import React,{useEffect,useRef,useState} from 'react';
-import {LibraryAssetPicker,type createLibraryClient,type LibraryAssetPickerProps} from 'symon-studio-plugin-library/client';
+import {LibraryAssetPicker,type createLibraryClient,type LibraryAssetPickerProps} from 'expert-workshop-plugin-library/client';
 import {QualityLibraryImport,type QualityLibraryImportProps,type QualityLibraryChoice} from './QualityLibraryImport.js';
 import {qualityLibraryChoice} from './library-choice.js';
 export interface QualityLibraryInputProps extends Omit<QualityLibraryImportProps,'selectSource'|'selectedSource'> {

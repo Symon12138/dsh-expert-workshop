@@ -1,9 +1,9 @@
-import { Button, Textarea, Input, Select } from 'symon-studio-ui';
+import { Button, Textarea, Input, Select } from 'expert-workshop-ui';
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots';
-import type { LibraryAsset, LibraryAssetKind, LibraryDraft, LibraryOriginalPreviewInput, LibraryOriginalPreviewRegistry, LibrarySearchHit, LibraryTreeEntry } from 'symon-studio-contracts/library';
-import { Modal } from 'symon-studio-ui';
+import type { LibraryAsset, LibraryAssetKind, LibraryDraft, LibraryOriginalPreviewInput, LibraryOriginalPreviewRegistry, LibrarySearchHit, LibraryTreeEntry } from 'expert-workshop-contracts/library';
+import { Modal } from 'expert-workshop-ui';
 import type { LibraryClient } from './management.js';
 import { libraryCss } from './styles.js';
 

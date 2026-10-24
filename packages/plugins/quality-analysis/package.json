@@ -1,9 +1,9 @@
 {
-  "name": "symon-studio-plugin-quality-analysis",
+  "name": "expert-workshop-plugin-quality-analysis",
   "version": "3.0.0-alpha.57",
   "private": true,
   "type": "module",
-  "description": "Symon Studio quality-analysis business workbench; installation acceptance in progress.",
+  "description": "Expert Workshop quality-analysis business workbench; installation acceptance in progress.",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -27,14 +27,14 @@
     "client": {
       "platform": "web",
       "inject": [
-        "symon-studio-plugin-workbenches",
+        "expert-workshop-plugin-workbenches",
         "@deepseek-ai/dsh-client-ui-layout",
         "@deepseek-ai/dsh-client-ui-conversation",
         "@deepseek-ai/dsh-client-ui-workspace"
       ],
       "external": [
-        "symon-studio-plugin-library/client",
-        "symon-studio-plugin-workbenches/client"
+        "expert-workshop-plugin-library/client",
+        "expert-workshop-plugin-workbenches/client"
       ]
     }
   },
@@ -67,8 +67,8 @@
     "@deepseek-ai/cordis": "4.0.5",
     "@deepseek-ai/dsh-storage-domain": "0.2.1-rc.2",
     "@deepseek-ai/dsh-client-connection": "0.2.1-rc.2",
-    "symon-studio-plugin-library": "0.1.0-alpha.8",
-    "symon-studio-plugin-workbenches": "3.0.0-alpha.49",
+    "expert-workshop-plugin-library": "0.1.0-alpha.8",
+    "expert-workshop-plugin-workbenches": "3.0.0-alpha.49",
     "@deepseek-ai/dsh-client-ui-layout": "0.2.1-rc.2",
     "@deepseek-ai/dsh-api-session-controller": "0.2.1-rc.2",
     "@deepseek-ai/dsh-client-ui-conversation": "0.2.1-rc.2",
@@ -82,11 +82,11 @@
     "@types/node": "22.19.0",
     "@types/react": "19.2.14",
     "react": "19.2.4",
-    "symon-studio-contracts": "workspace:*",
-    "symon-studio-plugin-library": "workspace:*",
+    "expert-workshop-contracts": "workspace:*",
+    "expert-workshop-plugin-library": "workspace:*",
     "@deepseek-ai/dsh-client-ui-layout": "0.2.1-rc.2",
     "workdsh-tabular": "workspace:*",
-    "symon-studio-plugin-workbenches": "workspace:*",
+    "expert-workshop-plugin-workbenches": "workspace:*",
     "@deepseek-ai/dsh-api-session-controller": "0.2.1-rc.2",
     "@deepseek-ai/dsh-client-ui-conversation": "0.2.1-rc.2",
     "@deepseek-ai/dsh-client-ui-workspace": "0.2.1-rc.2"

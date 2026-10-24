@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { WorkbenchSystemEditor } from './WorkbenchSystemEditor.js';
-import { parseWorkbenchRequirementsDraft, type WorkbenchRequirementsDraft } from 'symon-studio-contracts';
+import { parseWorkbenchRequirementsDraft, type WorkbenchRequirementsDraft } from 'expert-workshop-contracts';
 import {requirementsSaveFailureMessage} from './requirements-save-error.js';
 export interface WorkbenchRequirementsFormProps {
   readonly initial?: WorkbenchRequirementsDraft;

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Build the Symon Studio-owned local skill catalog from a WorkBuddy/SkillHub mirror.
+// Build the Expert Workshop-owned local skill catalog from a WorkBuddy/SkillHub mirror.
 //
 // The catalog is data, not code: metadata (title, category, icon) plus inert
 // payload copies that the skills plugin installs through its existing import

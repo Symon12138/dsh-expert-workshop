@@ -1,6 +1,6 @@
 - insert:
     - id: workdsh-identity-local
-      name: symon-studio-provider-identity-local
+      name: expert-workshop-provider-identity-local
       config:
         principalId: local-user
         organizationId: local-personal

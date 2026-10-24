@@ -1,4 +1,4 @@
-import { workbenchActivationState, type WorkbenchPackageReceipt, type WorkbenchDescriptor, parseWorkbenchDescriptor } from 'symon-studio-contracts';
+import { workbenchActivationState, type WorkbenchPackageReceipt, type WorkbenchDescriptor, parseWorkbenchDescriptor } from 'expert-workshop-contracts';
 import { WorkbenchRegistry, type WorkbenchRegistrationAuthority } from './registry.js';
 import { resolveWorkbenchLoaderSource, type WorkbenchCallerContext, type WorkbenchLoader, type WorkbenchLoaderSource } from './loader-source.js';
 import type { WorkbenchManifestReader } from './catalog.js';

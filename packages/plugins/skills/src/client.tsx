@@ -1,4 +1,4 @@
-import type { ActivityPresentation } from 'symon-studio-contracts/activity';
+import type { ActivityPresentation } from 'expert-workshop-contracts/activity';
 declare module '@deepseek-ai/cordis' { interface Context { activityPresentation: ActivityPresentation; } }
 import { installSkillCommandMenu } from './client/CommandMenu.js';
 import type { Context } from '@deepseek-ai/cordis';

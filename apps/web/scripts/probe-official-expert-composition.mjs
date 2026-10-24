@@ -1,4 +1,4 @@
-// U16-V1: official Team + per-Agent composition, without Symon Studio ExpertsManager.
+// U16-V1: official Team + per-Agent composition, without Expert Workshop ExpertsManager.
 // Deterministic model I/O; real Loader, AgentLoop, tools, skills and persistence.
 // First run: node scripts/probe-official-expert-composition.mjs --prepare
 // Cached: node scripts/probe-official-expert-composition.mjs

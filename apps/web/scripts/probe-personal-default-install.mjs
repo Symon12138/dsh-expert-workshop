@@ -33,7 +33,7 @@ try{
  await run(process.execPath,[join(root,'scripts/install-project-release.mjs'),'--directory',assets,'--profile','personal','--dsh',wrapper]);
  const profile=JSON.parse(await readFile(join(home,'profiles/personal/package.json'),'utf8'));
  for(const name of packages.map(p=>p.name))assert.ok(profile.dependencies[name],name);
- for(const name of ['symon-studio-plugin-office','symon-studio-plugin-projects','symon-studio-plugin-activity','symon-studio-provider-identity-enterprise','symon-studio-plugin-enterprise-collaboration'])assert.ok(!profile.dependencies[name],name);
+ for(const name of ['expert-workshop-plugin-office','expert-workshop-plugin-projects','expert-workshop-plugin-activity','expert-workshop-provider-identity-enterprise','expert-workshop-plugin-enterprise-collaboration'])assert.ok(!profile.dependencies[name],name);
  pass('Actual source installer creates a fresh personal Profile with only the default owned package set');
  server=spawn(process.execPath,[join(home,'profiles/personal/node_modules/@deepseek-ai/dsh/lib/bin.js'),'--profile','personal','--host','127.0.0.1','--port','0','--no-open'],{cwd:home,env,stdio:['ignore','pipe','pipe']});
  server.stdout.on('data',b=>{log+=b;});server.stderr.on('data',b=>{log+=b;});
@@ -49,8 +49,8 @@ try{
  const page=await context.newPage();await page.goto(host.address);
  for(const name of ['Continue','Configure later','Keep current display','Not now','Got it','继续','稍后配置','保留当前显示','暂不开启','知道了'])await page.getByRole('button',{name,exact:true}).last().click({timeout:700}).catch(()=>{});
  const entries=await page.evaluate(()=>window.__DSH_BOOT__.entries.map(r=>r.id));
- for(const name of ['skills','experts','connectors','library'])assert.ok(entries.includes('symon-studio-plugin-'+name),name);
- assert.ok(!entries.some(name=>/enterprise|symon-studio-plugin-(office|projects|activity)$/.test(name)));
+ for(const name of ['skills','experts','connectors','library'])assert.ok(entries.includes('expert-workshop-plugin-'+name),name);
+ assert.ok(!entries.some(name=>/enterprise|expert-workshop-plugin-(office|projects|activity)$/.test(name)));
  await expect(page.getByRole('button',{name:'专家 · 技能 · 连接器',exact:true})).toBeVisible();
  await expect(page.getByRole('button',{name:'资料库',exact:true})).toBeVisible();
  await expect(page.getByRole('button',{name:'项目',exact:true})).toHaveCount(0);

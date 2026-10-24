@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useEffect,useRef,useState,useSyncExternalStore} from 'react';
-import type {LibraryOriginalPreviewRegistry,LibraryTreeEntry} from 'symon-studio-contracts/library';
+import type {LibraryOriginalPreviewRegistry,LibraryTreeEntry} from 'expert-workshop-contracts/library';
 import type {LibraryClient} from './management.js';
 import {createLibraryOriginalRevisionSave} from './original-revision-save.js';
 

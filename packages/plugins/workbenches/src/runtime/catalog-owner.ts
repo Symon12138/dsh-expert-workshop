@@ -1,4 +1,4 @@
-import type { WorkbenchDescriptor } from 'symon-studio-contracts';
+import type { WorkbenchDescriptor } from 'expert-workshop-contracts';
 import { readWorkbenchCatalog } from './catalog.js';
 import { InstalledWorkbenchManifestReader } from './installed-manifest-reader.js';
 import { verifyInstalledWorkbenchArtifact } from './installed-artifact.js';

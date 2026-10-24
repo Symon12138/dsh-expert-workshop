@@ -1,4 +1,4 @@
-import { parseWorkbenchDescriptor, type WorkbenchDescriptor } from 'symon-studio-contracts';
+import { parseWorkbenchDescriptor, type WorkbenchDescriptor } from 'expert-workshop-contracts';
 
 export interface WorkbenchPageMount {
   readonly panelKey: string;

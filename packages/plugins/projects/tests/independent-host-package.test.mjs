@@ -19,6 +19,6 @@ test('independent Projects Host entry imports without an unpublished contracts p
     const entry = await import(pathToFileURL(join(root, 'dist/index.js')).href);
     assert.equal(typeof entry.apply, 'function');
     assert.equal(typeof entry.ProjectManager, 'function');
-    assert.equal(entry.name, 'symon-studio-plugin-projects');
+    assert.equal(entry.name, 'expert-workshop-plugin-projects');
   } finally { await rm(root, { recursive: true, force: true }); }
 });
