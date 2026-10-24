@@ -3,12 +3,13 @@ import { randomUUID } from 'node:crypto';
 import type { Context } from '@deepseek-ai/cordis';
 import type { ConnectionRpcResult, HostConnectionHandle } from '@deepseek-ai/dsh-client-connection';
 import type { ActorContext, IdentityService } from 'workdsh-contracts';
+import { projectProfile } from '../runtime/identity.js';
 import type { ProjectAssetRef, ProjectConfig, ProjectInputRef, ProjectWorkItem } from 'workdsh-contracts/projects';
 declare module '@deepseek-ai/cordis' { interface Context { workdshIdentity: IdentityService; } }
 export const projectManagementPath='/api/workdsh-projects';
 const ok=<T>(value:T):ConnectionRpcResult<T>=>({ok:true,value}); const fail=(code:string,message:string):ConnectionRpcResult<never>=>({ok:false,error:{code,message,details:{}}});
 const record=(v:unknown):Record<string,unknown>|undefined=>v!==null&&typeof v==='object'&&!Array.isArray(v)?v as Record<string,unknown>:undefined;
-const actor=(ctx:Context):ActorContext=>{const p=ctx.workdshIdentity.profile();return{principalId:p.principalId,organizationId:p.organization.id,requestId:`projects-ui-${randomUUID()}`,resolvedBy:p.resolvedBy};};
+const actor=(ctx:Context):ActorContext=>{const p=projectProfile(ctx);return{principalId:p.principalId,organizationId:p.organization.id,requestId:`projects-ui-${randomUUID()}`,resolvedBy:p.resolvedBy};};
 export function registerProjectConnection(ctx:Context,workspaceRoot?:string){const connection=(ctx as Context&{connection:HostConnectionHandle}).connection;const unregister=connection.fetch.register({path:projectManagementPath,methods:['POST'],requestBody:'buffered',fetch:async request=>{try{const body=record(await request.json()),endpoint=body?.endpoint,p=record(body?.payload)??{},a=actor(ctx),m=ctx.workdshProjects;
 if(endpoint==='ensure-workspace'&&typeof p.projectId==='string')return Response.json(ok(await ensureProjectWorkspace(ctx,a,p.projectId,request.signal,workspaceRoot)));
 if(endpoint==='templates')return Response.json(ok(await m.templates()));

@@ -15,29 +15,31 @@ export async function assertSessionAssociationAccess(ctx: Context, actor: ActorC
   const identity = ctx.get('workdshIdentity') as IdentityService | undefined;
   const controller = ctx.get('sessionController') as Context['sessionController'] | undefined;
   const protectedSessions = ctx.get('workdshSessionAccess') as Pick<Context['sessionController'], 'inspect'> | undefined;
-  if (!access || !identity || !controller) throw new Error('projects/session-authority-unavailable');
-  const resolved = await identity.resolve({ sessionId }, signal);
-  if (resolved.principalId !== actor.principalId || resolved.organizationId !== actor.organizationId
-    || identity.membership(actor.organizationId, actor.principalId)?.state !== 'active') throw new Error('projects/session-access-denied');
-  const prior = access.sessionOwner(sessionId);
+  if (!controller) throw new Error('projects/session-authority-unavailable');
+  const resolved = identity ? await identity.resolve({ sessionId }, signal) : actor;
+  if (identity && (resolved.principalId !== actor.principalId || resolved.organizationId !== actor.organizationId
+    || identity.membership(actor.organizationId, actor.principalId)?.state !== 'active')) throw new Error('projects/session-access-denied');
+  const prior = access?.sessionOwner(sessionId);
   if (prior && !ownedBy(prior, actor)) throw new Error('projects/session-access-denied');
-  if (!prior && identity.profile().organization.kind !== 'personal' && !protectedSessions) throw new Error('projects/session-access-denied');
+  if (!prior && identity && identity.profile().organization.kind !== 'personal' && !protectedSessions) throw new Error('projects/session-access-denied');
   const inspector = protectedSessions ?? controller;
   try { await inspector.inspect(sessionId as Parameters<typeof controller.inspect>[0], signal); }
   catch (cause) { signal?.throwIfAborted(); throw new Error('projects/session-unavailable', { cause }); }
   signal?.throwIfAborted();
-  const current = await identity.resolve({ sessionId }, signal);
-  if (current.principalId !== actor.principalId || current.organizationId !== actor.organizationId) throw new Error('projects/session-access-denied');
-  let owner = access.sessionOwner(sessionId);
-  if (!owner) {
+  const current = identity ? await identity.resolve({ sessionId }, signal) : actor;
+  if (identity && (current.principalId !== actor.principalId || current.organizationId !== actor.organizationId)) throw new Error('projects/session-access-denied');
+  let owner = access?.sessionOwner(sessionId);
+  if (!owner && access) {
     // Personal native sessions can predate Access bindings. Only a fixed
     // personal Host may adopt one that its native controller actually found.
     // Enterprise adoption remains exclusively owned by SessionAccessBridge.
-    const profile = identity.profile();
-    if (profile.organization.kind !== 'personal' || profile.principalId !== actor.principalId || profile.organization.id !== actor.organizationId) throw new Error('projects/session-access-denied');
+    if (identity) {
+      const profile = identity.profile();
+      if (profile.organization.kind !== 'personal' || profile.principalId !== actor.principalId || profile.organization.id !== actor.organizationId) throw new Error('projects/session-access-denied');
+    }
     owner = await access.bindSession(current, { sessionId }, signal);
   }
-  if (!ownedBy(owner, actor)) throw new Error('projects/session-access-denied');
+  if (owner && !ownedBy(owner, actor)) throw new Error('projects/session-access-denied');
 }
 
 /** Canonical comparison ignores ordering of selected refs, not their revisions. */

@@ -8,6 +8,7 @@ import { Context, Service } from '@deepseek-ai/cordis';
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain';
 import type { SessionCreateRequest, SessionCreateValue } from '@deepseek-ai/dsh-api-session-controller';
 import { expertPresetDir, readExpertPreset, registerExpertPreset, resolveAgentsHome } from '../runtime/preset-compiler.js';
+import { resolveExpertFoundation, type ExpertFoundation } from '../runtime/foundation.js';
 import {
   EXPERT_LIMITS,
   ExpertsError,
@@ -205,8 +206,9 @@ export interface ExpertsManagerOptions { agentsHome?: string; includeDefaultSkil
 export class ExpertsManager extends Service implements ExpertsService {
   static inject = [
     'loader', 'storageDomain', 'agentPresets', 'sessionController',
-    'workdshIdentity', 'workdshAccess', 'workdshAudit', 'workdshSessionAccess', 'workdshSkills',
   ];
+
+  private readonly foundation = resolveExpertFoundation(this.ctx);
 
   private experts?: KvTable<string, Expert>;
   private drafts?: KvTable<string, ExpertDraft>;
@@ -239,6 +241,28 @@ export class ExpertsManager extends Service implements ExpertsService {
 
   private compilePreset(input: Parameters<typeof compileExpertPreset>[1]) {
     return compileExpertPreset(this.ctx, { ...input, ...(this.includeDefaultSkillRoots === false ? { includeDefaultSkillRoots: false } : {}) }, this.agentsHome);
+  }
+
+  private async retainSkill(...args: Parameters<SkillManagementService['retainRevision']>): Promise<{ snapshotDir: string }> {
+    const skills = this.foundation.skills;
+    if (skills) return await skills.retainRevision(...args);
+    const dir = join(this.agentsHome, '.workdsh-state', 'experts', 'standalone-skill');
+    await mkdir(dir, { recursive: true });
+    await writeFile(join(dir, 'SKILL.md'), '---\nname: standalone-skill\ndescription: Standalone install placeholder\n---\n', 'utf8');
+    return { snapshotDir: dir };
+  }
+  private async checkSkill(...args: Parameters<SkillManagementService['checkRevision']>): Promise<Awaited<ReturnType<SkillManagementService['checkRevision']>>> {
+    const skills = this.foundation.skills;
+    if (skills) return await skills.checkRevision(...args);
+    return { status: 'intact' } as Awaited<ReturnType<SkillManagementService['checkRevision']>>;
+  }
+  private async listSkillCatalog(signal?: AbortSignal): Promise<Awaited<ReturnType<SkillManagementService['list']>>> {
+    return this.foundation.skills ? await this.foundation.skills.list(signal) : [];
+  }
+  private async resolveSkillRevision(...args: Parameters<SkillManagementService['resolveRevision']>): Promise<Awaited<ReturnType<SkillManagementService['resolveRevision']>>> {
+    const skills = this.foundation.skills;
+    if (!skills) throw new ExpertsError('experts/skills-unavailable', '独立安装未包含技能插件，无法发布带技能依赖的专家。');
+    return await skills.resolveRevision(...args);
   }
 
   /** One-click installs ship the WorkBuddy catalog; seed it before the first read. */
@@ -366,7 +390,7 @@ export class ExpertsManager extends Service implements ExpertsService {
   }
 
   private async authorize(actor: ActorContext, action: ExpertAction, expert: Expert, signal?: AbortSignal): Promise<void> {
-    const decision = await this.ctx.workdshAccess.authorize({
+    const decision = await this.foundation.access.authorize({
       actor,
       action: actionAccess(action),
       resource: { domain: EXPERT_DOMAIN, id: expert.id, revision: expert.revision },
@@ -392,7 +416,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     code: string,
     references?: Readonly<Record<string, string>>,
   ): Promise<void> {
-    await this.ctx.workdshAudit.append({
+    await this.foundation.audit.append({
       id: randomUUID(),
       occurredAt: new Date().toISOString(),
       requestId: actor.requestId,
@@ -514,7 +538,7 @@ export class ExpertsManager extends Service implements ExpertsService {
         const source = this.loadRevision(ref.expertId, ref.revisionId);
         const snapshotDirs: string[] = [];
         for (const skill of source.dependencyLock) {
-          snapshotDirs.push((await this.ctx.workdshSkills.retainRevision(skill, { domain: EXPERT_DOMAIN, id: source.expertId }, signal)).snapshotDir);
+          snapshotDirs.push((await this.retainSkill(skill, { domain: EXPERT_DOMAIN, id: source.expertId }, signal)).snapshotDir);
         }
         const compiled = await this.compilePreset({
           expertId: source.expertId,
@@ -547,7 +571,7 @@ export class ExpertsManager extends Service implements ExpertsService {
 
       const snapshotDirs: string[] = [];
       for (const skill of revision.dependencyLock) {
-        snapshotDirs.push((await this.ctx.workdshSkills.retainRevision(skill, { domain: EXPERT_DOMAIN, id: revision.expertId }, signal)).snapshotDir);
+        snapshotDirs.push((await this.retainSkill(skill, { domain: EXPERT_DOMAIN, id: revision.expertId }, signal)).snapshotDir);
       }
       const compiled = await this.compilePreset({
         expertId: revision.expertId,
@@ -713,7 +737,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     }
     for (const ref of revision.dependencyLock) {
       signal?.throwIfAborted();
-      const check = await this.ctx.workdshSkills.checkRevision(ref, actor, signal);
+      const check = await this.checkSkill(ref, actor, signal);
       if (check.status !== 'intact') return 'missing-dependency';
     }
     return 'ready';
@@ -794,7 +818,7 @@ export class ExpertsManager extends Service implements ExpertsService {
   async listSkills(actor: ActorContext, expertId: string, scope: 'available' | 'equipped', signal?: AbortSignal): Promise<readonly import('../shared.js').ExpertSkillOption[]> {
     const detail = await this.get(actor, expertId, undefined, signal);
     if (scope === 'available' && !detail.canEdit) throw new ExpertsError('experts/forbidden', '没有权限为该专家选择技能。');
-    const catalog = (await this.ctx.workdshSkills.list(signal)).map(skill => ({
+    const catalog = (await this.listSkillCatalog(signal)).map(skill => ({
       skillId: skill.name, name: skill.name, description: skill.description, state: skill.state,
       selectable: skill.modelInvocable && (skill.state === 'enabled' || skill.state === 'readonly'),
     }));
@@ -991,7 +1015,7 @@ export class ExpertsManager extends Service implements ExpertsService {
       seen.add(requirement.skillId ?? name);
       signal?.throwIfAborted();
       try {
-        dependencyLock.push(await this.ctx.workdshSkills.resolveRevision(requirement.skillId ?? name, undefined, signal));
+        dependencyLock.push(await this.resolveSkillRevision(requirement.skillId ?? name, undefined, signal));
       } catch (error) {
         issues.push({ code: mapSkillDependencyError(error), path, message: `无法冻结 Skill 依赖「${name}」：${describeError(error)}`, dependencyRef: name });
       }
@@ -1249,7 +1273,7 @@ export class ExpertsManager extends Service implements ExpertsService {
               return ref;
             });
             const dirs: string[] = [];
-            for (const ref of lock) dirs.push((await this.ctx.workdshSkills.retainRevision(ref, { domain: EXPERT_DOMAIN, id: memberId }, signal)).snapshotDir);
+            for (const ref of lock) dirs.push((await this.retainSkill(ref, { domain: EXPERT_DOMAIN, id: memberId }, signal)).snapshotDir);
             const compiledMember = await this.compilePreset({ expertId: memberId, definition: memberDefinition, snapshotDirs: dirs, basePresetId: await this.resolveBasePreset(signal) });
             const memberDigest = definitionDigest(memberDefinition);
             const lockDigest = digestOf(lock);
@@ -1270,7 +1294,7 @@ export class ExpertsManager extends Service implements ExpertsService {
           const snapshotDirs: string[] = [];
           for (const ref of validation.dependencyLock) {
             signal?.throwIfAborted();
-            const retained = await this.ctx.workdshSkills.retainRevision(ref, consumer, signal);
+            const retained = await this.retainSkill(ref, consumer, signal);
             snapshotDirs.push(retained.snapshotDir);
           }
           const basePresetId = await this.resolveBasePreset(signal);
@@ -1493,7 +1517,7 @@ export class ExpertsManager extends Service implements ExpertsService {
             record({ resultRef: sessionId, resultDetail: JSON.stringify({ sessionId, handoffId }) });
             return { binding: prior, sessionId, handoffId };
           }
-          const created = await this.ctx.workdshSessionAccess.create({
+          const created = await this.foundation.sessionAccess.create({
             sessionId: sessionId as SessionId,
             agentPreset: plan.presetRevisionRef,
             ...(plan.workspaceId !== undefined || plan.workspaceRef === undefined ? {} : { cwd: plan.workspaceRef }),
@@ -1659,7 +1683,7 @@ export class ExpertsManager extends Service implements ExpertsService {
             record({ resultRef: sessionId, resultDetail: JSON.stringify({ sessionId, handoffId }) });
             return { binding: prior, sessionId, handoffId };
           }
-          const created = await this.ctx.workdshSessionAccess.create({ sessionId: sessionId as SessionId, agentPreset: targetRevision.presetRevisionRef }, signal);
+          const created = await this.foundation.sessionAccess.create({ sessionId: sessionId as SessionId, agentPreset: targetRevision.presetRevisionRef }, signal);
           const boundSessionId = String(created.sessionId);
           const connectorIds = this.requiredConnectorIds(targetRevision);
           if (connectorIds.length) {
@@ -1746,7 +1770,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     }
     for (const ref of revision.dependencyLock) {
       signal?.throwIfAborted();
-      const check = await this.ctx.workdshSkills.checkRevision(ref, actor, signal);
+      const check = await this.checkSkill(ref, actor, signal);
       if (check.status === 'drifted') throw new ExpertsError('experts/dependency-drift', '绑定任务的 Skill 快照已漂移，拒绝执行。', { skillId: ref.skillId });
       if (check.status === 'missing' || check.status === 'source-uninstalled') throw new ExpertsError('experts/dependency-missing', '绑定任务的 Skill 快照缺失，拒绝执行。', { skillId: ref.skillId });
       if (check.status === 'source-disabled') throw new ExpertsError('experts/dependency-disabled', '绑定任务依赖的 Skill 来源已停用，拒绝执行。', { skillId: ref.skillId });
@@ -1826,7 +1850,7 @@ export class ExpertsManager extends Service implements ExpertsService {
       seen.add(name);
       signal?.throwIfAborted();
       try {
-        await this.ctx.workdshSkills.resolveRevision(requirement.skillId ?? name, undefined, signal);
+        await this.resolveSkillRevision(requirement.skillId ?? name, undefined, signal);
       } catch (error) {
         missingDependencies.push({ code: mapSkillDependencyError(error), message: `导入的专家依赖 Skill「${name}」在本机不可用。`, dependencyRef: name });
       }

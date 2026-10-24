@@ -1,6 +1,7 @@
 import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-agent';
 import type {} from '@deepseek-ai/dsh-system-prompt';
+import { resolveProjectActor } from './identity.js';
 
 /** Inject the immutable project configuration captured when this task was created. */
 export function registerProjectContextInjection(ctx: Context): void {
@@ -10,7 +11,7 @@ export function registerProjectContextInjection(ctx: Context): void {
     try {
       const sessionId = context.agent ? String(context.agent.id) : undefined;
       if (!sessionId) return resolved;
-      const actor = await ctx.workdshIdentity.resolve({ sessionId }, context.signal);
+      const actor = await resolveProjectActor(ctx, { sessionId }, context.signal);
       const selected = await ctx.workdshProjects.taskContext(actor, sessionId, context.signal);
       if (!selected) return resolved;
       const references = selected.task.references.filter(row => row.kind !== 'asset').map(row => `- ${row.kind === 'work-item' ? '计划待办' : '技能'}：${row.label}（修订 ${row.revision}）`);

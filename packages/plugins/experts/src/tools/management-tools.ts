@@ -8,6 +8,7 @@ import type { ActorContext, DomainIssue, ExpertDefinition, ExpertDetail, ExpertL
 import type { ExpertsManager } from '../services/experts-manager.js';
 import { expertDraftUrl } from '../domain/navigation.js';
 import { authoringDocuments, definitionFromDocuments } from '../authoring/documents.js';
+import { resolveActor as resolveFoundationActor } from '../runtime/foundation.js';
 import { ExpertsError } from '../domain/values.js';
 
 /**
@@ -194,7 +195,7 @@ function issueText(issue: DomainIssue): string {
 /** Resolve the trusted actor from the calling Session; the model never supplies it. */
 async function resolveActor(ctx: Context, exec: ToolRunContext): Promise<ActorContext> {
   const sessionId = exec.agent ? String(exec.agent.id) : undefined;
-  return ctx.workdshIdentity.resolve(sessionId === undefined ? undefined : { sessionId }, exec.signal);
+  return resolveFoundationActor(ctx, sessionId === undefined ? undefined : { sessionId }, exec.signal);
 }
 
 /** Derive a stable idempotency key from the call id so pipeline retries replay instead of duplicating. */

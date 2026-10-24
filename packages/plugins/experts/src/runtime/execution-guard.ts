@@ -4,6 +4,7 @@ import type {} from '@deepseek-ai/dsh-experimental-agent-team';
 import * as Persona from '@deepseek-ai/dsh-persona';
 import * as SkillFiles from '@deepseek-ai/dsh-skill-filesystem';
 import { expertPersonaConfig, expertPresetDir, readExpertPreset, resolveAgentsHome } from './preset-compiler.js';
+import { resolveActor } from './foundation.js';
 import { join } from 'node:path';
 import { ExpertsError } from '../domain/values.js';
 
@@ -16,7 +17,7 @@ export function registerExpertExecutionGuard(ctx: Context, options: { agentsHome
     const membership = ctx.agentTeams.tryMembership(agent);
     const root = membership?.root ?? agent;
     const header = agent.session.header;
-    const actor = await ctx.workdshIdentity.resolve({ sessionId: String(root.id) }, signal);
+    const actor = await resolveActor(ctx, { sessionId: String(root.id) }, signal);
     let role;
     try {
       role = await ctx.workdshExperts.resolveNativeRole(actor, String(root.id), membership?.role === 'teammate' ? membership.name : undefined, signal);
@@ -35,7 +36,7 @@ export function registerExpertExecutionGuard(ctx: Context, options: { agentsHome
     if (role.binding.presetRevisionRef !== header.agentPreset) throw new ExpertsError('experts/conflict', '原生任务 preset 与固定专家组合不一致。');
     if (membership?.role === 'teammate') {
       if (header.parentSession !== root.id || header.cwd !== root.session.header.cwd) throw new ExpertsError('experts/conflict', '官方成员与主任务的父关系或工作区不一致。');
-      const childActor = await ctx.workdshIdentity.resolve({ sessionId: String(agent.id) }, signal);
+      const childActor = await resolveActor(ctx, { sessionId: String(agent.id) }, signal);
       if (childActor.principalId !== actor.principalId || childActor.organizationId !== actor.organizationId) throw new ExpertsError('experts/forbidden', '成员和主任务不属于同一授权主体。');
     }
     const { revision } = role;

@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { basename } from 'node:path';
+import { resolveProjectActor } from './identity.js';
 import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-fs';
 import type {} from '@deepseek-ai/dsh-session';
@@ -128,7 +129,7 @@ export async function attributePresentedFiles(
 export function registerDeliverableAttribution(ctx: Context): void {
   const logger = ctx.logger('workdsh-projects');
   const deps: DeliverableAttributionDeps = {
-    identity: { resolve: (evidence, signal) => ctx.workdshIdentity.resolve(evidence, signal) },
+    identity: { resolve: (evidence, signal) => resolveProjectActor(ctx, evidence, signal) },
     projects: {
       taskContext: (actor, sessionId, signal) => ctx.workdshProjects.taskContext(actor, sessionId, signal),
       addAsset: (actor, projectId, asset, signal) => ctx.workdshProjects.addAsset(actor, projectId, asset, signal),

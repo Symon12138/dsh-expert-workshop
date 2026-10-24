@@ -1,4 +1,5 @@
 import type { Context } from '@deepseek-ai/cordis';
+import { resolveActor } from '../runtime/foundation.js';
 import type { ConnectionRpcResult, HostConnectionHandle } from '@deepseek-ai/dsh-client-connection';
 import type {
   ActorContext,
@@ -335,7 +336,7 @@ export function registerExpertsConnection(ctx: Context): void {
         if (text.length > maximumBodyBytes) return json(fail('experts/invalid-request', '专家管理请求过大。'), 413);
         const body = record(JSON.parse(text));
         if (!body) return json(fail('experts/invalid-request', '专家管理请求格式无效。'), 400);
-        const actor = await ctx.workdshIdentity.resolve(undefined, request.signal);
+        const actor = await resolveActor(ctx, undefined, request.signal);
         return json(await dispatch(manager, actor, body.endpoint, body.payload, request.signal));
       } catch (error) {
         if (error instanceof SyntaxError) return json(fail('experts/invalid-request', '专家管理请求格式无效。'), 400);
@@ -376,7 +377,7 @@ export function registerExpertsConnection(ctx: Context): void {
         const body = record(await request.json().catch(() => undefined));
         const expertId = str(body?.expertId);
         if (!expertId) return json(fail('experts/invalid-request', '请求缺少专家标识。'), 400);
-        const actor = await ctx.workdshIdentity.resolve(undefined, request.signal);
+        const actor = await resolveActor(ctx, undefined, request.signal);
         const descriptor = await manager.export(actor, expertId, str(body?.revisionId), request.signal);
         const { archive } = buildExport(descriptor.definition, descriptor.sourceAttribution);
         const ascii = descriptor.fileName.replace(/[^\x20-\x7e]/g, '_').replace(/"/g, '');
