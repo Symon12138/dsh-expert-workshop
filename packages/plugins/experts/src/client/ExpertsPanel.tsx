@@ -13,6 +13,7 @@ import { expertDraftId } from '../domain/navigation.js';
 import { CATEGORY_LABEL, CATEGORY_ORDER } from './categories.js';
 import { avatarColor, expertTitle } from './avatar.js';
 import { FEATURED_SCENES, SCENE_IMAGE_BASE } from './scenes.js';
+import { WB_AVATARS } from './workbuddy-content.js';
 import { ExpertDraftEditor } from './ExpertDraftEditor.js';
 import { ImportExpertModal } from './ImportExportModals.js';
 import { expertsCss } from './styles.js';
@@ -51,9 +52,10 @@ const READINESS: Record<string, { label: string; cls: string }> = {
 
 function Avatar({ summary }: { summary: ExpertSummary }) {
   const title = summary.expertType === 'team' ? summary.name : expertTitle(summary.name);
-  const image = summary.avatarRef?.startsWith('data:image/');
-  return <span className="avatar" style={image ? undefined : { background: avatarColor(summary.name) }} aria-hidden>
-    {image ? <img src={summary.avatarRef} alt="" /> : (title.trim().charAt(0) || '专')}
+  const stored = summary.avatarRef?.startsWith('data:image/') || /^https:\/\//.test(summary.avatarRef ?? '') ? summary.avatarRef : undefined;
+  const src = stored ?? WB_AVATARS[summary.name];
+  return <span className="avatar" style={src ? undefined : { background: avatarColor(summary.name) }} aria-hidden>
+    {src ? <img src={src} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={event => { event.currentTarget.style.display = 'none'; }} /> : (title.trim().charAt(0) || '专')}
   </span>;
 }
 

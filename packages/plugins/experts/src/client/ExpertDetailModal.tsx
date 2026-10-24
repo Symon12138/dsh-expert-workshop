@@ -8,6 +8,7 @@ import { ExpertWorkSummary } from './ExpertWorkSummary.js';
 import { TeamOverview } from './TeamOverview.js';
 import { CATEGORY_LABEL } from './categories.js';
 import { avatarColor, expertTitle } from './avatar.js';
+import { WB_AVATARS, WB_PROMPTS } from './workbuddy-content.js';
 
 export type ExpertDetailModalProps = {
   readonly expertId: string;
@@ -87,11 +88,14 @@ export function ExpertDetailModal({ expertId, management, acting, onClose, onSum
   const kindLabel = definition.team ? '专家团' : '专家';
   const versionLabel = revision ? `版本 ${revision.revisionId.slice(0, 10)}` : '草稿';
   const headline = definition.team ? definition.name : expertTitle(definition.name);
-  const avatarImage = definition.avatarRef?.startsWith('data:image/');
+  const storedAvatar = definition.avatarRef?.startsWith('data:image/') || /^https:\/\//.test(definition.avatarRef ?? '') ? definition.avatarRef : undefined;
+  const avatarSrc = storedAvatar ?? WB_AVATARS[definition.name];
+  const examples = definition.examples.length ? definition.examples
+    : (WB_PROMPTS[definition.name] ?? []).map((prompt, index) => ({ id: `wb-${index}`, prompt, title: undefined }));
 
   return <div className="dialog-scroll">
     <header className="detail-header">
-      <span className="detail-avatar" style={avatarImage ? undefined : { background: avatarColor(definition.name) }} aria-hidden>{avatarImage ? <img src={definition.avatarRef} alt="" /> : headline.trim().charAt(0) || '专'}</span>
+      <span className="detail-avatar" style={avatarSrc ? undefined : { background: avatarColor(definition.name) }} aria-hidden>{avatarSrc ? <img src={avatarSrc} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" /> : headline.trim().charAt(0) || '专'}</span>
       <div className="detail-title">
         <h1 title={definition.name}>{headline || '（未命名专家）'}</h1>
         <p className="detail-subtitle">{ORIGIN_LABEL[expert.origin] ?? expert.origin} · {kindLabel} · {isDraft ? '草稿' : AVAILABILITY_LABEL[expert.availability]}</p>
@@ -132,10 +136,10 @@ export function ExpertDetailModal({ expertId, management, acting, onClose, onSum
       <div className="notice-body"><strong>{readiness.label}</strong><span>{readiness.hint}</span></div>
     </div>}
 
-    {definition.examples.length > 0 && <>
+    {examples.length > 0 && <>
       <h2 className="detail-section-title">{definition.team ? '团队帮你做' : '专家帮你做'}</h2>
       <div className="example-list">
-        {definition.examples.map(example => <button className="example" key={example.id} disabled={!canSummon || acting}
+        {examples.map(example => <button className="example" key={example.id} disabled={!canSummon || acting}
           title={canSummon ? '用此示例召唤专家（仅填入草稿，不会自动发送）' : readiness.hint}
           onClick={() => { setMenuOpen(false); onSummon(expertId, revisionId, example.prompt); }}>
           <span className="example-text">{example.title && <strong>{example.title}</strong>}<span>{example.prompt}</span></span>
