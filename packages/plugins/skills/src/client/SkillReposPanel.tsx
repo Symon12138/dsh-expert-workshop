@@ -1,4 +1,4 @@
-import { Button, Modal } from 'workdsh-ui';
+import { Button } from 'workdsh-ui';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -11,27 +11,21 @@ type RepoEntry = {
   totalBytes: number;
   existing: boolean;
 };
-type Discover = { ok: boolean; repo: string; ref: string | null; branches?: string[]; entries: RepoEntry[]; error?: string };
+type RepoSpec = { repo: string; title: string; description: string; query: string };
+type Discover = { ok: boolean; repo: string; ref: string | null; entries: RepoEntry[] };
 type Progress = {
-  ok: boolean;
-  jobId: string;
-  status: 'running' | 'done' | 'cancelled' | 'error';
-  total: number;
-  done: number;
-  current?: string;
-  imported: { name: string }[];
-  skipped: { name: string; reason: string }[];
-  failed: { name: string; error: string }[];
-  error?: string;
+  ok: boolean; status: 'running' | 'done' | 'cancelled' | 'error';
+  imported: { name: string }[]; skipped: { name: string }[]; failed: { name: string; error: string }[]; error?: string;
 };
+type MarketItem = RepoEntry & { repo: string; ref: string | null; title: string };
 
-/** Community skill repos used as the DSH skill market (the public SkillHub
- *  search API requires an account, so this uses the installed skill-hub's
- *  GitHub discovery/import routes instead). */
-const REPOS = [
-  { repo: 'obra/superpowers', title: 'Superpowers', description: '社区高人气技能合集：头脑风暴、诊断、实现与评审工作流。' },
-  { repo: 'mattpocock/skills', title: 'Matt Pocock Skills', description: '工程与 TypeScript 方向技能：交接、评审、架构与实现。' },
-  { repo: 'nexu-io/open-design', title: 'Open Design', description: '设计方向技能合集：视觉、品牌、视频与创意模板。' },
+/** Public community skill repos. `query` may carry an explicit `@ref` for
+ *  repos without releases (anthropics/skills). */
+const REPOS: readonly RepoSpec[] = [
+  { repo: 'anthropics/skills', title: 'Anthropic Skills', description: 'Anthropic 官方技能仓库', query: 'anthropics/skills@main' },
+  { repo: 'obra/superpowers', title: 'Superpowers', description: '社区高人气技能合集', query: 'obra/superpowers' },
+  { repo: 'mattpocock/skills', title: 'Matt Pocock', description: '工程与 TypeScript 技能', query: 'mattpocock/skills' },
+  { repo: 'nexu-io/open-design', title: 'Open Design', description: '设计、品牌与创意模板', query: 'nexu-io/open-design' },
 ] as const;
 
 async function json<T>(url: string, init?: RequestInit): Promise<T> {
@@ -43,84 +37,79 @@ async function json<T>(url: string, init?: RequestInit): Promise<T> {
   return payload;
 }
 
+function Mark({ name }: { name: string }) {
+  let hue = 0;
+  for (const ch of name) hue = (hue * 31 + (ch.codePointAt(0) ?? 0)) % 360;
+  return <span className="skillhub-icon" style={{ background: `hsl(${hue} 36% 25%)`, color: `hsl(${hue} 84% 78%)` }} aria-hidden>{name.slice(0, 1).toUpperCase()}</span>;
+}
+
 export function SkillReposPanel({ query, onInstalled, onOpenInstalled }: { query: string; onInstalled: () => Promise<void>; onOpenInstalled: () => void }) {
-  const [openRepo, setOpenRepo] = useState<string>();
-  const [discover, setDiscover] = useState<Discover>();
-  const [selected, setSelected] = useState<readonly string[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState<Progress>();
+  const [items, setItems] = useState<readonly MarketItem[]>([]);
+  const [repoFilter, setRepoFilter] = useState('全部');
+  const [limit, setLimit] = useState(60);
+  const [busy, setBusy] = useState(true);
+  const [installing, setInstalling] = useState('');
+  const [installed, setInstalled] = useState<readonly string[]>([]);
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [installed, setInstalled] = useState('');
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setBusy(true); setError('');
+    void (async () => {
+      const rows: MarketItem[] = [];
+      await Promise.all(REPOS.map(async spec => {
+        const result = await json<Discover>(`/api/skill-hub/repo?repo=${encodeURIComponent(spec.query)}`, { signal: controller.signal });
+        for (const entry of result.entries) rows.push({ ...entry, repo: result.repo, ref: result.ref, title: spec.title });
+      }));
+      if (controller.signal.aborted) return;
+      rows.sort((left, right) => left.title.localeCompare(right.title, 'zh-CN') || left.name.localeCompare(right.name));
+      setItems(rows);
+    })().catch(cause => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : '读取技能仓库失败。'); })
+      .finally(() => { if (!controller.signal.aborted) setBusy(false); });
+    return () => controller.abort();
+  }, []);
 
   const normalized = query.trim().toLowerCase();
-  const repos = REPOS.filter(item => `${item.repo} ${item.title} ${item.description}`.toLowerCase().includes(normalized));
-  const visibleEntries = useMemo(() => {
-    const entries = discover?.entries ?? [];
-    if (!normalized) return entries;
-    return entries.filter(item => `${item.name} ${item.dir}`.toLowerCase().includes(normalized));
-  }, [discover, normalized]);
+  useEffect(() => { setLimit(60); }, [repoFilter, normalized]);
+  const filtered = useMemo(() => items.filter(item => (repoFilter === '全部' || item.repo === repoFilter)
+    && (!normalized || `${item.name} ${item.title} ${item.repo}`.toLowerCase().includes(normalized))), [items, repoFilter, normalized]);
+  const visible = filtered.slice(0, limit);
+  const repos = ['全部', ...new Set(items.map(item => item.repo))];
 
-  useEffect(() => { setSelected(visibleEntries.filter(item => !item.existing).map(item => item.path)); }, [visibleEntries]);
-
-  const browse = async (repo: string) => {
-    setOpenRepo(repo); setDiscover(undefined); setSelected([]); setProgress(undefined); setError(''); setBusy(true);
-    try {
-      const result = await json<Discover>(`/api/skill-hub/repo?repo=${encodeURIComponent(repo)}`);
-      setDiscover(result);
-      setSelected(result.entries.filter(item => !item.existing).map(item => item.path));
-    } catch (cause) { setError(cause instanceof Error ? cause.message : '读取技能仓库失败。'); }
-    finally { setBusy(false); }
-  };
-
-  const install = async () => {
-    if (!openRepo || !discover?.ref || !selected.length) return;
-    setBusy(true); setError('');
+  const install = async (item: MarketItem) => {
+    if (!item.ref) return;
+    setInstalling(item.path); setError(''); setMessage('');
     try {
       const started = await json<{ jobId: string }>('/api/skill-hub/repo/import', {
         method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ repo: openRepo, paths: selected, ref: discover.ref }),
+        body: JSON.stringify({ repo: item.repo, paths: [item.path], ref: item.ref }),
       });
       let latest: Progress | undefined;
       for (let attempt = 0; attempt < 240; attempt++) {
         await new Promise(resolve => setTimeout(resolve, 500));
         latest = await json<Progress>(`/api/skill-hub/repo/import/progress?jobId=${encodeURIComponent(started.jobId)}`);
-        setProgress(latest);
         if (latest.status !== 'running') break;
       }
       if (latest?.status === 'done') {
-        setInstalled(`已安装 ${latest.imported.length} 个技能${latest.skipped.length ? `，跳过 ${latest.skipped.length} 个同名技能` : ''}${latest.failed.length ? `，失败 ${latest.failed.length} 个` : ''}。`);
+        setInstalled(current => [...new Set([...current, item.name])]);
+        setMessage(`已安装「${item.name}」${latest.failed.length ? `，${latest.failed.length} 项失败` : ''}。`);
         await onInstalled();
       } else if (latest?.error) setError(latest.error);
     } catch (cause) { setError(cause instanceof Error ? cause.message : '安装技能失败。'); }
-    finally { setBusy(false); }
+    finally { setInstalling(''); }
   };
 
   return <section className="skillhub-market" aria-label="技能市场">
-    <div className="market-head"><h2>技能市场 <span className="market-count">{repos.length}</span></h2><span className="muted">从 GitHub 技能仓库安装，安装后进入本机技能目录</span></div>
-    {installed && <div className="skillhub-success" role="status"><span>{installed}</span><Button onClick={onOpenInstalled}>查看已安装</Button><button className="skillhub-dismiss" aria-label="关闭安装提示" onClick={() => setInstalled('')}>×</button></div>}
-    {repos.length ? <div className="grid">{repos.map(item => <article className="card market-card" key={item.repo}>
-      <div className="card-top"><span className="skillhub-icon" aria-hidden>{item.title.slice(0, 1).toUpperCase()}</span><span className="card-title"><strong>{item.title}</strong><small>{item.repo}</small></span><Button className="install" aria-label={`浏览 ${item.title}`} onClick={() => void browse(item.repo)}>浏览</Button></div>
-      <p className="muted">{item.description}</p>
-    </article>)}</div> : <p className="muted">没有匹配的技能仓库。</p>}
-
-    <Modal open={Boolean(openRepo)} label="技能仓库" className="skill-detail-dialog catalog-dialog" onClose={() => { if (!busy) setOpenRepo(undefined); }}>
-      {openRepo && <article>
-        <div className="detail-hero"><span className="skillhub-icon large" aria-hidden>{(REPOS.find(item => item.repo === openRepo)?.title ?? openRepo).slice(0, 1)}</span><div className="detail-title"><h1>{openRepo}</h1><p className="slug">{discover?.ref ? `版本 ${discover.ref}` : '正在读取仓库…'}</p></div></div>
-        {busy && !discover && <p className="muted" role="status">正在读取仓库技能…</p>}
-        {error && <p className="catalog-note" role="alert">{error}</p>}
-        {discover && <>
-          <p className="muted">共 {discover.entries.length} 个技能，已选择 {selected.length} 个。</p>
-          <div className="repo-entries">{visibleEntries.map(item => <label className={`repo-entry ${item.existing ? 'existing' : ''}`} key={item.path}>
-            <input type="checkbox" checked={selected.includes(item.path)} disabled={item.existing || busy} onChange={event => setSelected(current => event.currentTarget.checked ? [...current, item.path] : current.filter(path => path !== item.path))} />
-            <span><strong>{item.name}</strong><small>{item.fileCount} 个文件 · {(item.totalBytes / 1024).toFixed(1)} KB{item.existing ? ' · 本机已存在' : ''}</small></span>
-          </label>)}</div>
-          {progress && <p className="muted" role="status">{progress.status === 'running' ? `正在安装 ${progress.done}/${progress.total}${progress.current ? ` · ${progress.current}` : ''}` : progress.status === 'done' ? '安装完成。' : progress.status === 'cancelled' ? '已取消。' : '安装失败。'}</p>}
-          <div className="detail-actions" style={{ marginTop: 18 }}>
-            <Button variant="primary" className="install solid" disabled={busy || !selected.length || !discover.ref} onClick={() => void install()}>{busy ? '正在处理…' : '安装所选技能'}</Button>
-            <Button onClick={() => setOpenRepo(undefined)} disabled={busy}>关闭</Button>
-          </div>
-        </>}
-      </article>}
-    </Modal>
+    <div className="market-head"><h2>技能市场 <span className="market-count">{items.length}</span></h2><span className="muted">来自公开 GitHub 技能仓库，安装后进入本机技能目录</span></div>
+    {message && <div className="skillhub-success" role="status"><span>{message}</span><Button onClick={onOpenInstalled}>查看已安装</Button><button className="skillhub-dismiss" aria-label="关闭安装提示" onClick={() => setMessage('')}>×</button></div>}
+    {error && <p className="catalog-note" role="alert">{error}</p>}
+    <nav className="category-tabs" aria-label="技能仓库">{repos.map(repo => <button key={repo} className={repoFilter === repo ? 'active' : ''} aria-pressed={repoFilter === repo} onClick={() => setRepoFilter(repo)}>{repo === '全部' ? '全部' : (REPOS.find(spec => spec.repo === repo)?.title ?? repo)}</button>)}</nav>
+    {busy ? <p className="muted" role="status">正在读取技能仓库…</p> : visible.length ? <div className="grid">{visible.map(item => <article className="card market-card" key={`${item.repo}-${item.path}`}>
+      <div className="card-top"><Mark name={item.name} /><span className="card-title"><strong title={item.name}>{item.name}</strong><small>{item.title} · {item.fileCount} 个文件</small></span>
+        <Button className={`install${item.existing || installed.includes(item.name) ? ' is-status is-installed' : ''}`} disabled={item.existing || installing === item.path || installed.includes(item.name)} aria-label={`安装 ${item.name}`} onClick={() => void install(item)}>{item.existing || installed.includes(item.name) ? '已安装' : installing === item.path ? '…' : '＋'}</Button></div>
+      <p className="muted">{item.dir}</p>
+    </article>)}</div> : <p className="muted">没有匹配的技能。</p>}
+    {visible.length < filtered.length && <div className="market-more"><Button onClick={() => setLimit(value => value + 60)}>加载更多（{filtered.length - visible.length}）</Button></div>}
   </section>;
 }
