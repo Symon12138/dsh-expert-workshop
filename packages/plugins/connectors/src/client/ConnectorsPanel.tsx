@@ -7,6 +7,7 @@ import type { ConnectorConfigView, ConnectorInput, ConnectorSummary } from '../s
 import type { ConnectorManagementClient } from './management.js';
 import { connectorCss } from './styles.js';
 import { RECOMMENDED_CONNECTORS, type RecommendedConnector } from './recommended.js';
+import { MARKET_CONNECTORS, type MarketConnector } from './market.js';
 
 type Injected = { toggleNavigation: () => void; management: ConnectorManagementClient; openCapability: (key: string) => void; hasCapability: (key: string) => boolean };
 type Props = PropsRuntime<'main'> & InjectFace<Injected>;
@@ -18,6 +19,8 @@ const fromConfig = (row: ConnectorConfigView): Draft => ({ id: row.id, title: ro
 export function ConnectorsPanel({ toggleNavigation, management, openCapability, hasCapability }: Props) {
   const [rows, setRows] = useState<readonly ConnectorSummary[]>([]); const [query, setQuery] = useState('');
   const [mcpCategory, setMcpCategory] = useState('全部');
+  const [marketCategory, setMarketCategory] = useState('全部');
+  const [marketLimit, setMarketLimit] = useState(24);
   const [busy, setBusy] = useState(true); const [error, setError] = useState(''); const [expanded, setExpanded] = useState<string>();
   const [draft, setDraft] = useState<Draft>(); const [removeTarget, setRemoveTarget] = useState<ConnectorSummary>();
   const refresh = useCallback(async () => { setBusy(true); setError(''); try { setRows(await management.list()); } catch (cause) { setError(cause instanceof Error ? cause.message : '读取连接器失败。'); } finally { setBusy(false); } }, [management]);
@@ -36,6 +39,10 @@ export function ConnectorsPanel({ toggleNavigation, management, openCapability, 
   const availableRecommended = RECOMMENDED_CONNECTORS.filter(entry => !rows.some(row => row.serverName === entry.name) && `${entry.name} ${entry.description} ${entry.category}`.toLowerCase().includes(normalized));
   const recommended = availableRecommended.filter(entry => mcpCategory === '全部' || entry.category === mcpCategory);
   const mcpCategories = ['全部', ...new Set(availableRecommended.map(entry => entry.category))];
+  const marketCategories = ['全部', ...new Set(MARKET_CONNECTORS.map(entry => entry.category))];
+  const marketFiltered = MARKET_CONNECTORS.filter(entry => (marketCategory === '全部' || entry.category === marketCategory) && `${entry.name} ${entry.description} ${entry.category}`.toLowerCase().includes(normalized));
+  const marketVisible = marketFiltered.slice(0, marketLimit);
+  const addRemote = (entry: MarketConnector) => setDraft({ id: undefined, title: entry.name, description: entry.description, serverName: entry.id, transport: entry.transport === 'sse' ? 'streamable-http' : entry.transport, command: '', argsText: '', url: entry.url, authorizationToken: '', authorizationConfigured: false });
   const addRecommended = (entry: RecommendedConnector) => setDraft({ id: undefined, title: entry.name, description: entry.description, serverName: entry.name, transport: entry.transport, command: entry.command, argsText: entry.args.join('\n'), url: '', authorizationToken: '', authorizationConfigured: false });
   const detail = rows.find(row => row.id === expanded);
   const capabilityTabs = [['experts', '专家'], ['skills', '技能'], ['connectors', '连接器']] as const;
@@ -54,6 +61,15 @@ export function ConnectorsPanel({ toggleNavigation, management, openCapability, 
         <p className="recommend-desc">{entry.description}</p>
       </article>)}</div> : <p className="muted">该分类暂无连接器。</p>}
     </section> : null}
+    <section className="market-section" aria-label="独立连接器">
+      <div className="list-meta"><strong>独立连接器 <span className="count">{marketFiltered.length}</span></strong><span className="muted">非 WorkBuddy 强绑定，直接连各自服务；可能需要该服务自己的 Token/OAuth</span></div>
+      <nav className="mcp-categories" aria-label="独立连接器分类">{marketCategories.map(label => <button key={label} className={marketCategory === label ? 'active' : ''} aria-pressed={marketCategory === label} onClick={() => { setMarketCategory(label); setMarketLimit(24); }}>{label}</button>)}</nav>
+      {marketVisible.length ? <div className="connector-grid">{marketVisible.map(entry => <article className="connector-card" key={`${entry.id}-${entry.url}`}>
+        <div className="card-top"><button className="card-open" aria-label={`添加连接器 ${entry.name}`} onClick={() => addRemote(entry)}><span className="connector-mark" aria-hidden>{entry.name.charAt(0).toUpperCase()}</span><span className="card-title"><strong>{entry.name}</strong><small>{entry.transport} · {entry.category}</small></span></button><button className="recommend-add" aria-label={`添加 ${entry.name}`} onClick={() => addRemote(entry)}>＋</button></div>
+        <p className="recommend-desc">{entry.description}</p>
+      </article>)}</div> : <p className="muted">没有匹配的连接器。</p>}
+      {marketVisible.length < marketFiltered.length && <div className="market-more"><Button onClick={() => setMarketLimit(value => value + 24)}>加载更多（{marketFiltered.length - marketVisible.length}）</Button></div>}
+    </section>
     <div className="list-meta"><strong>我的连接器 <span className="count">{rows.length}</span></strong><span className="muted">{rows.filter(row => row.enabled && row.state === 'ready').length} 已连接</span></div>
     {error ? <p className="error" role="alert">{error}</p> : null}
     {!busy && !filtered.length ? <div className="empty">{rows.length ? '没有匹配的 MCP 服务。' : '尚未配置 MCP 服务，点击“添加 MCP”创建第一个连接。'}</div> : null}
