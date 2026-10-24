@@ -19,6 +19,12 @@
 | 连接器 | `workdsh-plugin-connectors` | `0.1.0-alpha.10` |
 | 项目 | `workdsh-plugin-projects` | `0.1.0-alpha.5` |
 
+## 下载
+
+发布页：https://github.com/Symon12138/workdsh/releases/tag/standalone-v0.1.0
+
+7 个 `.tgz` 都在该 Release 的 Assets 中，下载后按下面的顺序安装。
+
 ## 方式一：整套安装（推荐）
 
 按依赖顺序安装：
