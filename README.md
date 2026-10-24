@@ -3,6 +3,7 @@
 <p align="center"><strong>A WorkBuddy-style workspace where skills, experts, and plugins shape new workflows.</strong></p>
 <p align="center">Inspired by WorkBuddy’s workflow and built on DeepSeek Harness plugins: start with personal use, then install Enterprise Connection for company models, collaboration, and colleague mentions.</p>
 <p align="center"><a href="#download-desktop">Download Desktop</a> · <a href="#from-material-to-deliverable">Explore the workflow</a> · <a href="#personal-and-enterprise-use">Personal and enterprise</a> · <a href="docs/user-guide.en.md">User guide</a> · <a href="README.zh-CN.md">简体中文</a></p>
+<p align="center"><a href="STANDALONE.md"><strong>Install the plugins individually / 插件独立安装说明</strong></a></p>
 
 [![Desktop release](https://img.shields.io/badge/Desktop-3.0.0--alpha.3-176BFF)](https://github.com/techflag/workdsh/releases/tag/desktop-v3.0.0-alpha.3) [![GitHub stars](https://img.shields.io/github/stars/techflag/workdsh?label=stars)](https://github.com/techflag/workdsh) [![MIT License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
