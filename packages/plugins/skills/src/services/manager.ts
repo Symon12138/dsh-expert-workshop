@@ -199,6 +199,12 @@ export class SkillManager extends Service implements SkillManagementService {
     const registeredFiles = new Set<string>();
     for (const skill of skills) {
       const manageable = this.isManagedSummary(skill);
+      if (!manageable) {
+        // A provider may register the same skill without a directory resourceBase
+        // (the agents-home filesystem root is one). Let the active-root scan below
+        // add the writable copy instead of pinning a read-only duplicate.
+        try { if (await this.activeEntry(skill.name)) continue; } catch { /* keep readonly row */ }
+      }
       if (manageable) {
         const definition = await this.ctx.skills.get(skill.name, { signal });
         const path = definition?.path;

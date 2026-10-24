@@ -23,4 +23,7 @@ export const RECOMMENDED_CONNECTORS: readonly RecommendedConnector[] = [
   { name: 'brave-search', description: 'Brave Search 网页搜索（需要 BRAVE_API_KEY）。', category: '搜索', transport: 'stdio', command: 'npx', args: ['-y', '@modelcontextprotocol/server-brave-search'] },
   { name: 'slack', description: 'Slack 工作区：消息、频道、线程（需要 Bot Token）。', category: '协作', transport: 'stdio', command: 'npx', args: ['-y', '@modelcontextprotocol/server-slack'] },
   { name: 'google-maps', description: '地理编码、地点、路线（需要 GOOGLE_MAPS_API_KEY）。', category: '搜索', transport: 'stdio', command: 'npx', args: ['-y', '@modelcontextprotocol/server-google-maps'] },
+  { name: 'everything', description: '覆盖 MCP 全部特性的参考服务器，适合冒烟测试接入。', category: '开发', transport: 'stdio', command: 'npx', args: ['-y', '@modelcontextprotocol/server-everything'] },
+  { name: 'redis', description: 'Redis 数据库操作（需要 REDIS_URL）。', category: '数据', transport: 'stdio', command: 'npx', args: ['-y', '@modelcontextprotocol/server-redis'] },
+  { name: 'puppeteer', description: 'Puppeteer 浏览器自动化：导航、点击、截图（首次运行会下载 Chromium）。', category: '开发', transport: 'stdio', command: 'npx', args: ['-y', '@modelcontextprotocol/server-puppeteer'] },
 ];

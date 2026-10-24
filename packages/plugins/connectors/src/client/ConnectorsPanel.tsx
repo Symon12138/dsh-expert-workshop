@@ -17,6 +17,7 @@ const fromConfig = (row: ConnectorConfigView): Draft => ({ id: row.id, title: ro
 
 export function ConnectorsPanel({ toggleNavigation, management, openCapability, hasCapability }: Props) {
   const [rows, setRows] = useState<readonly ConnectorSummary[]>([]); const [query, setQuery] = useState('');
+  const [mcpCategory, setMcpCategory] = useState('全部');
   const [busy, setBusy] = useState(true); const [error, setError] = useState(''); const [expanded, setExpanded] = useState<string>();
   const [draft, setDraft] = useState<Draft>(); const [removeTarget, setRemoveTarget] = useState<ConnectorSummary>();
   const refresh = useCallback(async () => { setBusy(true); setError(''); try { setRows(await management.list()); } catch (cause) { setError(cause instanceof Error ? cause.message : '读取连接器失败。'); } finally { setBusy(false); } }, [management]);
@@ -32,7 +33,9 @@ export function ConnectorsPanel({ toggleNavigation, management, openCapability, 
   };
   const remove = async () => { if (!removeTarget) return; setBusy(true); setError(''); try { await management.remove(removeTarget.id); setRemoveTarget(undefined); await refresh(); } catch (cause) { setError(cause instanceof Error ? cause.message : '删除连接器失败。'); setBusy(false); } };
   const normalized = query.trim().toLowerCase(); const filtered = rows.filter(row => `${row.title} ${row.description} ${row.serverName} ${row.toolNames.join(' ')}`.toLowerCase().includes(normalized));
-  const recommended = RECOMMENDED_CONNECTORS.filter(entry => !rows.some(row => row.serverName === entry.name) && `${entry.name} ${entry.description} ${entry.category}`.toLowerCase().includes(normalized));
+  const availableRecommended = RECOMMENDED_CONNECTORS.filter(entry => !rows.some(row => row.serverName === entry.name) && `${entry.name} ${entry.description} ${entry.category}`.toLowerCase().includes(normalized));
+  const recommended = availableRecommended.filter(entry => mcpCategory === '全部' || entry.category === mcpCategory);
+  const mcpCategories = ['全部', ...new Set(availableRecommended.map(entry => entry.category))];
   const addRecommended = (entry: RecommendedConnector) => setDraft({ id: undefined, title: entry.name, description: entry.description, serverName: entry.name, transport: entry.transport, command: entry.command, argsText: entry.args.join('\n'), url: '', authorizationToken: '', authorizationConfigured: false });
   const detail = rows.find(row => row.id === expanded);
   const capabilityTabs = [['experts', '专家'], ['skills', '技能'], ['connectors', '连接器']] as const;
@@ -44,11 +47,12 @@ export function ConnectorsPanel({ toggleNavigation, management, openCapability, 
     </header>
     <div className="connector-head"><span className="title-icon"><Icon name="connectors" /></span><div><h1>连接器</h1><p>连接 MCP 服务，把外部工具接入 DSH 会话</p></div>
       <div className="head-actions"><Button className="secondary" onClick={() => void refresh()} disabled={busy}>刷新状态</Button><Button variant="primary" className="primary" onClick={() => setDraft(blank())}>＋ 自定义连接器</Button></div></div>
-    {recommended.length ? <section className="recommend-section" aria-label="推荐连接器"><div className="list-meta"><strong>推荐连接器 <span className="count">{recommended.length}</span></strong><span className="muted">来自 MCP 市场目录，点击 ＋ 添加后保存并连接</span></div>
-      <div className="connector-grid recommend-grid">{recommended.map(entry => <article className="connector-card" key={entry.name}>
+    {availableRecommended.length ? <section className="recommend-section" aria-label="MCP 市场"><div className="list-meta"><strong>MCP 市场 <span className="count">{availableRecommended.length}</span></strong><span className="muted">来自 MCP 市场目录，点击 ＋ 添加后保存并连接</span></div>
+      <nav className="mcp-categories" aria-label="MCP 分类">{mcpCategories.map(label => <button key={label} className={mcpCategory === label ? 'active' : ''} aria-pressed={mcpCategory === label} onClick={() => setMcpCategory(label)}>{label}</button>)}</nav>
+      {recommended.length ? <div className="connector-grid recommend-grid">{recommended.map(entry => <article className="connector-card" key={entry.name}>
         <div className="card-top"><button className="card-open" aria-label={`添加连接器 ${entry.name}`} onClick={() => addRecommended(entry)}><span className="connector-mark" aria-hidden>{entry.name.charAt(0).toUpperCase()}</span><span className="card-title"><strong>{entry.name}</strong><small>{entry.transport} · {entry.category}</small></span></button><Button className="recommend-add" aria-label={`添加 ${entry.name}`} onClick={() => addRecommended(entry)}>＋</Button></div>
         <p className="recommend-desc">{entry.description}</p>
-      </article>)}</div>
+      </article>)}</div> : <p className="muted">该分类暂无连接器。</p>}
     </section> : null}
     <div className="list-meta"><strong>我的连接器 <span className="count">{rows.length}</span></strong><span className="muted">{rows.filter(row => row.enabled && row.state === 'ready').length} 已连接</span></div>
     {error ? <p className="error" role="alert">{error}</p> : null}
