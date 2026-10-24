@@ -21,7 +21,7 @@
 
 ## 下载
 
-发布页：https://github.com/Symon12138/workdsh/releases/tag/standalone-v0.1.0
+发布页：https://github.com/Symon12138/symon-studio/releases/tag/symon-studio-v0.1.0
 
 7 个 `.tgz` 都在该 Release 的 Assets 中，下载后按下面的顺序安装。
 
